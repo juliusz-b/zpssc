@@ -25,7 +25,7 @@ MM_samples = 0;          % Moving mean window size
 SNR = 10;                % Signal-to-noise ratio [dB]
 noise = struct();
 noise.type = 'nep';      % Noise type: 'awgn-snr', 'snr-relative', 'nep', 'true'
-noise.SNR = 10;          % SNR for AWGN noise
+noise.SNR = SNR;          % SNR for AWGN noise
 noise.NEP = 15e-12;      % Noise equivalent power [W/√Hz]
 noise.Fn = 1;            % Noise figure
 
