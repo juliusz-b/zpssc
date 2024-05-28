@@ -3,12 +3,12 @@
 W niniejszym repozytorium znajduje się implementacja symulatora do światłowodowych systemów czujnikowych bazujących na multipleksacji kodowej wraz z elementami optymalizacji reflektancji siatek.
 ## Tematyka projektu
 
-The project aims to develop advanced signal processing methods for enhancing the performance and capacity of code-based optical sensor systems. The main objectives include:
+Główne założenia projektu:
 
-1. Analysis of different codes with good correlation properties
-2. Development of a comprehensive simulator for code-based FBG sensor systems
-3. Optimization of system parameters for maximum performance
-4. Design of specialized electronic components (amplifiers) required for the system
+1. Analiza kodów możliwych do zastosowania w systemach czujnikowych
+2. Opracowanie symulatora do sieci czujnikowych
+3. Optymalizacja doboru siatek Bragga do systemu
+4. Opracowanie elektronicznych układów wykorzystywanych w analizowanych systemach czujnikowych
 
 ## Struktura repozytorium
 
