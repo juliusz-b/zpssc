@@ -38,10 +38,10 @@ for i = 1:U
         code = codes.(code_type)(i, :);
 
         % Calculate auto-correlation
-        ac = xcorr(code, code) / length(code);
+        [ac,lags] = xcorr(code, code);
 
-        % Plot with offset for clarity
-        plot(ac + (j-1)*0.2, 'LineWidth', 1.5);
+        % Plot
+        plot(lags,ac / length(code) , 'LineWidth', 1.5);
     end
 
     title(['User ' num2str(i) ' Auto-correlation']);
@@ -51,6 +51,9 @@ for i = 1:U
     if i == 1
         legend(code_types, 'Location', 'northeast');
     end
+
+    xlim([-2 2])
+    ylim([0 1])
 
     grid on;
     hold off;
@@ -67,8 +70,8 @@ for i = 1:length(code_types)
     code_set = codes.(code_type);
 
     % Create cross-correlation matrix
-    cc_matrix = zeros(U, U);
-    max_cc = zeros(U, U);
+    cc_matrix = ones(U, U);
+    max_cc = ones(U, U);
 
     for u1 = 1:U
         for u2 = 1:U
@@ -88,9 +91,10 @@ for i = 1:length(code_types)
 
     % Plot the cross-correlation matrix
     subplot(2, 3, i);
-    imagesc(cc_matrix);
-    colormap(jet);
+    imagesc(log10(cc_matrix));
+    colormap(gray);
     colorbar;
+    %clim([0 1])
     title([upper(code_type(1)) code_type(2:end) ' Cross-correlation']);
     xlabel('User Index');
     ylabel('User Index');

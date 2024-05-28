@@ -1,70 +1,82 @@
 function [xcov_out] = calcXcov(data_in, data_original, should_ref, xcov_block)
-% CALCXCOV Calculate cross-covariance between signals
-%
-% [xcov_out] = calcXcov(data_in, data_original, should_ref, xcov_block)
-%
-% Inputs:
-%   data_in - Input data signal
-%   data_original - Reference signal
-%   should_ref - (optional) Boolean flag for reference mode
-%   xcov_block - (optional) Parameters for block-based processing
-%
-% Outputs:
-%   xcov_out - Cross-covariance result
 
-% Default parameters
-if nargin < 4
-    xcov_block = {'normal', 1, 1};
-    if nargin < 3
+if nargin<4
+    xcov_block{1} = 'normal';
+    xcov_block{2} = 1;
+    xcov_block{3} = 1;
+    if nargin<3
         should_ref = false;
-        if nargin < 2
+        if nargin<2
            data_original = data_in; 
         end
     end
 end
-
-% Check if we can use the standard mode
-if size(data_in, 1) == size(data_original, 1)
-   should_ref = false; 
+if size(data_in,1)==size(data_original,1)
+   should_ref=false; 
 end
 
-% Get processing mode
+
 xcov_mode = xcov_block{1};
 if ~contains(xcov_mode, {'mean', 'normal'})
-    error('Unsupported mode: use "mean" or "normal"');
+    error('Wybrany tryb nie moze byc obsluzony');
 end
 
-% Determine the size of the output
-M = max(size(data_in, 2), size(data_original, 2));
+xcov_samples = xcov_block{2}*xcov_block{3};
+
+
+MODE = 2;
+if MODE ~= 1
+   warning('Wykorzystywany jest inny tryb MODE niz 1!') 
+end
+
+M = size(data_in, 2);if M<size(data_original, 2);M = size(data_original, 2);end
 xcov_out = zeros(size(data_original, 1), M);
 
-% Check input dimensions
-if (size(data_in) ~= size(data_original))
+if (size(data_in)~=size(data_original))
     if ~should_ref
-        error('Data dimensions mismatch when not in reference mode');
+        error('Rozmiary danych porownywanych i oryginalnych powinny byc takie same!')
     end
 end
 
-% Number of reference signals
 s_ = size(data_original, 1);
 
-% Ensure data_original has sufficient length
-if size(data_original, 2) < size(data_in, 2)
-    data_original_padded = [data_original, zeros(size(data_original, 1), size(data_in, 2) - size(data_original, 2))];
-else
-    data_original_padded = data_original;
-end
-
-% Calculate cross-covariance
-for i = 1:s_
-    if should_ref
-        % Cross-covariance between input and reference signal
-        xcov_temp = xcorr(data_in(1, :), data_original_padded(i, :));
-        xcov_out(i, :) = xcov_temp(floor(length(xcov_temp)/2)+1:end);
-    else
-        % Cross-covariance between corresponding signals
-        xcov_temp = xcorr(data_in(i, :), data_original_padded(i, :));
-        xcov_out(i, :) = xcov_temp(floor(length(xcov_temp)/2)+1:end);
+if MODE~=2
+    if size(data_original,2)<size(data_in,2)
+        data_original = [data_original, zeros(size(data_original,1), size(data_in,2) - size(data_original,2))];
     end
 end
+
+for i=1:s_
+    
+    if i == 5
+       xd = 1; 
+    end
+    
+    if should_ref
+        if MODE==1
+            %aa = xcovBlockCalc(data_in(1,:), data_original(i,:), 500);
+            xcov_out(i,:) = myXcov(data_in(1,:), data_original(i,:));
+            %xcov_out(i,:) = movingMyXcov(data_in(1,:), data_original(i,:));
+        elseif MODE==2
+            xcov_temp = xcorr(data_in(1,:), data_original(i,:));
+            xcov_out(i,:) = xcov_temp(end/2:end);
+        else
+            xcov_temp = conv(data_in(1,:)-mean(data_in(1,:)), flip(data_original(i,:)-mean(data_original(i,:))));
+            xcov_out(i,:) = xcov_temp(end/2:end);
+        end
+    else
+        if MODE==1
+            xcov_out(i,:) = myXcov(data_in(i,:), data_original(i,:));
+            %xcov_out(i,:) = movingMyXcov(data_in(i,:), data_original(i,:));
+        elseif MODE==2
+            xcov_temp = xcorr(data_in(i,:), data_original(i,:));%/length(data_original(i,:))*2;
+            xcov_out(i,:) = xcov_temp(end/2:end);
+        else
+            xcov_temp = conv(data_in(1,:)-mean(data_in(1,:)), flip(data_original(i,:)-mean(data_original(i,:))));
+            xcov_out(i,:) = xcov_temp(end/2:end);
+        end
+    end
 end
+
+end
+

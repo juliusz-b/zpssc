@@ -99,8 +99,8 @@ switch MODE
         [peaks_, peaks_locs] = findpeaks(circshift(x, SHIFT), xx);
         
         % Remove peaks before the first expected location
-        peaks_(peaks_locs < D_s(1)) = [];
-        peaks_locs(peaks_locs < D_s(1)) = [];
+        %peaks_(peaks_locs < D_s(1)) = [];
+        %peaks_locs(peaks_locs < D_s(1)) = [];
         
         % Sort by amplitude
         [peaks_, sort_idx] = sort(peaks_, 'descend');

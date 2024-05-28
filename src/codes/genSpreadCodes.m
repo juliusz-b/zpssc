@@ -33,8 +33,8 @@ switch code_type
         
     case 'walsh'
         % Walsh-Hadamard codes
-        seq = hadamard(2^nextpow2(L*U));
-        
+        mx1 = max(L,U);
+        seq = hadamard(2^nextpow2(mx1));
     case 'kasami'
         % Kasami sequences using the myKasami function
         seq = myKasami(nextpow2(L));
