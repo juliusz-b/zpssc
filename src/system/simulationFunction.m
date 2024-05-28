@@ -1,7 +1,7 @@
-function [outputResults] = simulationFunction(scenariusz, kod, mode, p, Nb, Fsample, laser, K, SNR, fbg, MM_samples, modulation, initial_filter, denoise_m, pd, fiber, noise)
+function [outputResults] = simulationFunction(scenariusz, kod, mode, p, Nb, Fsample, laser, K, fbg, MM_samples, modulation, initial_filter, denoise_m, pd, fiber, noise)
 % SIMULATIONFUNCTION Main simulation function for FBG sensing system
 %
-% [outputResults] = simulationFunction(scenariusz, kod, mode, p, Nb, Fsample, laser, K, SNR, fbg, MM_samples, modulation, initial_filter, denoise_m, pd, fiber, noise)
+% [outputResults] = simulationFunction(scenariusz, kod, mode, p, Nb, Fsample, laser, K, fbg, MM_samples, modulation, initial_filter, denoise_m, pd, fiber, noise)
 %
 % Inputs:
 %   scenariusz - Type of scenario: 'tof', 'kody1', 'kody2', 'kody-nosna', 'tof-nosna'
@@ -12,7 +12,6 @@ function [outputResults] = simulationFunction(scenariusz, kod, mode, p, Nb, Fsam
 %   Fsample - Sampling frequency [Hz]
 %   laser - Laser parameters structure
 %   K - Number of averages
-%   SNR - Signal-to-noise ratio [dB]
 %   fbg - FBG parameters structure
 %   MM_samples - Moving mean window size
 %   modulation - Modulation parameters
@@ -97,7 +96,7 @@ switch scenariusz
     case 'tof'
         % Time of flight measurement
         % Add noise and apply photodetector response
-        dane_w_kanale = noiseAndMeanDataInChannel(dane_z_siatkami, SNR, K, laser, noise, pd).^power;
+        dane_w_kanale = noiseAndMeanDataInChannel(dane_z_siatkami, K, laser, noise, pd).^power;
         dane_w_kanale = lowpass(dane_w_kanale, pd.BW, Fsample);
         dane_w_kanale = dane_w_kanale * pd.A * pd.gain;
         
@@ -114,7 +113,7 @@ switch scenariusz
         dane_w_kanale = dane_z_siatkami * pd.A;
         
         % Add noise and apply electrical filtering
-        dane_w_kanale = noiseAndMeanDataInChannel(dane_w_kanale, SNR, K, laser, noise, pd).^power;
+        dane_w_kanale = noiseAndMeanDataInChannel(dane_w_kanale, K, laser, noise, pd).^power;
         
         % Apply bandwidth limitation
         for i = 1:size(dane_w_kanale, 1)
@@ -140,7 +139,7 @@ switch scenariusz
         dane_w_kanale = dane_w_kanale * pd.A;
         
         % Add noise
-        dane_w_kanale = noiseAndMeanDataInChannel(dane_w_kanale, SNR, K).^power;
+        dane_w_kanale = noiseAndMeanDataInChannel(dane_w_kanale, K, laser, noise, pd).^power;
         
         % Apply bandwidth limitation
         for i = 1:size(dane_w_kanale, 1)
@@ -160,7 +159,7 @@ switch scenariusz
     case 'kody-nosna'
         % Code division with carrier modulation
         % Add noise to summed signals
-        dane_w_kanale = noiseAndMeanDataInChannel(sum(dane_z_siatkami, 1), SNR, K).^power;
+        dane_w_kanale = noiseAndMeanDataInChannel(sum(dane_z_siatkami, 1), K).^power;
         dane_w_kanale = lowpass(dane_w_kanale, pd.BW, Fsample);
         dane_w_kanale = dane_w_kanale * pd.A * pd.gain;
         
@@ -177,7 +176,7 @@ switch scenariusz
     case 'tof-nosna'
         % Time of flight with carrier modulation
         % Add noise to summed signals
-        dane_w_kanale = noiseAndMeanDataInChannel(sum(dane_z_siatkami, 1), SNR, K).^power;
+        dane_w_kanale = noiseAndMeanDataInChannel(sum(dane_z_siatkami, 1), K).^power;
         dane_w_kanale = lowpass(dane_w_kanale, pd.BW, Fsample);
         dane_w_kanale = dane_w_kanale * pd.A * pd.gain;
         
@@ -228,7 +227,7 @@ outputResults.R_simulated = R_simulated;
 outputResults.simulation_range = simulation_range;
 
 % Display results if not suppressed
-plotGratingsSnr(lambdas, R_s, SNR, fbg);
+plotGratingsSnr(lambdas, R_s, 10, fbg);
 plotGratingReflectanceSurf(lambdas, R_simulated, R_received, length_domain, ...
                           dane_po_przetworzeniu_without_envelope, dane_w_kanale, ...
                           dane_upsamplowane, fbg.N_s, D_s, R_simulated, ...

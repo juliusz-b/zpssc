@@ -6,7 +6,8 @@ function plotGratingReflectanceSurf(lambdas, R_original, R_received, length_doma
 
 Z = zeros(size(dane_po_przetworzeniu,1),length(length_domain));
 for i=1:size(dane_po_przetworzeniu,1)
-    xcv = varFilter(dane_po_przetworzeniu(i,:),size(dane_referencyjne,2),mean(diff(D_s)),true,true,false);
+    %xcv = varFilter(dane_po_przetworzeniu(i,:),size(dane_referencyjne,2),mean(diff(D_s)),true,true,false);
+    xcv = dane_po_przetworzeniu(i,:);
     xcv_filter = ones(size(xcv));
     xcv_filter(1:D_s(1)-1) = 0;
     xcv = xcv .* xcv_filter;

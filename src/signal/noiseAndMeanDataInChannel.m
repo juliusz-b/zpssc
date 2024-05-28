@@ -1,4 +1,4 @@
-function [data_out] = noiseAndMeanDataInChannel(data_in, SNR, K, laser, noise, pd)
+function [data_out] = noiseAndMeanDataInChannel(data_in, K, laser, noise, pd)
 % NOISEANDMEANDATAINCHANNEL Add noise and average multiple measurements
 %
 % [data_out] = noiseAndMeanDataInChannel(data_in, SNR, K, laser, noise, pd)
@@ -19,7 +19,7 @@ data_out = zeros(size(data_in));
 
 % Add noise and accumulate for K iterations
 for i = 1:K
-    data_out = data_out + addNoise(data_in, SNR, laser, noise, pd);
+    data_out = data_out + addNoise(data_in, laser, noise, pd);
 end
 
 % Average the accumulated data

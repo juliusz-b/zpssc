@@ -12,7 +12,7 @@ AddAllSubfolders();
 
 %% Configure Simulation Parameters
 % System parameters
-scenariusz = 'kody1';    % Measurement scenario: 'tof', 'kody1', 'kody2', 'kody-nosna', 'tof-nosna'
+scenariusz = 'kody2';    % Measurement scenario: 'tof', 'kody1', 'kody2', 'kody-nosna', 'tof-nosna'
 kod = 'kasami';          % Code type: 'gold', 'walsh', 'kasami', 'prbs', 'randi'
 mode = 'unipolar';       % Signal mode: 'unipolar' or 'bipolar'
 p = 8;                   % Code length power (2^p-1)
@@ -22,10 +22,9 @@ K = 3;                   % Number of averages
 MM_samples = 0;          % Moving mean window size
 
 % SNR and noise parameters
-SNR = 10;                % Signal-to-noise ratio [dB]
 noise = struct();
 noise.type = 'nep';      % Noise type: 'awgn-snr', 'snr-relative', 'nep', 'true'
-noise.SNR = SNR;          % SNR for AWGN noise
+noise.SNR = 10;          % SNR for AWGN noise
 noise.NEP = 15e-12;      % Noise equivalent power [W/√Hz]
 noise.Fn = 1;            % Noise figure
 
@@ -79,12 +78,12 @@ denoise_m.framelen = 11;           % Frame length for Savitzky-Golay filter
 denoise_m.iterations = 100;        % Number of iterations for TVD
 
 %% Run Basic Simulation
-fprintf('Running simulation with %d FBGs, %s coding, SNR=%d dB\n', ...
-    fbg.N_s, kod, SNR);
+fprintf('Running simulation with %d FBGs, %s coding\n', ...
+    fbg.N_s, kod);
 
 % Run system simulation
 results = simulationFunction(scenariusz, kod, mode, p, Nb, Fsample, laser, ...
-    K, SNR, fbg, MM_samples, modulation, initial_filter, denoise_m, pd, fiber, noise);
+    K, fbg, MM_samples, modulation, initial_filter, denoise_m, pd, fiber, noise);
 
 %% Analyze Results
 % Extract Bragg wavelengths

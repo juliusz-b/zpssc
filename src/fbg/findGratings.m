@@ -28,14 +28,15 @@ max_peaks = -Inf;
 % Process each wavelength
 for i = 1:size(xcv, 1)
     % Process correlation data for current wavelength
-    xcv_filtered = varFilter(xcv(i,:), size(reference_data, 2), mean(diff(D_s))*1.5, true, true, true);
+    %xcv_filtered = varFilter(xcv(i,:), size(reference_data, 2), mean(diff(D_s))*1.5, true, true, true);
+    xcv_filtered = xcv(i,:);
     
     % Non-zero indices that are within the expected grating locations
     NZIX = xcv_filtered ~= 0;
     xcv_filtered(NZIX) = xcv_filtered(NZIX) ./ xcv_filtered(NZIX) .* xcv(i, NZIX);
     
     % Find peaks in the filtered data
-    [peaks_locs, peaks_, ~] = findPeak(xcv_filtered, N_of_gratings, D_s);
+    [peaks_locs, peaks_, ~] = findPeak(xcv_filtered, N_of_gratings);
     
     % Calculate reference peak value
     if sum(reference_data) == length(reference_data)
