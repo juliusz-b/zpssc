@@ -11,7 +11,7 @@ clc;
 AddAllSubfolders;
 
 %% Parameters
-p = 8;          % Power of 2 for code length
+p = 4;          % Power of 2 for code length
 L = 2^p-1;      % Code length
 Nb = 4;         % Samples per bit
 U = 8;          % Number of users/codes
@@ -23,6 +23,8 @@ codes.kasami = genSpreadCodes(L, U, 'kasami');
 codes.prbs = genSpreadCodes(L, U, 'prbs');
 codes.walsh = genSpreadCodes(L, U, 'walsh');
 codes.randi = genSpreadCodes(L, U, 'randi');
+%codes.ooc = genSpreadCodes(L, U, 'ooc',[4,1]);
+codes.ooc = genSpreadCodes(L, U, 'sidelnikov',[p,1]);
 
 %% Compare auto-correlation properties
 figure('Name', 'Auto-correlation Comparison', 'Position', [100, 100, 1000, 600]);
@@ -41,7 +43,7 @@ for i = 1:U
         [ac,lags] = xcorr(code, code);
 
         % Plot
-        plot(lags,ac / length(code) , 'LineWidth', 1.5);
+        plot(lags,ac / max(ac) , 'LineWidth', 1.5);
     end
 
     title(['User ' num2str(i) ' Auto-correlation']);
@@ -91,10 +93,12 @@ for i = 1:length(code_types)
 
     % Plot the cross-correlation matrix
     subplot(2, 3, i);
-    imagesc(log10(cc_matrix));
+    %imagesc(log10(cc_matrix));
+    imagesc((cc_matrix));
     colormap(gray);
     colorbar;
-    %clim([0 1])
+    clim([0 1])
+    
     title([upper(code_type(1)) code_type(2:end) ' Cross-correlation']);
     xlabel('User Index');
     ylabel('User Index');

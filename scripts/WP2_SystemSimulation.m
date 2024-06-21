@@ -47,7 +47,7 @@ pd.Idark = 0.05e-12;     % Dark current [A]
 
 % Fiber parameters
 fiber = struct();
-fiber.alpha = 10^(0.1/1000/10); % Fiber attenuation [linear]
+fiber.alpha =  ; % Fiber attenuation [linear]
 
 % FBG parameters
 fbg = struct();

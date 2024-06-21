@@ -1,4 +1,4 @@
-function [codes_out] = genSpreadCodes(L, U, code_type)
+function [codes_out] = genSpreadCodes(L, U, code_type,extra_params)
 % GENSPREADCODES Generate spreading codes of various types
 %
 % [codes_out] = genSpreadCodes(L, U, code_type)
@@ -57,6 +57,12 @@ switch code_type
     case 'randi'
         % Random binary sequences
         seq = randi([0 1], [L U])';
+
+    case 'ooc'
+        seq = ooc(L,extra_params(1),extra_params(2));
+
+    case 'sidelnikov'
+        [seq, ~] = mySidelnikov(extra_params(1),extra_params(2), U, L);
         
     otherwise
         error('Unknown code type. Supported types: gold, walsh, kasami, prbs, randi');
