@@ -62,7 +62,13 @@ switch code_type
         seq = ooc(L,extra_params(1),extra_params(2));
 
     case 'sidelnikov'
-        [seq, ~] = mySidelnikov(extra_params(1),extra_params(2), U, L);
+        [seq] = mySidelnikov(L,extra_params(1),U);
+
+    case 'golay'
+        [seq] = myGolay(2.^nextpow2(L));
+
+    case 'chaotic'
+        [seq] = myChaotic(2.^nextpow2(L));
         
     otherwise
         error('Unknown code type. Supported types: gold, walsh, kasami, prbs, randi');
@@ -77,6 +83,14 @@ for i = 1:U
         else
             % If not enough codes, wrap around
             codes_out(i,:) = seq(mod(i+6-1, size(seq, 1))+1, 1:L);
+        end
+    elseif strcmp(code_type, 'sidelnikov')
+        % For other code types, use sequential codes
+        if i <= size(seq, 1)
+            codes_out(i,:) = seq(i, 1:L-1);
+        else
+            % If not enough codes, wrap around
+            codes_out(i,:) = seq(mod(i-1, size(seq, 1))+1, 1:L-1);
         end
     else
         % For other code types, use sequential codes

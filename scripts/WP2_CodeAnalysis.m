@@ -11,7 +11,7 @@ clc;
 AddAllSubfolders;
 
 %% Parameters
-p = 4;          % Power of 2 for code length
+p = 8;          % Power of 2 for code length
 L = 2^p-1;      % Code length
 Nb = 4;         % Samples per bit
 U = 8;          % Number of users/codes
@@ -23,8 +23,10 @@ codes.kasami = genSpreadCodes(L, U, 'kasami');
 codes.prbs = genSpreadCodes(L, U, 'prbs');
 codes.walsh = genSpreadCodes(L, U, 'walsh');
 codes.randi = genSpreadCodes(L, U, 'randi');
-%codes.ooc = genSpreadCodes(L, U, 'ooc',[4,1]);
-codes.ooc = genSpreadCodes(L, U, 'sidelnikov',[p,1]);
+codes.ooc = genSpreadCodes(13, 2, 'ooc',[4,2]);
+codes.sidelnikov = genSpreadCodes(257, U, 'sidelnikov',[2]);
+codes.golay = genSpreadCodes(L, U, 'golay');
+codes.chaotic = genSpreadCodes(L, U, 'chaotic');
 
 %% Compare auto-correlation properties
 figure('Name', 'Auto-correlation Comparison', 'Position', [100, 100, 1000, 600]);
