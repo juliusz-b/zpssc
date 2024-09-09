@@ -23,7 +23,7 @@ codes.kasami = genSpreadCodes(L, U, 'kasami');
 codes.prbs = genSpreadCodes(L, U, 'prbs');
 codes.walsh = genSpreadCodes(L, U, 'walsh');
 codes.randi = genSpreadCodes(L, U, 'randi');
-codes.ooc = genSpreadCodes(13, 2, 'ooc',[4,2]);
+codes.ooc = genSpreadCodes(13, U, 'ooc',[4,2]);
 codes.sidelnikov = genSpreadCodes(257, U, 'sidelnikov',[2]);
 codes.golay = genSpreadCodes(L, U, 'golay');
 codes.chaotic = genSpreadCodes(L, U, 'chaotic');
@@ -31,8 +31,8 @@ codes.chaotic = genSpreadCodes(L, U, 'chaotic');
 %% Compare auto-correlation properties
 figure('Name', 'Auto-correlation Comparison', 'Position', [100, 100, 1000, 600]);
 
-for i = 1:U
-    subplot(2, 4, i);
+for i = 1:2
+    subplot(1,2, i);
 
     % Calculate and plot auto-correlation for each code type
     hold on;
@@ -94,7 +94,7 @@ for i = 1:length(code_types)
     cc_metrics.(code_type).std = std(max_cc(:));
 
     % Plot the cross-correlation matrix
-    subplot(2, 3, i);
+    subplot(3, 3, i);
     %imagesc(log10(cc_matrix));
     imagesc((cc_matrix));
     colormap(gray);
@@ -106,8 +106,8 @@ for i = 1:length(code_types)
     ylabel('User Index');
     axis square;
 
-    % Add text to display metrics
-    % text(0.5, -0.1, ['Max: ' num2str(cc_metrics.(code_type).max, '%.4f')], ...
-    %     'Units', 'normalized', 'HorizontalAlignment', 'center');
+    %Add text to display metrics
+    %text(0.5, -0.1, ['Max: ' num2str(cc_metrics.(code_type).max, '%.4f')], ...
+    %    'Units', 'normalized', 'HorizontalAlignment', 'center');
     % text(0.5, -0
 end

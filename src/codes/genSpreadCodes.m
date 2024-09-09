@@ -68,7 +68,13 @@ switch code_type
         [seq] = myGolay(2.^nextpow2(L));
 
     case 'chaotic'
-        [seq] = myChaotic(2.^nextpow2(L));
+        % Distribute the PRBS sequence among users
+        seq = zeros(U, L);
+        for i = 1:U
+            [tmp] = myChaotic('logistic', L, 3.99, [], 200);
+            seq(i,:) = tmp(1:L);
+        end
+        
         
     otherwise
         error('Unknown code type. Supported types: gold, walsh, kasami, prbs, randi');
