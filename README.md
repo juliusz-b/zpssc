@@ -1,6 +1,8 @@
 # Zaawansowane techniki przetwarzania sygnałów w światłowodowych sieciach czujnikowych (ZPSSC)
  
 W niniejszym repozytorium znajduje się implementacja symulatora do światłowodowych systemów czujnikowych bazujących na multipleksacji kodowej wraz z elementami optymalizacji reflektancji siatek.
+
+Repozytorium jest ciągle aktualizowane. Część funkcji jest testowa i w obecnej formie nie posiada szczegółowych opisów lub konwencja składniowa jest przemieszana.
 ## Tematyka projektu
 
 Główne założenia projektu:
@@ -12,11 +14,16 @@ Główne założenia projektu:
 
 ## Struktura repozytorium
 
-TODO
 
 - `src/`: Kody źródłowe
-  - `core/`: Główne funkcje
+  - `codes/`: Funkcje do generowania sekwencji kodowych
+  - `fbg/`: Funkcje związane z symulacją siatek Bragga
+  - `opt_source/`: Funkcje związane z symulacją lasera VCSEL
+  - `plots/`: Funkcje do wyświetlania wyników
+  - `signals/`: Funkcje związane z przetwarzaniem sygnałów
+  - `system/`: Funkcje dotyczące symulacji systemu czujnikowego
 - `scripts/`: Skrypty w MATLAB
+- `tests/`: Testowe funkcje i/lub skrypty
 
 ## Jak uruchomić kody
 
@@ -41,10 +48,10 @@ run('scripts/WP2_CodeAnalysis.m');
 Projekt podzielono na następujące etapy:
 
 ### WP1: Analiza i przegląd literatury
-TODO
+Przeanalizowano kody Kasamiego, PRBS, Randi, Golda, OOC, Sidelnikova, pary Golaya, sekwencje chaotyczne. Filtracja dolnoprzepustowa powoduje zmianę PSNR. Konieczne jest więc korzystanie z wolniejszych kodów przy detektorze o stosunkowo małym paśmie. 
 
 ### WP2: Stworzenie symulatora systemu czujnikowego wraz z makietą pomiarową
-TODO
+Utworzono prosty symulator. Trwają prace nad modyfikacją skryptów i aktualizacją funkcjonalności.
 
 ### WP3: Optymalizacja projektowania systemów czujnikowych
 TODO
