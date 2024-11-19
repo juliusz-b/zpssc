@@ -12,7 +12,7 @@ AddAllSubfolders();
 
 %% Configure Simulation Parameters
 % System parameters
-scenariusz = 'kody2';    % Measurement scenario: 'tof', 'kody1', 'kody2', 'kody-nosna', 'tof-nosna'
+scenariusz = 'kody1';    % Measurement scenario: 'tof', 'kody1', 'kody2', 'kody-nosna', 'tof-nosna'
 kod = 'kasami';          % Code type: 'gold', 'walsh', 'kasami', 'prbs', 'randi'
 mode = 'unipolar';       % Signal mode: 'unipolar' or 'bipolar'
 p = 8;                   % Code length power (2^p-1)
