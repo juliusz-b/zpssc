@@ -20,6 +20,20 @@ Główne założenia projektu:
 3. Optymalizacja doboru siatek Bragga do systemu
 4. Opracowanie elektronicznych układów wykorzystywanych w analizowanych systemach czujnikowych
 
+### Schemat koncepcyjny systemu:
+
+```
+                  ┌─────────────────┐
+                  │                 │
+┌───────────┐     │   Światłowód    │    ┌───────────┐    ┌───────────────┐
+│ Generator │     │  z czujnikami   │    │ Fotodetek-│    │ Zaawansowane  │
+│  kodów    ├────►│   (FBG1...n)    ├───►│    tor    ├───►│ przetwarzanie │
+│ optycznych│     │                 │    │           │    │   sygnałów    │
+└───────────┘     │                 │    └───────────┘    └───────────────┘
+                  └─────────────────┘
+```
+
+
 ## 📁 Struktura repozytorium
 
 ```
@@ -59,23 +73,64 @@ Projekt podzielono na następujące etapy:
 
 ### WP1: Analiza i przegląd literatury ✅
 
-Przeanalizowano kody Kasamiego, PRBS, Randi, Golda, OOC, Sidelnikova, pary Golaya, sekwencje chaotyczne. Filtracja dolnoprzepustowa powoduje zmianę PSNR. Konieczne jest więc korzystanie z wolniejszych kodów przy detektorze o stosunkowo małym paśmie.
+#### Zakończone działania:
+- Przeprowadzono dogłębną analizę rodzin kodowych: Kasamiego, PRBS, Randi, Golda, OOC, Sidelnikova, pary Golaya i sekwencji chaotycznych
+- Stworzono zestaw skryptów do testowania różnych scenariuszy symulacyjnych
+- Określono wstępne parametry pracy systemu kodowego (minimalne pasmo odbiornika: 20 MHz)
+- Wstępne analizy wykazały lepszą detekowalność sekwencji Kasamiego w porównaniu do pozostałych sekwencji
+
+#### Wnioski:
+- Filtracja dolnoprzepustowa powoduje zmianę PSNR
+- Konieczne jest korzystanie z wolniejszych kodów przy detektorze o stosunkowo małym paśmie
+- Parametry pasma odbiornika są ściśle zależne od: odległości między czujnikami, wymaganej szybkości ściągania danych i długości stosowanych kodów
+
 
 ### WP2: Stworzenie symulatora systemu czujnikowego wraz z makietą pomiarową 🔄
 
-Utworzono prosty symulator. Trwają prace nad modyfikacją skryptów i aktualizacją funkcjonalności.
+#### W trakcie realizacji:
+- Utworzono podstawowy symulator systemu czujnikowego
+- Zaimplementowano model sieci z możliwością definiowania punktów pomiarowych
+- Przygotowano środowisko do analizy metod detekcji czujników z wykorzystaniem korelacji
+- Trwają prace nad implementacją metod redukcji szumów i poprawy SNR
 
+#### Planowane działania:
+- Wykonanie stanowiska laboratoryjnego do pomiaru sieci czujnikowych z możliwością zmiany temperatury wybranego czujnika światłowodowego
+- Implementacja zaawansowanych metod detekcji, w tym SIC
+- Analiza metod redukcji szumów, takich jak: TVD (Total Variation Denoising), adaptacyjne filtrowanie, filtracja pasmowo-przepustowa i filtr Savitzkiego-Golaya
 ### WP3: Optymalizacja projektowania systemów czujnikowych 📝
 
-*TODO*
+#### Planowane działania:
+- Określenie kluczowych parametrów systemu podlegających optymalizacji
+- Wybór kryteriów optymalizacyjnych i funkcji celu
+- Analiza i wybór algorytmów optymalizacyjnych
+- Przeprowadzenie symulacji porównawczych "przed" i "po" optymalizacji
+- Stworzenie dedykowanego modelu optymalizacyjnego dla systemów z multipleksacją kodową
 
 ### WP4: Wykonanie testów laboratoryjnych 📝
 
-*TODO*
+#### Planowane działania:
+- Zaprojektowanie układu wzmacniacza do fotodetektora o wysokim wzmocnieniu i niskich szumach własnych
+- Przygotowanie stanowiska pomiarowego
+- Wykonanie i walidacja modelu optymalizacyjnego
+- Testy praktyczne z wykorzystaniem siatek Bragga o zoptymalizowanych parametrach
 
 ## 📜 License
 
 Sprawdź plik LICENSE.
+
+
+## 🤝 Współpraca i kontakt
+
+Jesteśmy otwarci na współpracę z jednostkami naukowymi i podmiotami przemysłowymi zainteresowanymi zastosowaniem światłowodowych sieci czujnikowych.
+
+Jeśli jesteś zainteresowany/-a:
+- implementacją systemu czujnikowego w swojej aplikacji
+- współpracą badawczą w dziedzinie fotoniki i systemów czujnikowych
+- wymianą doświadczeń w zakresie przetwarzania sygnałów
+
+Skontaktuj się z nami poprzez:
+- Email: [juliusz.bojarczuk@pw.edu.pl](mailto:juliusz.bojarczuk@pw.edu.pl)
+- GitHub: Otwórz Issue lub Pull Request w tym repozytorium
 
 ## 🙏 Acknowledgments
 
@@ -118,3 +173,4 @@ Projekt finansowany z programu "Perły Nauki" Ministra Nauki i Szkolnictwa Wyżs
 [17] A. Barrias, J. Casas, and S. Villalba, "A Review of Distributed Optical Fiber Sensors for Civil Engineering Applications," *Sensors*, vol. 16, p. 748, 2016.
 
 [18] D. A. Krohn, T. W. MacDougall, and A. Mendez, *Fiber Optic Sensors: Fundamentals and Applications*. Society of Photo-Optical Instrumentation Engineers (SPIE), 2014.
+
