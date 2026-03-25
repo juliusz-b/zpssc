@@ -105,9 +105,9 @@ for v = 1:length(all_results)
     figure('Position', [50 50+200*(v-1) 1400 600], 'theme', 'light', ...
         'Name', sprintf('Zad.5: %s - przed/po', r.label));
 
-    % Subplot 1: Korelacja krzyżowa
+    % Subplot 1: Korelacja krzyzowa - lambda_12 (najsilniejszy kanal)
     subplot(2,3,[1 2]);
-    ch = 1;
+    ch = min(12, size(out_def.dane_bez_obwiedni, 1));
     len_def = out_def.length_domain;
     len_opt = out_opt.length_domain;
     D_s_def = out_def.D_s;
@@ -122,7 +122,7 @@ for v = 1:length(all_results)
     end
     xlim([D_min-30, D_max+30]);
     xlabel('Pozycja [m]'); ylabel('Amplituda');
-    title(sprintf('Korelacja krzyżowa \\lambda_1 - %s', r.label));
+    title(sprintf('Korelacja krzyzowa \\lambda_{%d} - %s', ch, r.label));
     legend(sprintf('Default (MAE=%.0f pm)', out_def.MAE), ...
            sprintf('%s opt (MAE=%.0f pm)', best_name, out_opt.MAE), 'Location', 'best');
     grid on; set(gca, 'FontSize', 11);
