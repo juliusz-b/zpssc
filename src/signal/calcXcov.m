@@ -18,7 +18,7 @@ end
 
 xcov_mode = xcov_block{1};
 if ~contains(xcov_mode, {'mean', 'normal'})
-    error('Wybrany tryb nie moze byc obsluzony');
+    error('Unsupported mode');
 end
 
 xcov_samples = xcov_block{2}*xcov_block{3};
@@ -26,7 +26,7 @@ xcov_samples = xcov_block{2}*xcov_block{3};
 
 MODE = 2;
 if MODE ~= 1
-   warning('Wykorzystywany jest inny tryb MODE niz 1!') 
+   warning('Using MODE other than 1!')
 end
 
 M = size(data_in, 2);if M<size(data_original, 2);M = size(data_original, 2);end
@@ -34,7 +34,7 @@ xcov_out = zeros(size(data_original, 1), M);
 
 if (size(data_in)~=size(data_original))
     if ~should_ref
-        error('Rozmiary danych porownywanych i oryginalnych powinny byc takie same!')
+        error('Input and reference data dimensions must match')
     end
 end
 
@@ -47,11 +47,6 @@ if MODE~=2
 end
 
 for i=1:s_
-    
-    if i == 5
-       xd = 1; 
-    end
-    
     if should_ref
         if MODE==1
             %aa = xcovBlockCalc(data_in(1,:), data_original(i,:), 500);

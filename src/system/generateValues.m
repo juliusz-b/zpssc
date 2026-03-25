@@ -1,7 +1,7 @@
-function [D_s, L_max, time_domain, length_domain] = generateValues(N, Fsample, Nb, D_s, U, N_s, should_add_extra_zeros)
+function [D_s, L_max, time_domain, length_domain] = generateValues(N, Fsample, Nb, D_s, U, N_s, should_add_extra_zeros, max_bounces)
 % GENERATEVALUES Generate parameter values for simulation
 %
-% [D_s, L_max, time_domain, length_domain] = generateValues(N, Fsample, Nb, D_s, U, N_s, should_add_extra_zeros)
+% [D_s, L_max, time_domain, length_domain] = generateValues(N, Fsample, Nb, D_s, U, N_s, should_add_extra_zeros, max_bounces)
 %
 % Inputs:
 %   N - Code length
@@ -11,6 +11,7 @@ function [D_s, L_max, time_domain, length_domain] = generateValues(N, Fsample, N
 %   U - Number of wavelength channels
 %   N_s - Number of gratings
 %   should_add_extra_zeros - (optional) Flag to add extra zeros padding
+%   max_bounces - (optional) Max reflections for ghost calculation (default 1)
 %
 % Outputs:
 %   D_s - FBG positions in samples
@@ -18,9 +19,12 @@ function [D_s, L_max, time_domain, length_domain] = generateValues(N, Fsample, N
 %   time_domain - Time domain array [s]
 %   length_domain - Length domain array [m]
 
-% Set default for extra zeros
+% Set defaults
+if nargin < 8
+    max_bounces = 1;
+end
 if nargin < 7
-   should_add_extra_zeros = false; 
+   should_add_extra_zeros = false;
 end
 
 % Double sample count if extra zeros requested
@@ -40,15 +44,25 @@ V = 3e8 / neff; % Light velocity in fiber
 % Calculate measurement frequency
 f_measure = Fsample / N / Nb / 32;
 
-% Display key parameters
-disp(['Minimum code length required: ' sprintf('%i', ceil(4 * (max([N_s .* D_s])) * (Fsample / Nb) / V)) ' samples']);
-disp(['No signal overlap when gratings separated by at least ' num2str(ceil(Nb * N / Fsample * V / 2)) ' m']);
+% Display key parameters (suppress during optimization via evalin check)
+if ~evalin('base', 'exist(''SILENT_MODE'',''var'') && SILENT_MODE')
+    disp(['Minimum code length required: ' sprintf('%i', ceil(4 * (max([N_s .* D_s])) * (Fsample / Nb) / V)) ' samples']);
+    disp(['No signal overlap when gratings separated by at least ' num2str(ceil(Nb * N / Fsample * V / 2)) ' m']);
+end
 
 % Convert physical distances to sample counts
 D_s = ceil(2 * D_s / V * Fsample);
 
 % Determine maximum signal length needed
-L_max = Nb * N + ceil(max(D_s(1:N_s)));
+% For multi-bounce: farthest ghost position = max(D(j) - D(k) + D(m))
+% = 2*max(D) - min(D) for 3-bounce with equally spaced gratings
+if max_bounces >= 3
+    max_ghost_dist = 2 * max(D_s(1:N_s)) - min(D_s(1:N_s));
+    L_max = Nb * N + ceil(max_ghost_dist);
+    disp(['Max ghost position (3-bounce): ' sprintf('%.1f m', max_ghost_dist / (2 * Fsample / V))]);
+else
+    L_max = Nb * N + ceil(max(D_s(1:N_s)));
+end
 
 % Ensure even length for better FFT performance
 if mod(L_max, 2) == 1
@@ -60,7 +74,9 @@ time_domain = (0:L_max-1) / Fsample;
 length_domain = (0:L_max-1) ./ (2 / V * Fsample);
 
 % Display system resolution information
-disp(['Spatial resolution: ' sprintf('%.2f m', V / Fsample / 2)]);
-disp(['Sampling frequency: ' sprintf('%.2f MHz', Fsample * 1e-6)]);
-disp(['Measurement frequency: ' sprintf('%.2f kHz', f_measure * 1e-3)]);
+if ~evalin('base', 'exist(''SILENT_MODE'',''var'') && SILENT_MODE')
+    disp(['Spatial resolution: ' sprintf('%.2f m', V / Fsample / 2)]);
+    disp(['Sampling frequency: ' sprintf('%.2f MHz', Fsample * 1e-6)]);
+    disp(['Measurement frequency: ' sprintf('%.2f kHz', f_measure * 1e-3)]);
+end
 end

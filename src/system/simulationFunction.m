@@ -49,7 +49,12 @@ switch scenariusz
 end
 
 % Generate distance values and domains
-[D_s, L_max, time_domain, length_domain] = generateValues(L, Fsample, Nb, fbg.D, U, fbg.N_s, false);
+if isfield(fbg, 'max_bounces')
+    mb = fbg.max_bounces;
+else
+    mb = 1;
+end
+[D_s, L_max, time_domain, length_domain] = generateValues(L, Fsample, Nb, fbg.D, U, fbg.N_s, false, mb);
 
 % Select mode function (unipolar/bipolar) and power parameter
 [BipUni, power] = selectMode(mode);
@@ -226,11 +231,13 @@ outputResults.D_s = D_s;
 outputResults.R_simulated = R_simulated;
 outputResults.simulation_range = simulation_range;
 
-% Display results if not suppressed
-plotGratingsSnr(lambdas, R_s, 10, fbg);
-plotGratingReflectanceSurf(lambdas, R_simulated, R_received, length_domain, ...
-                          dane_po_przetworzeniu_without_envelope, dane_w_kanale, ...
-                          dane_upsamplowane, fbg.N_s, D_s, R_simulated, ...
-                          simulation_range, new_lmb, R_filtered);
-plotXcovs(dane_po_przetworzeniu_without_envelope, length_domain);
+% Display results only if not suppressed via fbg.silent flag
+if ~isfield(fbg, 'silent') || ~fbg.silent
+    plotGratingsSnr(lambdas, R_s, 10, fbg);
+    plotGratingReflectanceSurf(lambdas, R_simulated, R_received, length_domain, ...
+                              dane_po_przetworzeniu_without_envelope, dane_w_kanale, ...
+                              dane_upsamplowane, fbg.N_s, D_s, R_simulated, ...
+                              simulation_range, new_lmb, R_filtered);
+    plotXcovs(dane_po_przetworzeniu_without_envelope, length_domain);
+end
 end

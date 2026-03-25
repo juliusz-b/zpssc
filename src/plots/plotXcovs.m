@@ -22,7 +22,7 @@ for i = 1:size(data_xcovs, 1)
 end
 
 % Create figure with specified size
-figure('Renderer', 'painters', 'Position', [100 100 900 600]);
+figure('Renderer', 'painters', 'Position', [100 100 900 600], 'theme', 'light');
 
 % Plot each cross-covariance
 for i = 1:size(data_xcovs, 1)

@@ -77,7 +77,7 @@ end
 SN = real(10 * log10(SN));
 
 % Create figure
-figure('Renderer', 'painters', 'Position', [100 100 900 600]);
+figure('Renderer', 'painters', 'Position', [100 100 900 600], 'theme', 'light');
 surf(1:N_s, lambdas*1e9, SN, 'edgecolor', 'none');
 alpha(0.7);
 

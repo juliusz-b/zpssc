@@ -25,8 +25,11 @@ L = grating_length / sections;
 % Initialize transfer matrix
 T = repmat(eye(2), 1, length(lambdas));
 
-% Generate apodization profile (Gaussian)
-apod = gaussmf(1:sections, [sections/3 sections/2]);
+% Generate apodization profile (Gaussian) - without Fuzzy Logic Toolbox
+x = 1:sections;
+sigma_apod = sections / 3;
+mu_apod = sections / 2;
+apod = exp(-((x - mu_apod).^2) / (2 * sigma_apod^2));
 
 % Calculate transfer matrix for each section
 for i = 1:sections

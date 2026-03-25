@@ -1,16 +1,25 @@
+<p align="center">
+  <img src="docs/perly_nauki_logo.png" alt="Perły Nauki - Ministerstwo Nauki i Szkolnictwa Wyższego" width="300">
+</p>
+
+<p align="center">
+  <strong>Projekt finansowany w ramach programu Perły Nauki MEiN</strong><br>
+  Umowa nr PN/01/0321/2022
+</p>
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15089768.svg)](https://doi.org/10.5281/zenodo.15089768)
-[![MATLAB](https://img.shields.io/badge/MATLAB-R2022b%2B-blue.svg)](https://www.mathworks.com/products/matlab.html)
+[![MATLAB](https://img.shields.io/badge/MATLAB-R2025b%2B-blue.svg)](https://www.mathworks.com/products/matlab.html)
 ![GitHub License](https://img.shields.io/github/license/juliusz-b/zpssc)
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=juliusz-b/zpssc)
 
 
-# 🔬 Zaawansowane techniki przetwarzania sygnałów w światłowodowych sieciach czujnikowych (ZPSSC)
+# Zaawansowane techniki przetwarzania sygnałów w światłowodowych sieciach czujnikowych (ZPSSC)
  
 ## 📋 Opis projektu
 
-W niniejszym repozytorium znajduje się implementacja symulatora do światłowodowych systemów czujnikowych bazujących na multipleksacji kodowej wraz z elementami optymalizacji reflektancji siatek.
+Repozytorium zawiera symulator światłowodowych sieci czujnikowych z multipleksacją kodową (CDM) i optymalizacją siatek Bragga.
 
-> **Uwaga:** Repozytorium jest ciągle aktualizowane. Część funkcji jest testowa i w obecnej formie nie posiada szczegółowych opisów lub konwencja składniowa jest przemieszana.
+> **Uwaga:** Część funkcji jest w fazie testowej i może nie posiadać pełnej dokumentacji.
 
 ## 🎯 Tematyka projektu
 
@@ -44,7 +53,7 @@ Główne założenia projektu:
 │   ├── fbg/               # Funkcje związane z symulacją siatek Bragga
 │   ├── opt_source/        # Funkcje związane z symulacją lasera VCSEL
 │   ├── plots/             # Funkcje do wyświetlania wyników
-│   ├── signals/           # Funkcje związane z przetwarzaniem sygnałów
+│   ├── signal/            # Funkcje związane z przetwarzaniem sygnałów
 │   └── system/            # Funkcje dotyczące symulacji systemu czujnikowego
 ├── scripts/               # Skrypty w MATLAB
 └── tests/                 # Testowe funkcje i/lub skrypty
@@ -54,9 +63,11 @@ Główne założenia projektu:
 
 ### Wymagania
 
-- MATLAB 2022b lub nowszy
+- MATLAB R2025b lub nowszy
 - Signal Processing Toolbox
 - Communications Toolbox
+- Global Optimization Toolbox
+- DSP System Toolbox
 
 ### Uruchomienie
 
@@ -64,9 +75,33 @@ Główne założenia projektu:
 % Add all directories to path
 AddAllSubfolders;
 
-% Run a basic simulation
-run('scripts/WP2_CodeAnalysis.m');
+% Run a basic simulation with default parameters
+params = defaultParams();
+params.show_plots = true;
+out = runSimulation(params);
+fprintf('MAE = %.1f pm\n', out.MAE);
+
+% Run with Gaussian fit (better accuracy)
+out_gauss = runSimulationGauss(params);
+fprintf('MAE (Gaussian) = %.1f pm\n', out_gauss.MAE);
 ```
+
+### Skrypty demonstracyjne
+
+| Skrypt | Opis |
+|--------|------|
+| `scripts/WP2_SystemSimulation_v2.m` | Podstawowa symulacja z wykresami |
+| `scripts/Zadanie1_MultiBounce.m` | Model wielokrotnych odbić |
+| `scripts/Zadanie2_TemperatureShift.m` | Wpływ gradientu temperaturowego |
+| `scripts/Zadanie3_SensitivityAnalysis.m` | Analiza wrażliwości (5 parametrów) |
+| `scripts/Zadanie4_FullOptimization.m` | Optymalizacja GA vs PSO |
+| `scripts/Zadanie4_GaussOptimization.m` | Optymalizacja z Gaussian fit |
+| `scripts/Zadanie4_Optimization.m` | Grid search p x deltaneff |
+| `scripts/Zadanie5_Comparison.m` | Porównanie przed/po optymalizacji |
+| `scripts/Zadanie6_BenchmarkCodesDenoising.m` | Porównanie kodów i metod odszumiania |
+| `scripts/Zadanie_DFE_test.m` | Test equalizera DFE |
+| `scripts/Zadanie_PINvsAPD.m` | Porównanie PIN vs APD |
+| `scripts/Zadanie_TDMvsCDM_Ghosty.m` | Porównanie TDM vs CDM |
 
 ## 📊 Etapy projektu
 
@@ -75,37 +110,50 @@ Projekt podzielono na następujące etapy:
 ### WP1: Analiza i przegląd literatury ✅
 
 #### Zakończone działania:
-- Przeprowadzono dogłębną analizę rodzin kodowych: Kasamiego, PRBS, Randi, Golda, OOC, Sidelnikova, pary Golaya i sekwencji chaotycznych
+- Przeprowadzono szczegółową analizę rodzin kodowych: Kasamiego, PRBS, Randiego, Golda, OOC, Sidelnikowa, pary Golaya i sekwencji chaotycznych
 - Stworzono zestaw skryptów do testowania różnych scenariuszy symulacyjnych
 - Określono wstępne parametry pracy systemu kodowego (minimalne pasmo odbiornika: 20 MHz)
 - Wstępne analizy wykazały lepszą detekowalność sekwencji Kasamiego w porównaniu do pozostałych sekwencji
 
 #### Wnioski:
-- Filtracja dolnoprzepustowa powoduje zmianę PSNR
+- Filtracja dolnoprzepustowa wpływa na stosunek sygnału do szumu (PSNR)
 - Konieczne jest korzystanie z wolniejszych kodów przy detektorze o stosunkowo małym paśmie
 - Parametry pasma odbiornika są ściśle zależne od: odległości między czujnikami, wymaganej szybkości ściągania danych i długości stosowanych kodów
 
 
-### WP2: Stworzenie symulatora systemu czujnikowego wraz z makietą pomiarową 🔄
+### WP2: Stworzenie symulatora systemu czujnikowego wraz z makietą pomiarową ✅
 
-#### W trakcie realizacji:
-- Utworzono podstawowy symulator systemu czujnikowego
-- Zaimplementowano model sieci z możliwością definiowania punktów pomiarowych
-- Przygotowano środowisko do analizy metod detekcji czujników z wykorzystaniem korelacji
-- Trwają prace nad implementacją metod redukcji szumów i poprawy SNR
+#### Zakończone działania:
+- Symulator sieci czujnikowej z pełnym pipeline: generacja kodów, widma FBG, odbicia, szum, korelacja, detekcja
+- Model wielokrotnych odbić z parametrem `max_bounces` (sygnały odbić wielokrotnych 3. rzędu)
+- Model przesunięcia temperaturowego siatek (`lambda_shifts`)
+- Analityczny model FBG (tanh) - przyspieszenie generacji widm o >6000x
+- Porównanie kodów: Kasami lepszy od Gold o 27%
+- Analiza szumu: 100% szumu korelacyjnego to deterministyczne listki boczne (nie szum detektora)
+- Systematyczne porównanie 8 metod odszumiania - żadna nie dała istotnej poprawy w systemie CDM
+- Porównanie PIN vs APD z parametrami Thorlabs: punkt przecięcia przy −20 dBm
+- Porównanie TDM vs CDM: CDM zapewnia naturalną ochronę przed sygnałami odbić wielokrotnych
+- Dopasowanie krzywej Gaussa do estymacji długości fali Bragga: poprawa 63–88% vs średnia ważona
 
-#### Planowane działania:
-- Wykonanie stanowiska laboratoryjnego do pomiaru sieci czujnikowych z możliwością zmiany temperatury wybranego czujnika światłowodowego
-- Implementacja zaawansowanych metod detekcji, w tym SIC
-- Analiza metod redukcji szumów, takich jak: TVD (Total Variation Denoising), adaptacyjne filtrowanie, filtracja pasmowo-przepustowa i filtr Savitzkiego-Golaya
-### WP3: Optymalizacja projektowania systemów czujnikowych 📝
+#### Kluczowe wyniki:
+- MAE (średni błąd bezwzględny) detekcji: od 391 pm (parametry domyślne) do 21,6 pm (po optymalizacji z dopasowaniem Gaussa)
+- Dłuższy kod (p=10) daje 5,3× poprawę MAE
+- CDM tłumi odbicia wielokrotne: degradacja <0,5% w CDM vs >10% w TDM
 
-#### Planowane działania:
-- Określenie kluczowych parametrów systemu podlegających optymalizacji
-- Wybór kryteriów optymalizacyjnych i funkcji celu
-- Analiza i wybór algorytmów optymalizacyjnych
-- Przeprowadzenie symulacji porównawczych "przed" i "po" optymalizacji
-- Stworzenie dedykowanego modelu optymalizacyjnego dla systemów z multipleksacją kodową
+### WP3: Optymalizacja projektowania systemów czujnikowych ✅
+
+#### Zakończone działania:
+- Identyfikacja 5 kluczowych parametrów: p, Δn_eff, N_s, NEP (ekwiwalentna moc szumu), gradient temperaturowy
+- Ranking wrażliwości: p ≫ gradient ≫ pozostałe
+- Optymalizacja 5-parametrowa (GA + PSO): Δn_eff, p, N_b, liczba długości fal, rozłożenie spektralne siatek
+- 4 warianty (N_s=5/10/20, z/bez gradientu), poprawa do 94,5%
+- Rozłożenie spektralne siatek jako nowy parametr projektowy (wybrany w 87,5% iteracji optymalizacji)
+- Porównanie przed/po optymalizacji z wykresami per wariant
+
+#### Kluczowe wyniki:
+- Optymalizacja ze średnią ważoną: N_s=5 → 56 pm, N_s=10 → 93 pm
+- Optymalizacja z dopasowaniem Gaussa: N_s=5 → **21,6 pm**, N_s=10 → **49,7 pm**
+- p=10 i n_lambdas=16 optymalne we wszystkich wariantach
 
 ### WP4: Wykonanie testów laboratoryjnych 📝
 
@@ -115,7 +163,7 @@ Projekt podzielono na następujące etapy:
 - Wykonanie i walidacja modelu optymalizacyjnego
 - Testy praktyczne z wykorzystaniem siatek Bragga o zoptymalizowanych parametrach
 
-## 📜 License
+## 📜 Licencja
 
 Sprawdź plik LICENSE.
 
@@ -129,13 +177,13 @@ Jeśli jesteś zainteresowany/-a:
 - współpracą badawczą w dziedzinie fotoniki i systemów czujnikowych
 - wymianą doświadczeń w zakresie przetwarzania sygnałów
 
-Skontaktuj się z nami poprzez:
+Skontaktuj się ze mną poprzez:
 - Email: [juliusz.bojarczuk@pw.edu.pl](mailto:juliusz.bojarczuk@pw.edu.pl)
 - GitHub: Otwórz Issue lub Pull Request w tym repozytorium
 
 ## 🙏 Acknowledgments
 
-Projekt finansowany z programu "Perły Nauki" Ministra Nauki i Szkolnictwa Wyższego (nr umowy: PN/01/0321/2022).
+Projekt finansowany z programu "Perły Nauki" Ministerstwa Nauki i Szkolnictwa Wyższego (nr umowy: PN/01/0321/2022).
 
 ## 📚 Bibliografia
 

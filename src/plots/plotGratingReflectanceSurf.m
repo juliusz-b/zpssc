@@ -1,8 +1,6 @@
 function plotGratingReflectanceSurf(lambdas, R_original, R_received, length_domain, dane_po_przetworzeniu, dane_w_kanale, dane_referencyjne, N_s,D_s,R_simulated, simulation_range,new_lmb,R_filtered)
-%load('C:\Users\jbojarczuk\Desktop\!testy_do_JLT.mat')
-%lambdas = lambdas * 1e9;
 
-%iteracja po kazdym kodzie, ergo - po kazdej lambdzie
+% Iterate over each code / each wavelength
 
 Z = zeros(size(dane_po_przetworzeniu,1),length(length_domain));
 for i=1:size(dane_po_przetworzeniu,1)
@@ -15,7 +13,7 @@ for i=1:size(dane_po_przetworzeniu,1)
 end
 %%
 Z3 = [dane_po_przetworzeniu-movmean(dane_po_przetworzeniu,D_s(2)-D_s(1),2)];
-%% rysowanie z plot3
+%% plot3 rendering
 
 figure('Renderer', 'opengl', 'units','normalized','Color','w');%,'outerposition',[0 0 1 1]
 for i=1:length(length_domain)
@@ -27,13 +25,11 @@ for i=1:length(length_domain)
 end
 
 %%
-%figure;plot(sum(R_simulated{1}.*simulation_range*1e9)/sum(R_simulated{1})-sum(R_received.*lambdas,2)./sum(R_received,2))
 R_org = cell2mat(R_simulated');
 R_rec = (R_received'-min(R_received'))';
 a = sum(R_rec.*lambdas*1e9,2)./sum(R_rec,2)-sum(R_org.*simulation_range*1e9,2)./sum(R_org,2);
 figure;
 plot(sum(R_rec.*lambdas*1e9,2)./sum(R_rec,2)-sum(R_org.*simulation_range*1e9,2)./sum(R_org,2))
-%plot(a([1:12 14:end]))
 %%
 figure;surf(lambdas*1e9,length_domain(D_s),R_received,'edgecolor','none');
 colormap gray
