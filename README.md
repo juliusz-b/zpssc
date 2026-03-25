@@ -110,7 +110,7 @@ Projekt podzielono na następujące etapy:
 ### WP1: Analiza i przegląd literatury ✅
 
 #### Zakończone działania:
-- Przeprowadzono szczegółową analizę rodzin kodowych: Kasamiego, PRBS, Randiego, Golda, OOC, Sidelnikowa, pary Golaya i sekwencji chaotycznych
+- Przeprowadzono szczegółową analizę rodzin kodowych: Kasamiego, PRBS, pseudolosowych, Golda, OOC, Sidelnikowa, pary Golaya i sekwencji chaotycznych
 - Stworzono zestaw skryptów do testowania różnych scenariuszy symulacyjnych
 - Określono wstępne parametry pracy systemu kodowego (minimalne pasmo odbiornika: 20 MHz)
 - Wstępne analizy wykazały lepszą detekowalność sekwencji Kasamiego w porównaniu do pozostałych sekwencji
