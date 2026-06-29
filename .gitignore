@@ -2,15 +2,12 @@
 *.asv
 
 # Notatki robocze i dokumenty wewnętrzne
-CLAUDE.md
-CLAUDE_CODE_START_PROMPT.md
 INSTRUKCJE.md
 NOTATKI_SESJA_*.md
 MATEMATYKA_GHOSTY.md
 ZARYS_ARTYKULU.md
 RETROSPEKTYWA.md
 OBSERWACJE.md
-.claude/
 
 # Pliki tymczasowe z symulacji
 bench_*.mat
