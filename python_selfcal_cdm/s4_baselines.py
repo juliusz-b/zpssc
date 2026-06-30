@@ -1,8 +1,9 @@
-"""S4: porownanie strategii kalibracji (baseline MANDATORY), usrednione po realizacjach.
-Os dlugosci fali: nieliniowosc przeciagu (gladka + falowanie wyzszego rzedu) + dryf.
-Do tego FM->AM od chirpu. MZI k-clock prostuje OS (nieliniowosc+dryf), ale NIE usuwa
-FM->AM na zboczu siatki; kanaly referencyjne usuwaja FM->AM w trybie wspolnym, lecz
-kilkoma punktami nie odtworza falowania nieliniowosci. Dopiero polaczenie usuwa oba."""
+"""S4: comparison of calibration strategies (mandatory baseline), averaged over
+realizations. Wavelength axis: sweep nonlinearity (smooth + higher-order wiggle)
++ drift, plus chirp FM-AM. The MZI k-clock straightens the AXIS (nonlinearity +
+drift) but does NOT remove the grating-edge FM-AM; the reference channels remove
+FM-AM in common mode, but a few points cannot reproduce the nonlinearity wiggle.
+Only the combination removes both."""
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore'); import common as C
 fwhm=15.0; band=600.0; delta=0.5*fwhm; PM=C.PM_PER_GHZ
@@ -25,25 +26,25 @@ for it in range(NR):
     fm_ref=np.array([fmam_err(ref_nu[j],ref_asym[j]) for j in range(nref)])
     fm_sen=np.array([fmam_err(sen_nu[i],sen_asym[i]) for i in range(nsen)])
     tot_ref=ax_ref+fm_ref; tot_sen=ax_sen+fm_sen
-    e_nocal=tot_sen; e_mzi=fm_sen
+    e_nocal=tot_sen; e_mzi=fm_sen                       # MZI removes axis, FM-AM remains
     e_ref=tot_sen-np.polyval(np.polyfit(ref_nu,tot_ref,2),sen_nu)
     e_refmzi=fm_sen-np.polyval(np.polyfit(ref_nu,fm_ref,2),sen_nu)
     acc+=np.array([mae(e_nocal),mae(e_mzi),mae(e_ref),mae(e_refmzi)])
     if it==0: last=(sen_nu,e_nocal,e_mzi,e_ref,e_refmzi)
 vals=acc/NR
-labels=['brak\nkalibracji','tylko MZI\nk-clock','tylko\nreferencje FBG','referencje\n+ MZI']
+labels=['no\ncalibration','MZI k-clock\nonly','references\nonly','references\n+ MZI']
 print({l.replace(chr(10),' '):round(v,1) for l,v in zip(labels,vals)})
 fig,ax=plt.subplots(1,2,figsize=(10.6,3.8))
 ax[0].bar(range(4),vals,color=['#c0392b','#e67e22','#2980b9','#27ae60'])
 ax[0].set_xticks(range(4)); ax[0].set_xticklabels(labels,fontsize=8)
-ax[0].set_ylabel(f'MAE [pm] (srednia z {NR} realizacji)'); ax[0].set_title('(a) MAE vs strategia kalibracji')
+ax[0].set_ylabel(f'MAE [pm] (mean of {NR} runs)'); ax[0].set_title('(a) MAE vs calibration strategy')
 for i,v in enumerate(vals): ax[0].text(i,v+1.5,f'{v:.0f}',ha='center',fontsize=9)
 sn,e0,e1,e2,e3=last
 ax[1].axhline(0,c='0.85',lw=0.7)
-ax[1].plot(sn/1000*PM,e0*PM,'o-',ms=4,label='brak')
+ax[1].plot(sn/1000*PM,e0*PM,'o-',ms=4,label='none')
 ax[1].plot(sn/1000*PM,e1*PM,'^-',ms=4,label='MZI')
-ax[1].plot(sn/1000*PM,e2*PM,'s-',ms=4,label='referencje')
+ax[1].plot(sn/1000*PM,e2*PM,'s-',ms=4,label='references')
 ax[1].plot(sn/1000*PM,e3*PM,'D-',ms=4,label='ref+MZI')
-ax[1].set_xlabel('pozycja w pasmie [nm]'); ax[1].set_ylabel('blad [pm]')
-ax[1].set_title('(b) Blad per czujnik (jedna realizacja)'); ax[1].legend(fontsize=7,ncol=2)
+ax[1].set_xlabel('position in band [nm]'); ax[1].set_ylabel('error [pm]')
+ax[1].set_title('(b) Per-sensor error (one run)'); ax[1].legend(fontsize=7,ncol=2)
 plt.tight_layout(); plt.savefig('figs/fig_s4_baselines.png',dpi=140); print('saved figs/fig_s4_baselines.png')
