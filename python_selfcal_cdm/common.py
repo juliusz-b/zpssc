@@ -28,6 +28,10 @@ FBG_FWHM_GHZ       = FBG_FWHM_PM * GHZ_PER_PM   # ~31.25 GHz
 FBG_R              = 0.10      # reflectivity per grating (config A0LF, declared 10%)
 N_GRATINGS_BENCH   = 3         # gratings on the bench (one Peltier stage each)
 N_GRATINGS_AVAIL   = 15        # gratings procured (order S-2026-0066)
+N_PELTIER          = 3         # Peltier stages available (budget-limited). KEY: only
+                              # REFERENCES need a Peltier (known, stabilized wavelength);
+                              # SENSORS do not (their unknown shift is measured), so many
+                              # non-Peltier sensors are possible. Peltier count == reference count.
 TEMP_COEF_PM_PER_C = 10.0      # Bragg temperature sensitivity (~10 pm/C)
 TEMP_RANGE_C       = (15.0, 60.0)   # Peltier set-point range (to confirm)
 TUNING_RANGE_PM    = (TEMP_RANGE_C[1] - TEMP_RANGE_C[0]) * TEMP_COEF_PM_PER_C  # ~450 pm
