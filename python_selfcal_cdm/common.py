@@ -33,6 +33,19 @@ TEMP_RANGE_C       = (15.0, 60.0)   # Peltier set-point range (to confirm)
 TUNING_RANGE_PM    = (TEMP_RANGE_C[1] - TEMP_RANGE_C[0]) * TEMP_COEF_PM_PER_C  # ~450 pm
 TEMP_STAB_C        = 0.1       # PID stability -> ~1 pm wavelength stability
 
+# Source: swept HCG-VCSEL (BW10-1550). The CW laser line is narrow, FWHM 2.4 pm
+# (~0.3 GHz Lorentzian) in the WDM-CDM model [Markowski 2023]. Under direct code
+# modulation the carrier CHIRPS: the same paper's "differential output spectra"
+# (with-code minus without-code) shows a dispersive dip(-)/peak(+) at the code
+# wavelength, and the depleted-to-gained separation is about 0.08-0.10 nm, i.e.
+# a chirp excursion of ~10 GHz (much larger than the CW line). This is the FM-AM
+# driver this study addresses; the exact value should be re-read from the paper.
+LASER_LINEWIDTH_PM  = 2.4      # CW laser line FWHM (probing linewidth)
+LASER_LINEWIDTH_GHZ = LASER_LINEWIDTH_PM * GHZ_PER_PM   # ~0.30 GHz
+MEAS_CHIRP_PM       = 85.0     # code-induced shift, dip-to-peak in differential output spectra
+MEAS_CHIRP_GHZ      = MEAS_CHIRP_PM * GHZ_PER_PM        # ~10.6 GHz
+CHIRP_REALISTIC_GHZ = (6.0, 12.0)   # measured-chirp band [GHz]; confirm exact value from paper
+
 def temp_to_dnu_ghz(dT_celsius):
     """Bragg detuning (GHz) for a temperature change dT (Celsius) at ~10 pm/C."""
     return dT_celsius * TEMP_COEF_PM_PER_C * GHZ_PER_PM

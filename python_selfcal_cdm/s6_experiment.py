@@ -32,7 +32,7 @@ composite = np.clip(sum(R*s for s in specs), 0, None)
 ref_nu = np.array([-18.0, +18.0])       # two references set ~+/-150 pm by temperature
 ref_as = np.array([+0.01, -0.01])       # references well characterized
 sen_nu = 4.0; sen_as = 0.05             # sensor near band center
-deltas = np.linspace(0.3, 8.0, 16)      # chirp excursion [GHz] (set by modulation depth)
+deltas = np.linspace(0.3, 14.0, 20)     # chirp excursion [GHz] (set by modulation depth)
 raw=[]; cor=[]
 for d in deltas:
     e_s = app_err(sen_nu, d, sen_as)
@@ -41,7 +41,7 @@ for d in deltas:
     raw.append(abs(e_s)); cor.append(abs(e_s - np.polyval(p, sen_nu)))
 
 # (c) temperature calibration at a fixed realistic modulation (chirp 4 GHz)
-d_fix = 4.0
+d_fix = C.MEAS_CHIRP_GHZ
 true_nu = np.linspace(-25, 25, 21)      # sensor true Bragg via temperature [GHz]
 e_r = np.array([app_err(ref_nu[j], d_fix, ref_as[j]) for j in range(2)])
 p = np.polyfit(ref_nu, e_r, 1)
@@ -67,7 +67,11 @@ ax[0,0].set_xlabel('wavelength offset from 1545 nm [nm]'); ax[0,0].set_ylabel('r
 ax[0,0].set_title('(a) 3 identical FBGs @1545 nm, FWHM 250 pm, R=10%'); ax[0,0].legend(fontsize=7)
 ax[0,1].plot(deltas/F, raw,'o-',label='raw (no calibration)')
 ax[0,1].plot(deltas/F, cor,'s-',label='2 co-coded references')
-ax[0,1].axvspan(0.3/F, 4.0/F, color='0.9'); ax[0,1].text(2.2/F,max(raw)*0.5,'realistic\nmodulation',fontsize=7,ha='center')
+lw=C.LASER_LINEWIDTH_GHZ; mc=C.MEAS_CHIRP_GHZ
+ax[0,1].axvspan(C.CHIRP_REALISTIC_GHZ[0]/F, C.CHIRP_REALISTIC_GHZ[1]/F, color='0.9')
+ax[0,1].axvline(mc/F, color='k', ls='-', lw=1.0); ax[0,1].axvline(lw/F, color='0.6', ls=':', lw=0.8)
+ax[0,1].text(mc/F, max(raw)*0.5, ' measured\n ~10 GHz', fontsize=6, ha='left')
+ax[0,1].text(lw/F, max(raw)*0.85, 'CW\n0.3 GHz', fontsize=6, ha='left')
 ax[0,1].set_xlabel('chirp excursion / FWHM'); ax[0,1].set_ylabel('|apparent Bragg error| [pm]')
 ax[0,1].set_title('(b) Sensor error vs chirp (FWHM = 250 pm)'); ax[0,1].legend(fontsize=7)
 ax[1,0].axhline(0,c='0.85',lw=0.7)
@@ -75,14 +79,16 @@ ax[1,0].plot(true_nu*PM/1000, e_raw,'o-',label='raw')
 ax[1,0].plot(true_nu*PM/1000, e_cor,'s-',label='reference-corrected')
 ax[1,0].plot(ref_nu*PM/1000,[0,0],'k^',ms=10,label='references (fixed T)')
 ax[1,0].set_xlabel('sensor true Bragg offset (temperature) [nm]'); ax[1,0].set_ylabel('apparent error [pm]')
-ax[1,0].set_title('(c) Temperature calibration, chirp = 4 GHz'); ax[1,0].legend(fontsize=7)
+ax[1,0].set_title(f'(c) Temperature calibration, chirp = {C.MEAS_CHIRP_GHZ:.0f} GHz (measured)'); ax[1,0].legend(fontsize=7)
 ax[1,1].plot(slots*PM/1000, comp_slots/comp_slots.max(),'k',lw=1,label='composite (input)')
 for k in range(3): ax[1,1].plot(slots*PM/1000, desp[k]/dmax,'.-',ms=3,label=f'despread FBG{k+1}')
 ax[1,1].set_xlabel('wavelength offset [nm]'); ax[1,1].set_ylabel('norm. amplitude')
 ax[1,1].set_title('(d) CDM despreading separates the 3 overlapping FBGs'); ax[1,1].legend(fontsize=7)
 plt.tight_layout(); plt.savefig('figs/fig_s6_experiment.png',dpi=140)
-i4=int(np.argmin(abs(deltas-4)))
+i4=int(np.argmin(abs(deltas-C.MEAS_CHIRP_GHZ)))
 print(f"FBG: lambda0={C.LAMBDA0_NM} nm, FWHM={C.FBG_FWHM_PM} pm (={F:.1f} GHz), R={C.FBG_R}, {C.N_GRATINGS_BENCH} on bench / {C.N_GRATINGS_AVAIL} procured")
-print(f"raw sensor error @chirp=4 GHz (Delta/FWHM={4/F:.2f}): {raw[i4]:.1f} pm; 2-ref corrected: {cor[i4]:.2f} pm")
+print(f"laser line (Markowski 2023) = {C.LASER_LINEWIDTH_PM} pm = {C.LASER_LINEWIDTH_GHZ:.2f} GHz")
+print(f"raw sensor error @measured chirp {C.MEAS_CHIRP_GHZ:.1f} GHz (Delta/FWHM={C.MEAS_CHIRP_GHZ/F:.2f}): {raw[i4]:.1f} pm; 2-ref corrected: {cor[i4]:.2f} pm")
+
 print(f"temperature-calibration residual RMS (corrected): {np.sqrt(np.mean(e_cor**2)):.2f} pm")
 print("saved figs/fig_s6_experiment.png")
