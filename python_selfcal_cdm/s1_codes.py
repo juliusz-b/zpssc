@@ -13,12 +13,15 @@ ax[0].plot(lag,np.roll(cross,L//2),lw=0.9,label='cross-correlation')
 ax[0].axhline(17/127,ls='--',c='k',lw=0.7); ax[0].axhline(-17/127,ls='--',c='k',lw=0.7,label='Gold bound 17/127')
 ax[0].set_xlabel('lag [chip]'); ax[0].set_ylabel('correlation (norm.)')
 ax[0].set_title('(a) Gold codes, N=127'); ax[0].legend(fontsize=7)
-ns=[5,6,7]; fl=[]
+# Panel (b): floor vs code LENGTH N, using only ODD-n Gold codes (n=5,7,9 -> N=31,127,511)
+# so the floor decreases monotonically toward the 1/sqrt(N) reference.
+ns=[5,7,9]; Ns=[2**n-1 for n in ns]; fl=[]
 for n in ns:
     gg=C.gold_set(n); a,x=C.code_corr_stats(gg); fl.append(max(a,x))
-ax[1].semilogy(ns,fl,'o-',label='floor (max sidelobe/cross)')
-ax[1].semilogy(ns,[1/np.sqrt(2**n-1) for n in ns],'s--',label=r'$1/\sqrt{N}$')
-ax[1].set_xlabel('code order n'); ax[1].set_ylabel('correlation floor')
+ax[1].loglog(Ns,fl,'o-',label='floor (max sidelobe/cross)')
+ax[1].loglog(Ns,[1/np.sqrt(N) for N in Ns],'s--',label=r'$1/\sqrt{N}$')
+ax[1].set_xlabel('code length N'); ax[1].set_ylabel('correlation floor')
+ax[1].set_xticks(Ns); ax[1].set_xticklabels([str(N) for N in Ns])
 ax[1].set_title('(b) Despreading floor vs code length'); ax[1].legend(fontsize=7)
 plt.tight_layout(); plt.savefig('figs/fig_s1_codes.png',dpi=140)
 print("saved figs/fig_s1_codes.png")
