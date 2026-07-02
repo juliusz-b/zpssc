@@ -1,34 +1,45 @@
 # python_selfcal_cdm — samokalibrująca interrogacja CDM (badanie symulacyjne)
 
-Lekkie, reprodukowalne symulacje w Pythonie do artykułu o **tłumieniu w trybie
-wspólnym błędu FM→AM od chirpu źródła** w interrogacji CDM sieci siatek Bragga z
-użyciem **współ-kodowanych siatek referencyjnych**. Uzupełnienie pełnego
-symulatora MATLAB w katalogu nadrzędnym (`../`).
+Lekkie, reprodukowalne symulacje w Pythonie do artykułu JCR (EN) o samokalibrującej
+się interrogacji CDM sieci siatek Bragga z tanim, bezpośrednio modulowanym,
+przestrajanym VCSEL-em. Uzupełnienie symulatora MATLAB (`../`). Kod i opisy po angielsku.
+
+> **STAN:** po rundzie 6 recenzji (major revision), w rewizji. Handoff i decyzje:
+> `../../Realizacja zadań/Artykul_JCR_2026/STAN_ARTYKULU_2026-06.md` oraz `RECENZJE_I_DECYZJE_2026.md`.
 
 ## Wymagania
-- Python 3.10+, `numpy`, `scipy`, `matplotlib`
-- `pip install numpy scipy matplotlib`
+- Python 3.10+, `numpy`, `scipy`, `matplotlib` (`pip install numpy scipy matplotlib`)
 
 ## Pliki
 | Plik | Opis |
 |------|------|
-| `common.py` | wspólna fizyka: kody Gold/Kasami (konstrukcja decymacyjna), widma FBG (Gauss / tanh²), model chirpu i konwersji FM→AM, estymatory piku (Gauss / centroid), nieliniowy przeciąg VCSEL, linijka MZI (k-clock) |
-| `s1_codes.py` | właściwości korelacyjne kodów; podłoga listków bocznych vs długość kodu |
-| `s2_despread.py` | rozplot CDM nakładających się widmowo siatek + kanały referencyjne |
-| `s3_residual.py` | **wynik główny**: rezyduum błędu λ_B po korekcie referencjami vs chirp/FWHM i niedopasowanie nachylenia |
-| `s4_baselines.py` | porównanie strategii kalibracji: brak / MZI k-clock / referencje / referencje+MZI |
-| `s5_ghosts.py` | odporność kotwicy referencyjnej na wielokrotne odbicia (ghosty) |
+| `common.py` | wspólna fizyka + parametry sprzętu: kody Gold/Kasami, widma FBG (Gauss/tanh²), model chirpu i FM→AM, estymatory piku (Gauss/centroid), nieliniowy przeciąg VCSEL, linijka MZI |
+| `s0_schematics.py` | schematy poglądowe: diagram blokowy + odwzorowanie długość fali-czas |
+| `s1_codes.py` | właściwości korelacyjne kodów; podłoga listków vs długość kodu (Fig.3) |
+| `s2_despread.py` | rozplot CDM nakładających się siatek + kanały referencyjne (Fig.4, waterfall) |
+| `s3_residual.py` | rezyduum błędu λ_B po korekcie referencjami vs chirp/FWHM i niedopasowanie nachylenia (Fig.5) |
+| `s4_baselines.py` | strategie kalibracji: brak / MZI / referencje / referencje+MZI (Fig.6) |
+| `s5_ghosts.py` | odporność kotwicy na wielokrotne odbicia (Fig.7) |
+| `s6_experiment.py` | predykcja makiety (FBGS DTG-A3A4, 1545 nm, 250 pm, R=10%) (Fig.8) |
+| `s7_axis_nonlinearity.py` | kalibracja nieliniowej osi λ(V) HCG; szerokie pasmo vs wąska makieta (Fig.9) |
+| `s_setup_figure.py` | schemat stanowiska eksperymentalnego (Fig.10) |
+| `s8_noise.py` | podłoga szumowa: jitter centroidu vs SNR i reflektancja |
+| `s9_coherent.py` | długość koherencji z linii CW; przypadek koherentny vs niekoherentny |
+| `s10_control.py` | **kontrola nowości**: referencja ko-kodowana vs zwykła (decydujące) |
+| `s11_sensitivity.py` | wrażliwość rezyduum na rozrzut niesymetrii i kształt (tanh² vs sinc²) |
 
 ## Uruchomienie
 ```bash
-python3 s1_codes.py     # i analogicznie s2..s5; figury zapisywane do figs/
+python3 s1_codes.py     # analogicznie s2..s11; figury -> figs/
 ```
 
-## Kluczowe wyniki (parametry domyślne)
-- Kody Gold N=127: maks. korelacja wzajemna **0,134 = granica teoretyczna 17/127**; Kasami N=63: 9/63.
-- Rozplot CDM (idealny tor, bez chirpu): MAE ≈ **9 pm**.
-- Korekta referencjami: surowy błąd ≈ **50 pm** @Δ=0,5·FWHM → **3,7 pm** (4 referencje). Rezyduum rośnie z chirp/FWHM i maleje z liczbą referencji; podłoga = niedopasowanie nachylenia widm.
-- Strategie (średnia z 40 realizacji): brak **110 pm**, tylko MZI k-clock **50 pm** (zostaje FM→AM), tylko referencje **39 pm**, referencje+MZI **3,8 pm**.
-- Ghosty: pozycja kotwicy (dopasowanie Gaussa) praktycznie niezmiennicza (**~0 pm @R=9%**), naiwny centroid pociągany (**35 pm**).
+## Kluczowe wyniki
+- Kody Gold N=127: korelacja wzajemna **0,134 = granica 17/127**; podłoga maleje z długością kodu.
+- Rozplot CDM (idealny tor): MAE ≈ **9 pm**.
+- Referencje usuwają wspólny offset chirpu → **podłoga rezyduum ~kilka pm** (niedopasowanie nachylenia). Surowy błąd FM-AM **skaluje się z chirpem** (chirp do zmierzenia na OSA; NIE zakładać konkretnej wartości).
+- Oś λ(V) (s7): szerokie pasmo wymaga 3 ref lub MZI; wąska makieta — 2 ref wystarczą (~9 pm).
+- Ghosty: kotwica (Gauss) niezmiennicza; koherencja (s9): L_coh ≈ 0,22 m ≪ 4 m → **niekoherentnie**.
+- Szum (s8): przy SNR ≥16 dB systematyka rządzi.
+- **Kontrola nowości (s10): ko-kodowanie referencji to zaleta SYSTEMOWA (bez dodatkowego sprzętu), NIE poprawa dokładności** — przy innych kanałach nawet szkodzi (cross-talk). Zmienia tezę pracy.
 
-Jednostki: częstotliwość optyczna w GHz, przeliczenie 1 GHz ≈ 8 pm przy 1550 nm.
+Jednostki: częstotliwość optyczna w GHz, 1 GHz ≈ 8 pm przy 1550 nm.
