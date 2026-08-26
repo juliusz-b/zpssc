@@ -189,6 +189,28 @@ def gauss_fit_peak(x, y, thr=0.3, win_frac=0.14):
     except Exception:
         return centroid(xs,ys,thr)
 
+def gauss_fit_full(x, y, thr=0.3, win_frac=0.14):
+    """Gaussian fit around the peak returning (amplitude, centre, sigma, baseline).
+
+    Same window and threshold logic as gauss_fit_peak, but the full parameter set
+    is returned; needed when the fitted line has to be reconstructed, e.g. to
+    estimate the transmission a grating imposes on the gratings behind it."""
+    x=np.asarray(x,float); y=np.asarray(y,float)
+    i0=int(np.argmax(y)); W=max(4,int(len(x)*win_frac))
+    lo=max(0,i0-W); hi=min(len(x),i0+W+1)
+    xs=x[lo:hi]; ys=y[lo:hi]
+    ym=ys.max(); base=float(np.min(ys))
+    m=ys>=base+thr*(ym-base)
+    fallback=(float(ym-base), float(xs[int(np.argmax(ys))]), float((xs[-1]-xs[0])/6.0), base)
+    if m.sum()<4: return fallback
+    p0=[ym-base, xs[int(np.argmax(ys))], (xs[-1]-xs[0])/6.0, base]
+    try:
+        lob=[0.0,xs[0],1e-6,-np.inf]; hib=[np.inf,xs[-1],xs[-1]-xs[0],np.inf]
+        popt,_=curve_fit(_gauss,xs[m],ys[m],p0=p0,bounds=(lob,hib),maxfev=20000)
+        return float(popt[0]), float(popt[1]), float(popt[2]), float(popt[3])
+    except Exception:
+        return fallback
+
 # ----------------------------------------------------------------------------
 # Nonlinear VCSEL sweep and Mach-Zehnder interferometer (k-clock)
 # ----------------------------------------------------------------------------
