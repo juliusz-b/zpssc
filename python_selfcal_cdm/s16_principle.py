@@ -8,14 +8,14 @@ grating's reflection spectrum, and its peak is the measurement.
 
 Figure 2, mechanisms: the three array effects that this study quantifies, each
 drawn from the same model used for the results, not sketched by hand.
-  (a) spectral shadowing: the upstream gratings punch a notch into the light that
-      reaches a downstream grating, and when they are detuned the notch is
-      asymmetric across its line, so the fitted peak moves;
-  (b) multiple reflections: a third-order path returns at tau_a - tau_b + tau_c,
+  (a) multiple reflections: a third-order path returns at tau_a - tau_b + tau_c,
       which for uniform spacing is always another occupied bin and for randomised
       spacing usually is not;
-  (c) code leakage: the autocorrelation side lobe adds a scaled copy of every
+  (b) code leakage: the autocorrelation side lobe adds a scaled copy of every
       other grating's spectrum as a broad background under the wanted line.
+
+Spectral shadowing, the third array term, has its own figure in s19 because it
+comes with a correction.
 """
 import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -135,34 +135,10 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # FIGURE 2: error mechanisms
 # ===========================================================================
-fig2, ax = plt.subplots(1, 3, figsize=(10.6, 3.5))
-
-# --- (a) spectral shadowing ------------------------------------------------
-g = np.linspace(-3.0 * F, 3.0 * F, 900)
-lam = g * PM / 1000.0
-up = np.exp(-0.5 * ((g + 14.0) / SIG) ** 2)          # upstream grating, detuned
-down = np.exp(-0.5 * (g / SIG) ** 2)                 # grating of interest
-Rs = 0.25                                            # exaggerated for legibility
-trans = (1.0 - Rs * up) ** 2
-obs = down * trans
-p_clean = C.gauss_fit_peak(g, down) * PM
-p_shad = C.gauss_fit_peak(g, obs) * PM
-ax[0].plot(lam, trans, color='#7d3c98', lw=1.2, label='upstream transmission')
-ax[0].plot(lam, down, color='#2980b9', lw=1.4, label='true line')
-ax[0].plot(lam, obs / obs.max(), color='#c0392b', lw=1.4, label='what is measured')
-ax[0].axvline(p_clean / 1000.0, color='#2980b9', ls=':', lw=1.0)
-ax[0].axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=1.0)
-ax[0].annotate('', xy=(p_shad / 1000.0, 1.06), xytext=(p_clean / 1000.0, 1.06),
-               arrowprops=dict(arrowstyle='<|-', color='k', lw=1.0))
-ax[0].text(0.32, 1.11, 'peak pulled %.0f pm' % abs(p_shad - p_clean),
-           ha='center', fontsize=7)
-ax[0].set_xlim(-0.55, 0.55); ax[0].set_ylim(0, 1.25)
-ax[0].set_xlabel('wavelength offset [nm]'); ax[0].set_ylabel('normalised')
-ax[0].set_title('(a) Spectral shadowing', fontsize=9)
-ax[0].legend(fontsize=6.6, loc='upper left')
+fig2, ax = plt.subplots(1, 2, figsize=(8.8, 3.5))
 
 # --- (b) ghost delays ------------------------------------------------------
-axb = ax[1]
+axb = ax[0]
 axb.set_xlim(0, 10); axb.set_ylim(-1.6, 10); axb.axis('off')
 axb.plot([0.6, 9.4], [8.6, 8.6], color='#555', lw=1.4)
 gz = [2.0, 4.4, 7.4]
@@ -215,7 +191,7 @@ for row, (b, gbs, ttl, col) in enumerate(
 axb.text(9.4, 4.80, 'x  lands on a grating bin', fontsize=6.6, ha='right', color='0.35')
 axb.text(9.4, 4.40, '.  lands in an empty bin', fontsize=6.6, ha='right', color='0.35')
 axb.text(5.0, -1.15, 'delay bin', ha='center', fontsize=7.2, color='0.35')
-axb.set_title('(b) Multiple reflections and spacing', fontsize=9)
+axb.set_title('(a) Multiple reflections and spacing', fontsize=9)
 
 # --- (c) code leakage ------------------------------------------------------
 Mc = 96
@@ -226,22 +202,20 @@ nubs = rng3.uniform(-25, 25, Kc)
 Ac = 0.05 * np.exp(-0.5 * ((nuc[None, :] - nubs[:, None]) / SIG) ** 2)
 wanted = Ac[0]
 leak = (-1.0 / NCH) * (Ac[1:].sum(axis=0))
-ax[2].plot(nuc * PM / 1000.0, wanted, color='#2980b9', lw=1.4, label='wanted grating')
-ax[2].plot(nuc * PM / 1000.0, np.abs(leak), color='0.45', lw=1.2,
+ax[1].plot(nuc * PM / 1000.0, wanted, color='#2980b9', lw=1.4, label='wanted grating')
+ax[1].plot(nuc * PM / 1000.0, np.abs(leak), color='0.45', lw=1.2,
            label=r'|leakage|, side lobe $1/N$')
-ax[2].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
+ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
            color='#c0392b', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
-ax[2].set_yscale('log'); ax[2].set_ylim(1e-5, 0.2)
-ax[2].set_xlabel('wavelength offset [nm]'); ax[2].set_ylabel('despread reflectance')
-ax[2].set_title('(c) Code leakage, K = %d' % Kc, fontsize=9)
-ax[2].legend(fontsize=6.6, loc='lower center')
-ax[2].grid(True, which='both', alpha=0.2)
+ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
+ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
+ax[1].set_title('(b) Code leakage, K = %d' % Kc, fontsize=9)
+ax[1].legend(fontsize=6.6, loc='lower center')
+ax[1].grid(True, which='both', alpha=0.2)
 
 fig2.tight_layout()
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=150, bbox_inches='tight')
 
-print('shadowing demo: peak pulled by %.1f pm (R = %.2f, upstream detuned %.0f pm)'
-      % (abs(p_shad - p_clean), Rs, 14.0 * PM))
 print('ghost bins, uniform: %d in span, %.0f%% on a grating bin'
       % (len(ghost_bins(bu)), 100 * np.mean([g in bu for g in ghost_bins(bu)])))
 print('ghost bins, random : %d in span, %.0f%% on a grating bin'
