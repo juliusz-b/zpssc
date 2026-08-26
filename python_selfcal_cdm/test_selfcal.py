@@ -210,6 +210,34 @@ check('shadowing bias vanishes when the upstream grating is far detuned',
            - 12.0) * PM) < 0.2)
 
 # ---------------------------------------------------------------------------
+print('BANDING AND COLLISIONS')
+# ---------------------------------------------------------------------------
+BAND_STEP = 8.0 * F
+sig_ = F / 2.35482
+overlap = np.exp(-0.5 * (BAND_STEP / sig_) ** 2)
+check('gratings one WDM band apart have negligible spectral overlap',
+      overlap < 1e-12, 'exp term %.1e at 2 nm pitch' % overlap)
+
+rngc = np.random.default_rng(5)
+Kc, Nc, TRIALS = 32, 511, 4000
+hits = 0
+for _ in range(TRIALS):
+    b = rngc.integers(0, Nc, size=Kc)
+    hits += int(len(np.unique(b)) < Kc)
+p_mc = hits / TRIALS
+i = np.arange(1, Kc)
+p_th = 1.0 - np.prod(1.0 - i / Nc)
+check('birthday formula matches Monte Carlo for co-binning probability',
+      abs(p_mc - p_th) < 0.03, 'theory %.3f, Monte Carlo %.3f' % (p_th, p_mc))
+
+pairs_mc = np.mean([np.sum(np.bincount(rngc.integers(0, Nc, size=Kc),
+                                       minlength=Nc) >= 2) for _ in range(2000)])
+pairs_th = Kc * (Kc - 1) / (2.0 * Nc)
+check('expected co-binned pairs close to K(K-1)/2N',
+      abs(pairs_mc - pairs_th) < 0.12,
+      'theory %.2f, Monte Carlo %.2f' % (pairs_th, pairs_mc))
+
+# ---------------------------------------------------------------------------
 print('ACQUISITION')
 # ---------------------------------------------------------------------------
 c_light, n_g = 2.99792458e8, 1.468

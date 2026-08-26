@@ -36,7 +36,9 @@ przestrajanym VCSEL-em. Uzupełnienie symulatora MATLAB (`../`). Kod i opisy po 
 | `s18_source.py` | chirp kodu (składowa adiabatyczna + przerzut), jądro p(δ), konwersja FM-AM na zboczu, rezyduum vs liczba referencji |
 | `s19_deshadow.py` | cieniowanie widmowe i rekurencja odcieniowania: schemat, linia przed/po, zysk i granica |
 | `s20_inversion.py` | **czego korekta musi znać**: wariant bez założenia kształtu, tolerancja skali amplitudy, rozróżnianie ghost/siatka po szerokości linii, dwie siatki w jednym binie opóźnienia |
-| `test_selfcal.py` | testy: granice korelacyjne kodów, estymatory, przypadki graniczne fizyki, algebra opóźnień ghostów, wzory akwizycji (`python test_selfcal.py`) |
+| `s21_cdmwdm.py` | **hybryda CDM-WDM**: adresowanie pasmo x bin opóźnienia, cykl pomiarowy w czasie, dowód numeryczny że pasmowanie resetuje mechanizmy błędu (32 w 1 paśmie: 60,1 pm; 4x8: 22,1; 8 w 1 paśmie: 22,6) |
+| `s22_codelength.py` | **długość kodu N jako zmienna projektowa**: biny/zasięg, sufit przecieku 0,37N (potwierdzony dla N=63..511), czas ramki i odświeżanie, statystyka kolizji binów (birthday) i oczekiwana liczba „trudnych par" ~0,26·K²/N |
+| `test_selfcal.py` | testy: granice korelacyjne kodów, estymatory, przypadki graniczne fizyki, algebra opóźnień ghostów, wzory akwizycji (33 testy, `python test_selfcal.py`) |
 
 ## Uruchomienie
 ```bash
