@@ -175,9 +175,9 @@ ax[0].set_ylabel('RMS Bragg error [pm]')
 ax[0].set_title('(a) Resolution: error vs chip rate')
 ax[0].legend(fontsize=7.5, loc='upper right'); ax[0].grid(True, which='both', alpha=0.25)
 
-ax[1].semilogy(jit, np.maximum(e_jit_25, 0.05), '^-', color='#28b463',
+ax[1].plot(jit, np.maximum(e_jit_25, 0.05), '^-', color='#28b463',
                label='B = 25 Mchip/s (dz = 4.1 m, marginal)')
-ax[1].semilogy(jit, np.maximum(e_jit_50, 0.05), 's-', color='#2980b9',
+ax[1].plot(jit, np.maximum(e_jit_50, 0.05), 's-', color='#2980b9',
                label='B = 50 Mchip/s (dz = 2.0 m, comfortable)')
 ax[1].axhline(10.0, color='0.3', ls='--', lw=0.8)
 ax[1].text(0.97, 0.93, '10 pm target', transform=ax[1].transAxes, fontsize=7.5,
