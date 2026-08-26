@@ -38,7 +38,9 @@ przestrajanym VCSEL-em. Uzupełnienie symulatora MATLAB (`../`). Kod i opisy po 
 | `s20_inversion.py` | **czego korekta musi znać**: wariant bez założenia kształtu, tolerancja skali amplitudy, rozróżnianie ghost/siatka po szerokości linii, dwie siatki w jednym binie opóźnienia |
 | `s21_cdmwdm.py` | **hybryda CDM-WDM**: adresowanie pasmo x bin opóźnienia, cykl pomiarowy w czasie, dowód numeryczny że pasmowanie resetuje mechanizmy błędu (32 w 1 paśmie: 60,1 pm; 4x8: 22,1; 8 w 1 paśmie: 22,6) |
 | `s22_codelength.py` | **długość kodu N jako zmienna projektowa**: biny/zasięg, sufit przecieku 0,37N (potwierdzony dla N=63..511), czas ramki i odświeżanie, statystyka kolizji binów (birthday) i oczekiwana liczba „trudnych par" ~0,26·K²/N |
-| `test_selfcal.py` | testy: granice korelacyjne kodów, estymatory, przypadki graniczne fizyki, algebra opóźnień ghostów, wzory akwizycji (33 testy, `python test_selfcal.py`) |
+| `s23_theory.py` | **teoria w zamkniętej formie, zweryfikowana**: prawo A (bias cieniowania pary, dokładne do 1. rzędu w R, maks. 0,81·R·sigma przy odstrojeniu sigma·sqrt(3/2)), prawo B (średni bias wielodostępu, nieparzysty, liniowy w (K-1)/N, zdejmowany przez referencje 4x), nierówność C (K·f_r <= eps·f_s/(c_L·n_s·M), N się skraca) |
+| `s24_storyboard.py` | **rysunek fabularny**: życie jednego okresu kodu - światłowód z osią odległości nad pasami czasowymi w tej samej skali (t=2nz/c), echa startują pod swoimi siatkami, piki korelacji tamże |
+| `test_selfcal.py` | testy: granice korelacyjne kodów, estymatory, przypadki graniczne fizyki, algebra opóźnień ghostów, wzory akwizycji (38 testów, `python test_selfcal.py`) |
 
 ## Uruchomienie
 ```bash

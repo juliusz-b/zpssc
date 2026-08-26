@@ -210,6 +210,50 @@ check('shadowing bias vanishes when the upstream grating is far detuned',
            - 12.0) * PM) < 0.2)
 
 # ---------------------------------------------------------------------------
+print('CLOSED-FORM LAWS')
+# ---------------------------------------------------------------------------
+from scipy.optimize import curve_fit as _cf
+SIGL = F / 2.35482
+gl = np.linspace(-5 * F, 5 * F, 3000)
+R_ = 0.01
+worst_c = 0.0
+for Df in (0.5, 1.0, 1.5, 2.0, 2.5):
+    D = Df * SIGL
+    meas = np.exp(-0.5 * (gl / SIGL) ** 2) * \
+        (1 - R_ * np.exp(-0.5 * ((gl - D) / SIGL) ** 2)) ** 2
+    sim = float(np.sum(gl * meas) / np.sum(meas))
+    th = -R_ * D / np.sqrt(2.0) * np.exp(-D ** 2 / (4 * SIGL ** 2))
+    worst_c = max(worst_c, abs(sim / th - 1))
+check('Law A (centroid form) exact to first order in R',
+      worst_c < 0.02, 'worst deviation %.2f%%' % (100 * worst_c))
+
+D = SIGL * np.sqrt(1.5)
+meas = np.exp(-0.5 * (gl / SIGL) ** 2) * \
+    (1 - R_ * np.exp(-0.5 * ((gl - D) / SIGL) ** 2)) ** 2
+fmod = lambda t, a, m, s, c0: a * np.exp(-0.5 * ((t - m) / s) ** 2) + c0
+pfit, _ = _cf(fmod, gl, meas, p0=[1.0, 0.0, SIGL, 0.0], maxfev=20000)
+th_max = -(4.0 / 3.0) * np.exp(-0.5) * R_ * SIGL
+check('Law A (LSQ form) worst case 0.81 R sigma at Delta* = sigma sqrt(3/2)',
+      abs(pfit[1] / th_max - 1) < 0.03,
+      'sim %.4f GHz vs theory %.4f GHz' % (pfit[1], th_max))
+
+# Law B: odd symmetry and edge magnitude of the mean multiple-access bias
+KB, NB, WB = 32, 127, 25.0
+prefB = (KB - 1) * SIGL ** 2 / (WB * NB)
+lawB = lambda v: prefB * (np.exp(-(WB - v) ** 2 / (4 * SIGL ** 2)) -
+                          np.exp(-(WB + v) ** 2 / (4 * SIGL ** 2)))
+check('Law B is odd in position', abs(lawB(12.0) + lawB(-12.0)) < 1e-12)
+check('Law B edge magnitude close to (K-1) sigma^2 / (W N)',
+      abs(lawB(WB) / prefB - 1) < 0.05, 'ratio %.3f' % (lawB(WB) / prefB))
+
+# Inequality C: the design-table products stay below the bound
+bound_c = 10.0 * 20e6 / (27.0 * 4 * 64)
+prods = {63: 24.6 * 1033, 127: 49.2 * 513, 255: 94.2 * 306, 511: 191.6 * 127}
+check('capacity-refresh products below the invariant bound for all N',
+      all(v <= bound_c * 1.01 for v in prods.values()),
+      'max %.0f vs bound %.0f' % (max(prods.values()), bound_c))
+
+# ---------------------------------------------------------------------------
 print('BANDING AND COLLISIONS')
 # ---------------------------------------------------------------------------
 BAND_STEP = 8.0 * F
