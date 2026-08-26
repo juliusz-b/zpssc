@@ -31,6 +31,11 @@ przestrajanym VCSEL-em. Uzupełnienie symulatora MATLAB (`../`). Kod i opisy po 
 | `s13_chiprate.py` | **tor akwizycji**: rozdzielczość przestrzenna vs chip rate, tolerancja jitteru, budżet próbkowania ekwiwalentnego (ETS), rozdzielczość przetwornika |
 | `s14_code_families.py` | **rodziny kodów**: m-sekwencje vs Gold vs Kasami vs pary Golaya w architekturze zamiatanej (liczy się autokorelacja, nie korelacja wzajemna) |
 | `s15_budget.py` | **zbiorczy budżet błędu** dla dwóch konfiguracji (makieta jak zakupiona, tablica zaprojektowana) + ile referencji się opłaca |
+| `s16_principle.py` | rysunki poglądowe: zasada działania (układ + mapa opóźnienie-długość fali) i dwa mechanizmy tablicy (ghosty, przeciek) |
+| `s17_coding.py` | co robi kod w dziedzinie czasu: przebieg, suma powrotów, wynik korelacji |
+| `s18_source.py` | chirp kodu (składowa adiabatyczna + przerzut), jądro p(δ), konwersja FM-AM na zboczu, rezyduum vs liczba referencji |
+| `s19_deshadow.py` | cieniowanie widmowe i rekurencja odcieniowania: schemat, linia przed/po, zysk i granica |
+| `s20_inversion.py` | **czego korekta musi znać**: wariant bez założenia kształtu, tolerancja skali amplitudy, rozróżnianie ghost/siatka po szerokości linii, dwie siatki w jednym binie opóźnienia |
 | `test_selfcal.py` | testy: granice korelacyjne kodów, estymatory, przypadki graniczne fizyki, algebra opóźnień ghostów, wzory akwizycji (`python test_selfcal.py`) |
 
 ## Uruchomienie
@@ -55,6 +60,10 @@ python3 test_selfcal.py   # 30 testów, kończy się kodem != 0 przy błędzie
 - **Sufit przeciekowy skaluje się jak K/N** i nie zależy od reflektancji: ok. 0,21·K pm przy N=127, czterokrotnie mniej przy N=511.
 - **Rozdzielczość**: kryterium Δz = c/(2nB) potwierdzone numerycznie (4 m → 25 Mchip/s, 2 m → 50 Mchip/s). Tolerancja jitteru σ_t < 0,2 okresu chipu.
 - **ETS zamyka spór o ADC**: pełny rekord przy 25 Mchip/s to 147 µs przy ADC 3,6 MS/s i 31 µs przy 20 MS/s. Kwantyzacja jest nieistotna (0,34 pm przy 8 bitach i 2% wypełnienia skali).
+- **Odcieniowanie nie wymaga kształtu linii (s20)**: transmisję da się zbudować punkt po punkcie z samego pomiaru, `T = (1 - g·S)²`. Na siatkach tanh² wariant bezkształtowy daje 1,90 pm wobec 3,67 pm dla dopasowania gaussowskiego. Potrzebna jest tylko skala amplitudy i to z grubsza: korekta pomaga dla g od 0,5 do 1,6.
+- **Granica K ≈ 24 przy R=10% to nieprzezroczystość, nie chciwy algorytm**: ostatnia siatka w tablicy 32-elementowej dostaje 700 razy słabszy sygnał, a iteracja po całej tablicy zmienia wynik o mniej niż 2 pm.
+- **Ghost da się rozpoznać (s20)**: linia węższa o √3 (zmierzone 0,571 wobec 0,577 z teorii), amplituda ∝ R³. Jeden próg na szerokości daje 95% zbalansowanej trafności.
+- **Dwie siatki w jednym binie opóźnienia (s20)**: dopasowanie dwuskładnikowe rozdziela je od pół szerokości linii (9,2 pm), przy pełnej szerokości 0,55 pm. Poniżej pół szerokości zawodzi. To pozwala wymieniać chip rate na separację widmową.
 - **Budżet błędu (s15)**: makieta jak zakupiona 9,9 pm (dominuje cieniowanie 8,1 i chirp 4,8), tablica zaprojektowana 3,3 pm. Trzy referencje tną rezyduum chirpu 24-krotnie względem braku referencji, czwarta daje już niewiele.
 
 Jednostki: częstotliwość optyczna w GHz, 1 GHz ≈ 8 pm przy 1550 nm.
