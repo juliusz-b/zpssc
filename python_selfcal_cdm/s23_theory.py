@@ -180,7 +180,7 @@ ax[0].axvspan(0.0, 200.0 / 106.2, color='0.5', alpha=0.12, lw=0)
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].text(0.94, -0.975, '$\\pm$10 K pair sweeps $0\\ldots2S$',
            fontsize=6.0, color='0.3', ha='center')
-ax[0].set_xlabel(r'neighbour detuning  $\Delta/\sigma$')
+ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('pairwise shadowing bias [pm]  (R = 1%)')
 ax[0].set_title('(a) Law A, exact to first order', fontsize=9)
 # curves occupy the flanks and the dip; the only clear pocket is top-centre
@@ -188,10 +188,13 @@ ax[0].legend(fontsize=6.2, loc='upper center', frameon=False,
              handlelength=1.5, labelspacing=0.25)
 ax[0].grid(True, alpha=0.25)
 
-ax[1].plot(pos, err, '.', ms=2, color='0.75', alpha=0.5)
-ax[1].plot(cent, binned, 'o', color='#2980b9', ms=5, label='binned mean, simulated')
-ax[1].plot(nu_fine, lawB_fine, '-', color='#c0392b', lw=1.4, label='Law B, closed form')
-ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [GHz]')
+# positions plotted in pm, the unit the narrative uses (+/-200 pm window)
+ax[1].plot(pos * PM, err, '.', ms=2, color='0.75', alpha=0.5)
+ax[1].plot(cent * PM, binned, 'o', color='#2980b9', ms=5,
+           label='binned mean, simulated')
+ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#c0392b', lw=1.4,
+           label='Law B, closed form')
+ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('multiple-access bias [pm]')
 ax[1].set_title('(b) Law B: an odd pull, K = 32, N = 127', fontsize=9)
 ax[1].text(0.03, 0.84, 'after 2-reference axis fit:\n%.1f pm -> %.1f pm'
@@ -210,7 +213,7 @@ ax[2].minorticks_off()
 ax[2].set_ylim(0, bound / 1e3 * 1.25)
 ax[2].set_xlabel('code length N')
 ax[2].set_ylabel(r'capacity-refresh product [10$^3$ sensor$\cdot$Hz]')
-ax[2].set_title('(c) Inequality C: N cancels', fontsize=9)
+ax[2].set_title('(c) Capacity-refresh invariant: N cancels', fontsize=9)
 ax[2].legend(fontsize=6.8, loc='lower right'); ax[2].grid(True, which='both', alpha=0.25)
 
 fig.tight_layout()

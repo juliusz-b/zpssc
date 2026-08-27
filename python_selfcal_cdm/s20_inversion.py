@@ -218,7 +218,7 @@ co = np.array([co_binned(s) for s in seps])
 # ---------------------------------------------------------------------------
 fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.35))
 
-labels = ['uncorrected', 'parametric\n(Gaussian fit)', 'shape-free\n(measured line)']
+labels = ['uncorrected', 'parametric\nfit', 'shape-free\nform']
 x = np.arange(3)
 w = 0.36
 ax[0].bar(x - w / 2, shape_tab[0][1], w, color='#2980b9', label='Gaussian gratings')
@@ -251,7 +251,8 @@ ax[2].semilogy(seps, co[:, 0], 'o-', color='#c0392b', label='single-peak fit')
 ax[2].semilogy(seps, co[:, 1], 's-', color='#28b463', label='two-component fit')
 ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8)
 ax[2].axvspan(seps[0], 0.5, color='0.85', alpha=0.6)
-ax[2].text(0.33, 40, 'fit fails\nhere', fontsize=5.8, color='0.35', ha='center')
+ax[2].text(0.33, 40, 'fit fails\nhere', fontsize=6.2, color='0.1',
+           ha='center')
 ax[2].set_xlabel('wavelength separation / linewidth')
 ax[2].set_ylabel('RMS Bragg error [pm]')
 ax[2].set_title('(c) Two gratings in one delay bin', fontsize=9)

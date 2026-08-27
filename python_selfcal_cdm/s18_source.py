@@ -183,7 +183,7 @@ ax[1].text(0.20, 1.14, 'apparent shift %.0f pm' % abs(p_chirp - p_true),
 ax[1].set_ylim(0, 1.28)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
-ax[1].set_ylabel('normalised reflectance')
+ax[1].set_ylabel('normalized reflectance')
 ax[1].set_title('(b) FM-to-AM on the flank', fontsize=9)
 ax[1].legend(fontsize=6.8, loc='upper left')
 

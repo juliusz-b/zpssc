@@ -43,7 +43,7 @@ a.plot([mu_seen, mu_seen], [0, seen.max()], color=FS.VERM, lw=0.7,
        ls=(0, (2, 2)))
 a.text(-0.028, 1.10, r'reading moves by $\delta$', fontsize=7.0,
        color=FS.VERM, ha='center')
-a.text(0.21, 0.66, 'bite by the\nneighbour\n' r'detuned by $\Delta$',
+a.text(0.21, 0.66, 'bite by the\nneighbor\n' r'detuned by $\Delta$',
        fontsize=6.6, color=FS.BLUE, ha='center')
 a.annotate('', xy=(0.115, 0.72), xytext=(0.175, 0.72),
            arrowprops=dict(arrowstyle='-|>', lw=0.6, color=FS.BLUE))
@@ -135,7 +135,7 @@ for x0 in pos:
 for x0 in pos:
     c.plot([x0 * st, x0], [1.0 - 0.16, 0.0 + 0.16], color=FS.BLUE,
            lw=0.5, alpha=0.55)
-c.text(0, 2.62, r'mean pull $\approx \nu_k (K{-}1)/N$ (Law B, eq. 10):'
+c.text(0, 2.62, r'mean pull $\approx \nu_k (K{-}1)/N$ (Law B):'
        '  a gain error, not noise', fontsize=6.4, ha='center',
        color='0.15')
 c.text(0, -0.38, 'two references (bold) pin gain and offset: '

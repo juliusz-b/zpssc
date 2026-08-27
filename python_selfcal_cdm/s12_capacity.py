@@ -48,7 +48,7 @@ the actual code supplies the leakage weights):
 Outputs
   (a) RMS Bragg error vs array size at R = 10 percent, decomposed by mechanism.
   (b) Capacity (largest array meeting a 10 pm target) vs reflectivity, for
-      uniform and randomised spacing.
+      uniform and randomized spacing.
 """
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
@@ -253,9 +253,9 @@ cl = lambda a: np.maximum(a, FLOOR)
 fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#7d3c98', label='spectral shadowing only')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#c0392b', label='ghosts only, uniform spacing')
-ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts only, randomised spacing')
+ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts only, randomized spacing')
 ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', label='code leakage + noise only')
-ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#2980b9', lw=1.8, label='full model, randomised')
+ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#2980b9', lw=1.8, label='full model, randomized')
 ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#f39c12', lw=1.8,
                label='full model + sequential deshadowing')
 ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0)
@@ -268,8 +268,8 @@ ax[0].set_title('(a) Error mechanisms vs array size, R = %.0f%%' % (R_A * 100))
 ax[0].legend(fontsize=6.8, loc='lower right'); ax[0].grid(True, which='both', alpha=0.25)
 
 ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#c0392b', label='uniform spacing')
-ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#2980b9', label='randomised spacing')
-ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#f39c12', label='randomised + deshadowing')
+ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#2980b9', label='randomized spacing')
+ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#f39c12', label='randomized + deshadowing')
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0)
 ax[1].text(0.10 * 100, 52, 'procured R = 10% ', fontsize=7, ha='right', color='0.3')
 ax[1].set_ylim(0, 58)
@@ -303,16 +303,16 @@ for i, R in enumerate(Rs):
     print('  %7.2f   %12.1f   %13.1f   %16.1f'
           % (R * 100, cap_rnd[i], cap_uni[i], cap_peel[i]))
 ibest = int(np.argmax(cap_rnd))
-print('  => randomised spacing peaks at R = %.2f%% with K_max = %.0f'
+print('  => randomized spacing peaks at R = %.2f%% with K_max = %.0f'
       % (Rs[ibest] * 100, cap_rnd[ibest]))
-print('--- code family, K=%d, R=%.0f%%, randomised spacing ---' % (K_CHK, R_CHK * 100))
+print('--- code family, K=%d, R=%.0f%%, randomized spacing ---' % (K_CHK, R_CHK * 100))
 print('  m-sequence (side lobe 1/N)  : %.2f pm' % e_mseq)
 print('  Gold code (three valued)    : %.2f pm' % e_gold)
 # leakage ceiling vs code length: leakage/primary is independent of R, so this
 # ceiling holds whatever the reflectivity
 _M9 = 1.0 - 2.0 * C._mls01(9)
 ACORR_M9 = C.periodic_xcorr(_M9, _M9)
-print('--- leakage-only ceiling vs code length (R = 0.3%%, randomised spacing) ---')
+print('--- leakage-only ceiling vs code length (R = 0.3%%, randomized spacing) ---')
 print('       N      K    RMS error [pm]')
 for nch, ac, tag in [(127, ACORR_MSEQ, '127'), (511, ACORR_M9, '511')]:
     for K in [16, 32, 48, 64, 96]:

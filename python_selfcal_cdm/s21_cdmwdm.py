@@ -165,7 +165,7 @@ axb.set_xlim(-0.4, 12.6); axb.set_ylim(-1.9, 13.6)
 axb.set_xlabel('time'); axb.set_ylabel('sweep wavelength (staircase)')
 axb.set_xticks([]); axb.set_yticks([])
 axb.text(9.0, 1.1, 'B = 25 Mchip/s, N = 127:\n31 us / step (20 MS/s ADC)\n'
-                   'M = 64 -> 2.0 ms frame\n-> 510 Hz refresh', fontsize=6.6,
+                   'M = 64 -> 1.95 ms frame\n-> 513 Hz refresh', fontsize=6.6,
          color='0.25')
 axb.set_title('(b) One measurement cycle', fontsize=9)
 

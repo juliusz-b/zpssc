@@ -79,7 +79,7 @@ ax.annotate('', xy=(4.7, 4.35), xytext=(5.9, 4.35),
             arrowprops=dict(arrowstyle='<->', lw=0.8, color='#555'))
 ax.annotate('', xy=(7.6, 4.35), xytext=(8.5, 4.35),
             arrowprops=dict(arrowstyle='<->', lw=0.8, color='#555'))
-ax.text(7.2, 3.95, 'randomised spacing (Section IV-B)', ha='center', fontsize=7,
+ax.text(7.2, 3.95, 'randomized spacing (Section IV-B)', ha='center', fontsize=7,
         color='#555')
 ax.text(7.1, 5.75, 'FBG array: same nominal wavelength,\nseparated only by delay',
         ha='center', fontsize=7.4)
@@ -198,7 +198,7 @@ axb.set_title('(a) Multiple reflections and spacing', fontsize=9)
 Mc = 96
 nuc = np.linspace(-2.6 * F, 2.6 * F, Mc)
 rng3 = np.random.default_rng(7)
-Kc = 24
+Kc = 32
 nubs = rng3.uniform(-25, 25, Kc)
 Ac = 0.05 * np.exp(-0.5 * ((nuc[None, :] - nubs[:, None]) / SIG) ** 2)
 wanted = Ac[0]

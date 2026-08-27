@@ -126,7 +126,7 @@ ax[0].loglog(NSarr[~solid], km[~solid], 'o', mfc='none', mec='#2980b9',
              label='lower bound (sweep cap)')
 ax[0].loglog(NSarr, 0.37 * NSarr, '--', color='0.4', label=r'$K = 0.37\,N$')
 for N in NS:
-    lab = 'N=%d' % N + (' (>=)' if sat[N] else '')
+    lab = 'N=%d' % N
     dx, dy = (4, -11) if N < 1023 else (-30, 8)
     ax[0].annotate(lab, (N, kmax[N]), textcoords='offset points',
                    xytext=(dx, dy), fontsize=6.6, color='#2980b9')
@@ -157,7 +157,7 @@ ax[1].set_xlabel('gratings on the fiber, K')
 ax[1].set_ylabel('probability / expected count')
 ax[1].set_title('(b) Co-binning: how often, how hard', fontsize=9)
 ax[1].text(0.98, 0.04, 'hard pair = same bin AND closer\n'
-                       'than FWHM/2 in wavelength;\nonly these need more than\n'
+                       'than FWHM/2 in wavelength.\nOnly these need more than\n'
                        'a two-component fit', transform=ax[1].transAxes,
            fontsize=6.6, color='0.3', ha='right', va='bottom')
 ax[1].legend(fontsize=6.8, loc='upper left')

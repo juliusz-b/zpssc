@@ -352,11 +352,11 @@ ax.set_xscale('log'); ax.set_xlim(0.01, 100); ax.set_ylim(-0.8, len(ROWS) - 0.2)
 ax.axvline(10.0, color='0.3', ls='--', lw=0.9)
 ax.text(10.6, len(ROWS) - 0.6, '10 pm target', fontsize=7.5, color='0.3')
 ax.set_xlabel('RMS contribution to the Bragg-wavelength error [pm]')
-ax.set_title('Systematic error budget, chirp excursion = %.1f x linewidth' % CHIRPS[1], fontsize=7)
+# no in-figure title: it duplicated the caption and collided with the legend
 ax.grid(True, axis='x', which='both', alpha=0.25)
-ax.legend(fontsize=5.8, loc='upper center', frameon=False,
-          bbox_to_anchor=(0.5, 1.14), ncol=1)
-fig.subplots_adjust(left=0.26, right=0.98, top=0.91, bottom=0.13); plt.savefig('figs/fig_s15_budget.png', dpi=140)
+ax.legend(fontsize=6.2, loc='upper center', frameon=False,
+          bbox_to_anchor=(0.5, 1.16), ncol=1)
+fig.subplots_adjust(left=0.26, right=0.98, top=0.87, bottom=0.13); plt.savefig('figs/fig_s15_budget.png', dpi=140)
 plt.savefig('figs/fig_s15_budget.pdf')
 print()
 print('saved figs/fig_s15_budget.png')

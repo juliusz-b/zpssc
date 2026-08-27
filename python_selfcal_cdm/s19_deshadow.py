@@ -168,7 +168,7 @@ axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12', lw=1.4,
 axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
 axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.42)
-axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalised readout')
+axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
 axb.set_title('(b) 4th grating behind three, R = 20%', fontsize=7)
 axb.legend(fontsize=5.6, loc='upper left')
 axb.text(0.44, 0.04, 'peak error %.0f pm -> %.1f pm'
