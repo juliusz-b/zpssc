@@ -344,6 +344,9 @@ for name, dy, col in [('bench as procured', h / 2, '#c0392b'),
     for yi, v in zip(y, vals[name]):
         if v < 0.01:
             ax.text(FLOOR * 1.4, yi + dy, 'below 0.01', va='center', fontsize=6.5, color=col)
+        else:
+            ax.text(v * 1.15, yi + dy, ('%.2f' % v) if v < 10 else ('%.1f' % v),
+                    va='center', fontsize=6.0, color=col)
 ax.set_yticks(y); ax.set_yticklabels(ROWS, fontsize=6.4)
 ax.set_xscale('log'); ax.set_xlim(0.01, 100); ax.set_ylim(-0.8, len(ROWS) - 0.2)
 ax.axvline(10.0, color='0.3', ls='--', lw=0.9)

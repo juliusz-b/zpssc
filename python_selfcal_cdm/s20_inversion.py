@@ -223,6 +223,12 @@ x = np.arange(3)
 w = 0.36
 ax[0].bar(x - w / 2, shape_tab[0][1], w, color='#2980b9', label='Gaussian gratings')
 ax[0].bar(x + w / 2, shape_tab[1][1], w, color='#c0392b', label=r'tanh$^2$ gratings')
+for xi, v in zip(x - w / 2, shape_tab[0][1]):
+    ax[0].text(xi, v * 1.12, '%.1f' % v, ha='center', va='bottom',
+               fontsize=6.6, color='#2980b9')
+for xi, v in zip(x + w / 2, shape_tab[1][1]):
+    ax[0].text(xi, v * 1.12, '%.1f' % v, ha='center', va='bottom',
+               fontsize=6.6, color='#c0392b')
 ax[0].set_xticks(x); ax[0].set_xticklabels(labels, fontsize=7)
 ax[0].set_yscale('log'); ax[0].set_ylim(0.5, 60)
 ax[0].set_ylabel('RMS Bragg error [pm]')
