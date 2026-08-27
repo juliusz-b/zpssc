@@ -115,7 +115,9 @@ Kx = np.arange(2, 130)
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
+# single panel: the co-binning statistics moved to eq. (18) in the text
+fig, ax0 = plt.subplots(figsize=(3.45, 2.6))
+ax = [ax0]
 
 NSarr = np.array(NS, float)
 km = np.array([kmax[N] for N in NS])
@@ -141,27 +143,8 @@ ax[0].set_xlabel('code length N')
 ax[0].set_ylabel('leakage-limited gratings per band', color='#2980b9')
 ax[0].tick_params(axis='y', labelcolor='#2980b9', labelsize=7)
 ax[0].set_xticks(NS); ax[0].set_xticklabels([str(N) for N in NS], fontsize=7)
-ax[0].set_title('(a) What N buys: bins, capacity, range', fontsize=9)
-ax[0].legend(fontsize=6.8, loc='upper left')
+ax[0].legend(fontsize=6.4, loc='upper left')
 ax[0].grid(True, which='both', alpha=0.25)
-
-for N, col in [(127, '#c0392b'), (511, '#2980b9'), (1023, '#28b463')]:
-    pc = np.array([p_collision(K, N) for K in Kx])
-    ax[1].plot(Kx, pc, '-', color=col, lw=1.3, label='P(any shared bin), N = %d' % N)
-hard_511 = P_HARD * Kx * (Kx - 1) / (2 * 511.0)
-ax[1].plot(Kx, hard_511, ':', color='#2980b9', lw=1.6,
-           label='expected hard pairs, N = 511')
-ax[1].axhline(1.0, color='0.6', ls='--', lw=0.7)
-ax[1].set_ylim(0, 2.3)
-ax[1].set_xlabel('gratings on the fiber, K')
-ax[1].set_ylabel('probability / expected count')
-ax[1].set_title('(b) Co-binning: how often, how hard', fontsize=9)
-ax[1].text(0.98, 0.04, 'hard pair = same bin AND closer\n'
-                       'than FWHM/2 in wavelength.\nOnly these need more than\n'
-                       'a two-component fit', transform=ax[1].transAxes,
-           fontsize=6.6, color='0.3', ha='right', va='bottom')
-ax[1].legend(fontsize=6.8, loc='upper left')
-ax[1].grid(True, alpha=0.25)
 
 fig.tight_layout()
 fig.savefig('figs/fig_s22_codelength.png', dpi=150, bbox_inches='tight')

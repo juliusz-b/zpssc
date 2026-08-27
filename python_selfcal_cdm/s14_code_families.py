@@ -132,39 +132,22 @@ for name, nchips, fsize, ac in FAMILIES:
 # ---------------------------------------------------------------------------
 COL = {'m-sequence, N=127': '#2980b9', 'Gold, N=127': '#c0392b',
        'Kasami small, N=63': '#7d3c98', 'Golay pair, N=128 (2 shots)': '#f39c12'}
-fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
+# single panel: the error curve alone (side-lobe levels live in Table I)
+fig, ax1 = plt.subplots(figsize=(3.45, 2.5))
 for name, nchips, fsize, ac in FAMILIES:
-    L = len(ac); lag = np.arange(L) - L // 2
-    y = np.abs(np.roll(ac, L // 2))
-    sel = np.abs(lag) <= 30
-    ax[0].semilogy(lag[sel], np.maximum(y[sel], 1e-4), lw=1.1, color=COL[name], label=name)
-ax[0].axhline(17 / 127, color='0.5', ls=':', lw=0.9)
-ax[0].text(30, 17 / 127 * 1.3, 'Gold bound 17/127 ', fontsize=7, color='0.4', ha='right')
-ax[0].axhline(1 / 127, color='0.5', ls='--', lw=0.9)
-ax[0].text(30, 1 / 127 * 1.3, 'm-sequence 1/N ', fontsize=7, color='0.4', ha='right')
-ax[0].set_ylim(1e-4, 2)
-ax[0].set_xlabel('lag [chip]'); ax[0].set_ylabel('|periodic autocorrelation|')
-ax[0].set_title('(a) Autocorrelation: what separates gratings')
-ax[0].grid(True, which='both', alpha=0.25)
-
-for name, nchips, fsize, ac in FAMILIES:
-    ax[1].plot(Ks, curves[name], 'o-', color=COL[name], label=name)
-ax[1].axhline(10.0, color='0.3', ls='--', lw=0.8)
-ax[1].text(0.97, 0.06, '10 pm target', transform=ax[1].transAxes, fontsize=7.5,
-           color='0.3', ha='right')
-ax[1].set_xlabel('gratings on the fiber, K')
-ax[1].set_ylabel('RMS Bragg error [pm]')
-ax[1].set_title('(b) Code-induced error vs array size')
-ax[1].grid(True, alpha=0.25)
-# one shared legend above both panels: same four families everywhere,
-# and nothing sits on top of the curves
-handles, labels = ax[0].get_legend_handles_labels()
-fig.legend(handles, labels, ncol=4, fontsize=6.8, loc='upper center',
-           frameon=False, bbox_to_anchor=(0.5, 1.005), handlelength=1.5,
-           columnspacing=1.1)
-plt.tight_layout(rect=(0, 0, 1, 0.92))
-plt.savefig('figs/fig_s14_codes.png', dpi=140)
-plt.savefig('figs/fig_s14_codes.pdf')
+    ax1.plot(Ks, curves[name], 'o-', color=COL[name], label=name)
+ax1.axhline(10.0, color='0.3', ls='--', lw=0.8)
+ax1.text(0.97, 0.06, '10 pm target', transform=ax1.transAxes, fontsize=7.5,
+         color='0.3', ha='right')
+ax1.set_xlabel('gratings on the fiber, K')
+ax1.set_ylabel('RMS Bragg error [pm]')
+ax1.grid(True, alpha=0.25)
+# legend above the axes so it never sits on the curves
+ax1.legend(fontsize=6.4, ncol=2, loc='lower center', frameon=False,
+           bbox_to_anchor=(0.5, 1.01), handlelength=1.4, columnspacing=0.9)
+plt.tight_layout()
+plt.savefig('figs/fig_s14_codes.png', dpi=140, bbox_inches='tight')
+plt.savefig('figs/fig_s14_codes.pdf', bbox_inches='tight')
 
 # ---------------------------------------------------------------------------
 # printed tables

@@ -113,7 +113,7 @@ e_one8 = avg(8, 1, R0, 300)
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.45))
+fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.45))
 
 # --- (a) addressing plane ---------------------------------------------------
 axa = ax[0]
@@ -140,37 +140,8 @@ axa.set_yticks([]); axa.set_xlabel('delay bin  ->  position')
 axa.set_ylabel('wavelength  ->  band')
 axa.set_title('(a) CDM-WDM addressing', fontsize=9)
 
-# --- (b) measurement cycle in time -------------------------------------------
-axb = ax[1]
-n_steps = 12
-T_STEP = 1.0
-for i in range(n_steps):
-    band_i = i // 3
-    y = i + 0.5
-    axb.add_patch(Rectangle((i * T_STEP, y - 0.32), 0.86 * T_STEP, 0.64,
-                            fc=BAND_COLS[band_i % 4], alpha=0.25, lw=0))
-    tt = np.linspace(i * T_STEP + 0.03, i * T_STEP + 0.83, 60)
-    codebits = np.repeat(_MS[:12], 5)[:60]
-    axb.plot(tt, y + 0.16 * codebits, color='0.25', lw=0.6)
-axb.plot([0.43 + i for i in range(n_steps)], [i + 0.5 for i in range(n_steps)],
-         ls='', marker=None)
-axb.annotate('', xy=(0.86, -0.55), xytext=(0.0, -0.55),
-             arrowprops=dict(arrowstyle='<->', lw=0.8))
-axb.text(0.43, -1.25, 'code, a few periods\n(equivalent-time sampling)',
-         fontsize=6.4, ha='center')
-axb.annotate('', xy=(12.0, 12.35), xytext=(0.0, 12.35),
-             arrowprops=dict(arrowstyle='<->', lw=0.8))
-axb.text(6.0, 12.6, 'frame = M steps  ->  refresh rate', fontsize=6.8, ha='center')
-axb.set_xlim(-0.4, 12.6); axb.set_ylim(-1.9, 13.6)
-axb.set_xlabel('time'); axb.set_ylabel('sweep wavelength (staircase)')
-axb.set_xticks([]); axb.set_yticks([])
-axb.text(9.0, 1.1, 'B = 25 Mchip/s, N = 127:\n31 us / step (20 MS/s ADC)\n'
-                   'M = 64 -> 1.95 ms frame\n-> 513 Hz refresh', fontsize=6.6,
-         color='0.25')
-axb.set_title('(b) One measurement cycle', fontsize=9)
-
-# --- (c) banding resets the mechanisms ---------------------------------------
-axc = ax[2]
+# --- (b) banding resets the mechanisms ---------------------------------------
+axc = ax[1]
 vals = [e_one32, e_band, e_one8]
 labels = ['one band\nK = 32', '4 bands\nof 8\n(K = 32)', 'one band\nK = 8\n(reference)']
 cols = ['#c0392b', '#f39c12', '#2980b9']
@@ -180,7 +151,7 @@ for i, v in enumerate(vals):
 axc.set_xticks(np.arange(3)); axc.set_xticklabels(labels, fontsize=7)
 axc.set_ylabel('RMS Bragg error [pm]')
 axc.set_ylim(0, max(vals) * 1.22)
-axc.set_title('(c) Banding resets the error chain', fontsize=9)
+axc.set_title('(b) Banding resets the error chain', fontsize=9)
 axc.grid(True, axis='y', alpha=0.25)
 
 fig.tight_layout()

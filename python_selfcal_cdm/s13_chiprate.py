@@ -156,40 +156,27 @@ def quant_jitter(bits, headroom=0.5, ntrials=300, seed=7):
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
-ax[0].loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#c0392b',
-             label='min spacing 0.5 m')
-ax[0].loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#2980b9',
-             label='min spacing 2 m')
-ax[0].loglog(Bs / 1e6, np.maximum(e_4, 0.05), '^-', color='#28b463',
-             label='min spacing 4 m (bench)')
+# single panel: the resolution criterion (jitter is one sentence in the text)
+fig, ax0 = plt.subplots(figsize=(3.45, 2.5))
+ax0.loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#c0392b',
+           label='min spacing 0.5 m')
+ax0.loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#2980b9',
+           label='min spacing 2 m')
+ax0.loglog(Bs / 1e6, np.maximum(e_4, 0.05), '^-', color='#28b463',
+           label='min spacing 4 m (bench)')
 for d, col in [(0.5, '#c0392b'), (2.0, '#2980b9'), (4.0, '#28b463')]:
     B_req = C_LIGHT / (2.0 * N_GROUP * d) / 1e6
-    ax[0].axvline(B_req, color=col, ls=':', lw=0.9)
-ax[0].axhline(10.0, color='0.3', ls='--', lw=0.8)
-ax[0].text(0.03, 0.10, 'dotted lines: dz = min spacing', transform=ax[0].transAxes,
-           fontsize=7, color='0.3')
-ax[0].text(0.03, 0.04, 'dashed line: 10 pm target', transform=ax[0].transAxes,
-           fontsize=7, color='0.3')
-ax[0].set_xlabel('chip rate B [Mchip/s]')
-ax[0].set_ylabel('RMS Bragg error [pm]')
-ax[0].set_title('(a) Resolution: error vs chip rate')
-ax[0].legend(fontsize=5.6, loc='lower left', frameon=True,
-             framealpha=0.95, edgecolor='none'); ax[0].grid(True, which='both', alpha=0.25)
-
-ax[1].plot(jit, np.maximum(e_jit_25, 0.05), '^-', color='#28b463',
-               label='B = 25 Mchip/s (dz = 4.1 m, marginal)')
-ax[1].plot(jit, np.maximum(e_jit_50, 0.05), 's-', color='#2980b9',
-               label='B = 50 Mchip/s (dz = 2.0 m, comfortable)')
-ax[1].axhline(10.0, color='0.3', ls='--', lw=0.8)
-ax[1].text(0.97, 0.955, '10 pm target', transform=ax[1].transAxes, fontsize=5.6,
-           color='0.3', ha='right')
-ax[1].set_xlabel('RMS timing jitter [chip periods]')
-ax[1].set_ylabel('RMS Bragg error [pm]')
-ax[1].set_title('(b) Timing jitter tolerance')
-ax[1].legend(fontsize=7.0, loc='lower right', frameon=True,
-             framealpha=0.95, edgecolor='none')
-ax[1].grid(True, which='both', alpha=0.25)
+    ax0.axvline(B_req, color=col, ls=':', lw=0.9)
+ax0.axhline(10.0, color='0.3', ls='--', lw=0.8)
+ax0.text(0.03, 0.10, 'dotted lines: dz = min spacing', transform=ax0.transAxes,
+         fontsize=6.6, color='0.3')
+ax0.text(0.03, 0.03, 'dashed line: 10 pm target', transform=ax0.transAxes,
+         fontsize=6.6, color='0.3')
+ax0.set_xlabel('chip rate B [Mchip/s]')
+ax0.set_ylabel('RMS Bragg error [pm]')
+ax0.legend(fontsize=5.8, loc='upper right', frameon=True,
+           framealpha=0.95, edgecolor='none')
+ax0.grid(True, which='both', alpha=0.25)
 plt.tight_layout(); plt.savefig('figs/fig_s13_chiprate.png', dpi=140)
 plt.savefig('figs/fig_s13_chiprate.pdf')
 

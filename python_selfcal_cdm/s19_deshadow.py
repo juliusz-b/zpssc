@@ -109,55 +109,11 @@ fixed = np.array([rms_error(K, 0.10, 200 + K, corrected=True) for K in Ks])
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.4))
+# two panels: the recursion itself lives in eqs. (19)-(20) of the paper
+fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.4))
 
-# --- (a) the recursion, drawn ----------------------------------------------
-axa = ax[0]
-axa.axis('off'); axa.set_xlim(0, 10); axa.set_ylim(0, 10.6)
-axa.plot([0.6, 9.4], [8.9, 8.9], color='#555', lw=1.5)
-gz = [1.8, 4.0, 6.2, 8.4]
-for i, z in enumerate(gz):
-    axa.add_patch(Rectangle((z - 0.22, 8.62), 0.44, 0.56, fc='#c0392b',
-                            ec='#7b241c', hatch='///', lw=0.8))
-    axa.text(z, 9.45, '%d' % (i + 1), ha='center', fontsize=6.5)
-axa.annotate('', xy=(9.4, 9.9), xytext=(0.6, 9.9),
-             arrowprops=dict(arrowstyle='-|>', lw=0.9, color='#555'))
-axa.text(0.6, 10.02, 'light', ha='left', fontsize=5.8, color='#555')
-
-
-BOX_H = 1.15
-ys = [6.55, 4.75, 2.95, 1.15]
-
-
-def step(y, text, fc='#eaf1fb'):
-    axa.add_patch(FancyBboxPatch((0.5, y), 9.0, BOX_H,
-                                 boxstyle='round,pad=0.05,rounding_size=0.12',
-                                 fc=fc, ec='#1f4e79', lw=1.0))
-    axa.text(5.0, y + BOX_H / 2, text, ha='center', va='center',
-             fontsize=6.9)
-
-
-step(ys[0], 'fit grating 1: it sees the full source')
-step(ys[1], r'reconstruct its transmission $[1-R_1(\lambda)]^2$',
-     fc='#fdf3e7')
-step(ys[2], r'divide it out of gratings $2 \ldots K$')
-step(ys[3], r'repeat with grating 2, then 3, $\ldots$', fc='#eafaf0')
-# arrows run exactly from one box's bottom edge to the next box's top edge
-axa.add_patch(FancyArrowPatch((5.0, 8.55), (5.0, ys[0] + BOX_H + 0.06),
-                              arrowstyle='-|>', mutation_scale=12, lw=1.2,
-                              color='#333', shrinkA=0, shrinkB=0))
-for y0, y1 in zip(ys[:-1], ys[1:]):
-    axa.add_patch(FancyArrowPatch((5.0, y0), (5.0, y1 + BOX_H + 0.06),
-                                  arrowstyle='-|>', mutation_scale=12,
-                                  lw=1.2, color='#333', shrinkA=0,
-                                  shrinkB=0))
-axa.text(5.0, 0.30, 'needs only the array order,\n'
-         'which the delay bins already give',
-         fontsize=6.2, color='0.35', ha='center')
-axa.set_title('(a) Sequential deshadowing', fontsize=7)
-
-# --- (b) one grating, before and after --------------------------------------
-axb = ax[1]
+# --- (a) one grating, before and after --------------------------------------
+axb = ax[0]
 lam = nu * PM / 1000.0
 axb.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#2980b9', lw=2.2,
          label='true line')
@@ -169,14 +125,14 @@ axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
 axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.42)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
-axb.set_title('(b) 4th grating behind three, R = 20%', fontsize=7)
+axb.set_title('(a) 4th grating behind three, R = 20%', fontsize=7)
 axb.legend(fontsize=5.6, loc='upper left')
 axb.text(0.44, 0.04, 'peak error %.0f pm -> %.1f pm'
          % (abs(p_shad - p_true), abs(p_corr - p_true)),
          transform=axb.transAxes, ha='center', fontsize=5.8)
 
-# --- (c) how far it gets -----------------------------------------------------
-axc = ax[2]
+# --- (b) how far it gets -----------------------------------------------------
+axc = ax[1]
 axc.semilogy(Ks, raw, 'o-', color='#c0392b', label='uncorrected')
 axc.semilogy(Ks, fixed, 's-', color='#f39c12', label='after deshadowing')
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8)
@@ -184,7 +140,7 @@ axc.text(0.97, 0.06, '10 pm target', transform=axc.transAxes, fontsize=5.8,
          color='0.3', ha='right')
 axc.set_xlabel('gratings on the fiber, K')
 axc.set_ylabel('RMS Bragg error [pm]')
-axc.set_title('(c) Gain and its limit, R = 10%', fontsize=7)
+axc.set_title('(b) Gain and its limit, R = 10%', fontsize=7)
 axc.legend(fontsize=5.8, loc='upper left'); axc.grid(True, which='both', alpha=0.25)
 
 fig.tight_layout()
