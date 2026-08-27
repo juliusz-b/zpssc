@@ -133,7 +133,7 @@ ax[0].text(0.15, -0.11, 'shaded: chip on', fontsize=6.6, color='0.45')
 ax[0].axhline(plateau, color='#c0392b', ls=':', lw=0.8)
 i_ov = 2 * OSR + int(np.argmax(nu_inst[2 * OSR:3 * OSR]))
 ax[0].annotate('transient overshoot', xy=(t[i_ov], nu_inst[i_ov]),
-               xytext=(2.35, 1.33), fontsize=6.8, color='#c0392b',
+               xytext=(0.22, 1.31), fontsize=6.8, color='#c0392b',
                arrowprops=dict(arrowstyle='->', lw=0.7, color='#c0392b'))
 ax[0].annotate('adiabatic level', xy=(3.55, plateau),
                xytext=(2.55, 0.30), fontsize=6.8, color='#c0392b',
@@ -144,13 +144,23 @@ ax[0].text(1.72, 0.5, r'$\Delta$', color='#1f4e79', fontsize=9.5, ha='left',
            va='center')
 ax[0].grid(True, alpha=0.2)
 
-axk = ax[0].inset_axes([0.66, 0.42, 0.32, 0.31])
+axk = ax[0].inset_axes([0.615, 0.50, 0.365, 0.37])
+axk.set_facecolor('white')
+axk.patch.set_alpha(1.0)
+axk.set_zorder(10)
+for sp in axk.spines.values():
+    sp.set_visible(True); sp.set_linewidth(0.7); sp.set_color('0.45')
 axk.fill_between(centres, hist, color='#c0392b', alpha=0.35, lw=0)
 axk.plot(centres, hist, color='#c0392b', lw=0.9)
-axk.set_title('kernel ' + r'$p(\delta)$', fontsize=6.2, pad=2)
+axk.set_title('kernel ' + r'$p(\delta)$', fontsize=6.4, pad=2)
 axk.tick_params(labelsize=5.5, pad=1)
 axk.set_yticks([])
 axk.set_xlim(-0.05, 1.12)
+# leader: from the trace into the boxed inset
+ax[0].annotate('', xy=(4.66, 1.02), xytext=(3.92, plateau + 0.02),
+               arrowprops=dict(arrowstyle='->', lw=0.8, color='0.45',
+                               connectionstyle='arc3,rad=0.25'),
+               zorder=11, annotation_clip=False)
 
 # --- (b) -------------------------------------------------------------------
 ax[1].plot(g * PM / 1000.0, true_line, color='#2980b9', lw=1.4, label='no chirp')
@@ -161,7 +171,7 @@ kern = np.exp(-0.5 * ((g - nu_op) / (0.5 * DELTA_DEMO)) ** 2)
 ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#7d3c98', alpha=0.32,
                    lw=0)
 ax[1].annotate('a spread of frequencies\nsampled on a steep flank',
-               xy=(nu_op * PM / 1000.0, 0.34), xytext=(-0.60, 0.62),
+               xy=(nu_op * PM / 1000.0, 0.34), xytext=(-0.60, 0.84),
                fontsize=6.5, color='#7d3c98',
                arrowprops=dict(arrowstyle='->', lw=0.7, color='#7d3c98'))
 ax[1].axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.9)
