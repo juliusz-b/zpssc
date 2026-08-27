@@ -31,8 +31,9 @@ import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
-plt.rcParams.update({'font.size': 8.5})
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -117,7 +118,7 @@ curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2,
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(10.6, 3.4))
+fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.35))
 
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',

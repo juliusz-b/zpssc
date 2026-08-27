@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle, Circle
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -30,12 +32,11 @@ NCH = 127
 MSEQ = 1.0 - 2.0 * C._mls01(7)
 ACORR = C.periodic_xcorr(MSEQ, MSEQ)
 
-plt.rcParams.update({'font.size': 8.5})
 
 # ===========================================================================
 # FIGURE 1: principle
 # ===========================================================================
-fig = plt.figure(figsize=(10.6, 3.9))
+fig = plt.figure(figsize=(7.1, 2.65))
 gs = fig.add_gridspec(1, 2, width_ratios=[1.15, 1.0], wspace=0.28)
 
 # --- (a) optical layout ----------------------------------------------------
@@ -135,7 +136,7 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # FIGURE 2: error mechanisms
 # ===========================================================================
-fig2, ax = plt.subplots(1, 2, figsize=(8.8, 3.5))
+fig2, ax = plt.subplots(1, 2, figsize=(7.1, 2.85))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]

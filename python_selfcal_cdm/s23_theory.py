@@ -54,8 +54,9 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
-plt.rcParams.update({'font.size': 8.5})
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -162,7 +163,7 @@ products = {N: k * f for N, (k, f) in table.items()}
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(10.6, 3.5))
+fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.4))
 
 ax[0].plot(Dfr, thc, '-', color='#2980b9', lw=1.3, label='centroid, closed form')
 ax[0].plot(Dfr[::2], simc[::2], 'o', color='#2980b9', ms=4, mfc='none',

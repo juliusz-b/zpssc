@@ -27,8 +27,9 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
-plt.rcParams.update({'font.size': 8.5})
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -108,7 +109,7 @@ fixed = np.array([rms_error(K, 0.10, 200 + K, corrected=True) for K in Ks])
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(10.6, 3.5))
+fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.4))
 
 # --- (a) the recursion, drawn ----------------------------------------------
 axa = ax[0]
@@ -118,17 +119,17 @@ gz = [1.8, 4.0, 6.2, 8.4]
 for i, z in enumerate(gz):
     axa.add_patch(Rectangle((z - 0.22, 8.62), 0.44, 0.56, fc='#c0392b',
                             ec='#7b241c', hatch='///', lw=0.8))
-    axa.text(z, 9.45, '%d' % (i + 1), ha='center', fontsize=8)
+    axa.text(z, 9.45, '%d' % (i + 1), ha='center', fontsize=6.5)
 axa.annotate('', xy=(9.4, 9.9), xytext=(0.6, 9.9),
              arrowprops=dict(arrowstyle='-|>', lw=0.9, color='#555'))
-axa.text(0.6, 9.95, 'light', ha='left', fontsize=6.8, color='#555')
+axa.text(0.6, 10.02, 'light', ha='left', fontsize=5.8, color='#555')
 
 
 def step(y, text, fc='#eaf1fb'):
     axa.add_patch(FancyBboxPatch((0.5, y), 9.0, 1.05,
                                  boxstyle='round,pad=0.05,rounding_size=0.12',
                                  fc=fc, ec='#1f4e79', lw=1.0))
-    axa.text(5.0, y + 0.52, text, ha='center', va='center', fontsize=7.2)
+    axa.text(5.0, y + 0.52, text, ha='center', va='center', fontsize=5.9)
 
 
 step(6.65, 'fit grating 1: it sees the full source', )
@@ -140,9 +141,9 @@ for y in (6.65, 4.85, 3.05):
                                   mutation_scale=10, lw=1.0, color='#333'))
 axa.add_patch(FancyArrowPatch((5.0, 8.55), (5.0, 7.75), arrowstyle='-|>',
                               mutation_scale=10, lw=1.0, color='#333'))
-axa.text(0.6, 0.45, 'needs only the order of the gratings, which the delay '
-                    'bins already give', fontsize=6.6, color='0.35')
-axa.set_title('(a) Sequential deshadowing', fontsize=9)
+axa.text(5.0, 0.42, 'needs only the array order,\nwhich the delay bins already give',
+         fontsize=5.6, color='0.35', ha='center')
+axa.set_title('(a) Sequential deshadowing', fontsize=7)
 
 # --- (b) one grating, before and after --------------------------------------
 axb = ax[1]
@@ -155,25 +156,25 @@ axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12', lw=1.4,
          ls='--', label='after deshadowing')
 axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
-axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.32)
+axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.42)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalised readout')
-axb.set_title('(b) Fourth grating behind three at R = 20%', fontsize=9)
-axb.legend(fontsize=6.6, loc='upper left')
-axb.text(0.97, 0.10, 'peak error %.0f pm  ->  %.1f pm'
+axb.set_title('(b) 4th grating behind three, R = 20%', fontsize=7)
+axb.legend(fontsize=5.6, loc='upper left')
+axb.text(0.97, 0.04, 'peak error %.0f pm -> %.1f pm'
          % (abs(p_shad - p_true), abs(p_corr - p_true)),
-         transform=axb.transAxes, ha='right', fontsize=7.2)
+         transform=axb.transAxes, ha='right', fontsize=5.8)
 
 # --- (c) how far it gets -----------------------------------------------------
 axc = ax[2]
 axc.semilogy(Ks, raw, 'o-', color='#c0392b', label='uncorrected')
 axc.semilogy(Ks, fixed, 's-', color='#f39c12', label='after deshadowing')
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8)
-axc.text(0.97, 0.06, '10 pm target', transform=axc.transAxes, fontsize=7,
+axc.text(0.97, 0.06, '10 pm target', transform=axc.transAxes, fontsize=5.8,
          color='0.3', ha='right')
 axc.set_xlabel('gratings on the fiber, K')
 axc.set_ylabel('RMS Bragg error [pm]')
-axc.set_title('(c) Gain and its limit, R = 10%', fontsize=9)
-axc.legend(fontsize=7, loc='upper left'); axc.grid(True, which='both', alpha=0.25)
+axc.set_title('(c) Gain and its limit, R = 10%', fontsize=7)
+axc.legend(fontsize=5.8, loc='upper left'); axc.grid(True, which='both', alpha=0.25)
 
 fig.tight_layout()
 fig.savefig('figs/fig_s19_deshadow.png', dpi=150, bbox_inches='tight')

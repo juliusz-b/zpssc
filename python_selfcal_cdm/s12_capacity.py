@@ -53,6 +53,8 @@ Outputs
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ            # 31.25 GHz = 250 pm (procured FBGS gratings)
@@ -246,10 +248,9 @@ bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-plt.rcParams.update({'font.size': 9})
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(1, 2, figsize=(10.6, 4.0))
+fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#7d3c98', label='spectral shadowing only')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#c0392b', label='ghosts only, uniform spacing')
 ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts only, randomised spacing')

@@ -24,6 +24,8 @@ Outputs
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -154,8 +156,7 @@ def quant_jitter(bits, headroom=0.5, ntrials=300, seed=7):
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-plt.rcParams.update({'font.size': 9})
-fig, ax = plt.subplots(1, 2, figsize=(10.6, 4.0))
+fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
 ax[0].loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#c0392b',
              label='min spacing 0.5 m')
 ax[0].loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#2980b9',
@@ -173,14 +174,14 @@ ax[0].text(0.03, 0.04, 'dashed line: 10 pm target', transform=ax[0].transAxes,
 ax[0].set_xlabel('chip rate B [Mchip/s]')
 ax[0].set_ylabel('RMS Bragg error [pm]')
 ax[0].set_title('(a) Resolution: error vs chip rate')
-ax[0].legend(fontsize=7.5, loc='upper right'); ax[0].grid(True, which='both', alpha=0.25)
+ax[0].legend(fontsize=5.6, loc='upper right'); ax[0].grid(True, which='both', alpha=0.25)
 
 ax[1].plot(jit, np.maximum(e_jit_25, 0.05), '^-', color='#28b463',
                label='B = 25 Mchip/s (dz = 4.1 m, marginal)')
 ax[1].plot(jit, np.maximum(e_jit_50, 0.05), 's-', color='#2980b9',
                label='B = 50 Mchip/s (dz = 2.0 m, comfortable)')
 ax[1].axhline(10.0, color='0.3', ls='--', lw=0.8)
-ax[1].text(0.97, 0.93, '10 pm target', transform=ax[1].transAxes, fontsize=7.5,
+ax[1].text(0.97, 0.955, '10 pm target', transform=ax[1].transAxes, fontsize=5.6,
            color='0.3', ha='right')
 ax[1].set_xlabel('RMS timing jitter [chip periods]')
 ax[1].set_ylabel('RMS Bragg error [pm]')

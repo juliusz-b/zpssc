@@ -38,8 +38,9 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
-plt.rcParams.update({'font.size': 8.5})
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -215,7 +216,7 @@ co = np.array([co_binned(s) for s in seps])
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(10.6, 3.4))
+fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.35))
 
 labels = ['uncorrected', 'parametric\n(Gaussian fit)', 'shape-free\n(measured line)']
 x = np.arange(3)
@@ -244,7 +245,7 @@ ax[2].semilogy(seps, co[:, 0], 'o-', color='#c0392b', label='single-peak fit')
 ax[2].semilogy(seps, co[:, 1], 's-', color='#28b463', label='two-component fit')
 ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8)
 ax[2].axvspan(seps[0], 0.5, color='0.85', alpha=0.6)
-ax[2].text(0.31, 200, 'fit fails here', fontsize=6.8, color='0.35', ha='center')
+ax[2].text(0.33, 40, 'fit fails\nhere', fontsize=5.8, color='0.35', ha='center')
 ax[2].set_xlabel('wavelength separation / linewidth')
 ax[2].set_ylabel('RMS Bragg error [pm]')
 ax[2].set_title('(c) Two gratings in one delay bin', fontsize=9)

@@ -31,6 +31,8 @@ Outputs
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -128,10 +130,9 @@ for name, nchips, fsize, ac in FAMILIES:
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-plt.rcParams.update({'font.size': 9})
 COL = {'m-sequence, N=127': '#2980b9', 'Gold, N=127': '#c0392b',
        'Kasami small, N=63': '#7d3c98', 'Golay pair, N=128 (2 shots)': '#f39c12'}
-fig, ax = plt.subplots(1, 2, figsize=(10.6, 4.0))
+fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
 for name, nchips, fsize, ac in FAMILIES:
     L = len(ac); lag = np.arange(L) - L // 2
     y = np.abs(np.roll(ac, L // 2))

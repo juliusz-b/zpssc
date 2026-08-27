@@ -32,8 +32,9 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
-plt.rcParams.update({'font.size': 8.5})
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -112,7 +113,7 @@ e_one8 = avg(8, 1, R0, 300)
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(10.6, 3.6))
+fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.45))
 
 # --- (a) addressing plane ---------------------------------------------------
 axa = ax[0]

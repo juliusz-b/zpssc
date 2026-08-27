@@ -26,6 +26,8 @@ second group is a genuine floor.
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ                  # 31.25 GHz = 250 pm
@@ -325,8 +327,7 @@ print('   what stays scales with the chirp and with the lineshape spread')
 # ---------------------------------------------------------------------------
 # figure: horizontal bars per term, both configurations
 # ---------------------------------------------------------------------------
-plt.rcParams.update({'font.size': 9})
-fig, ax = plt.subplots(figsize=(8.6, 4.3))
+fig, ax = plt.subplots(figsize=(7.1, 2.9))
 y = np.arange(len(ROWS))
 h = 0.38
 vals = {}
@@ -343,15 +344,14 @@ for name, dy, col in [('bench as procured', h / 2, '#c0392b'),
     for yi, v in zip(y, vals[name]):
         if v < 0.01:
             ax.text(FLOOR * 1.4, yi + dy, 'below 0.01', va='center', fontsize=6.5, color=col)
-ax.set_yticks(y); ax.set_yticklabels(ROWS, fontsize=8)
+ax.set_yticks(y); ax.set_yticklabels(ROWS, fontsize=6.4)
 ax.set_xscale('log'); ax.set_xlim(0.01, 100); ax.set_ylim(-0.8, len(ROWS) - 0.2)
 ax.axvline(10.0, color='0.3', ls='--', lw=0.9)
 ax.text(10.6, len(ROWS) - 0.6, '10 pm target', fontsize=7.5, color='0.3')
 ax.set_xlabel('RMS contribution to the Bragg-wavelength error [pm]')
-ax.set_title('Systematic error budget, chirp excursion = %.1f x linewidth' % CHIRPS[1])
+ax.set_title('Systematic error budget, chirp excursion = %.1f x linewidth' % CHIRPS[1], fontsize=7)
 ax.grid(True, axis='x', which='both', alpha=0.25)
-ax.legend(fontsize=7.5, loc='lower center', bbox_to_anchor=(0.5, -0.30), ncol=1,
-          frameon=False)
-fig.subplots_adjust(left=0.26, right=0.98, top=0.90, bottom=0.30); plt.savefig('figs/fig_s15_budget.png', dpi=140)
+ax.legend(fontsize=5.8, loc='lower right', frameon=False)
+fig.subplots_adjust(left=0.26, right=0.98, top=0.91, bottom=0.13); plt.savefig('figs/fig_s15_budget.png', dpi=140)
 print()
 print('saved figs/fig_s15_budget.png')

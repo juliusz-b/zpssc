@@ -31,8 +31,9 @@ import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
+import figstyle as FS
+FS.apply()
 
-plt.rcParams.update({'font.size': 8.5})
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
@@ -114,7 +115,7 @@ Kx = np.arange(2, 130)
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 2, figsize=(9.4, 3.6))
+fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
 
 NSarr = np.array(NS, float)
 km = np.array([kmax[N] for N in NS])
