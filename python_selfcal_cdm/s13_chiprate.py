@@ -191,6 +191,7 @@ ax[1].legend(fontsize=7.0, loc='lower right', frameon=True,
              framealpha=0.95, edgecolor='none')
 ax[1].grid(True, which='both', alpha=0.25)
 plt.tight_layout(); plt.savefig('figs/fig_s13_chiprate.png', dpi=140)
+plt.savefig('figs/fig_s13_chiprate.pdf')
 
 # ---------------------------------------------------------------------------
 # printed tables

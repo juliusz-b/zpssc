@@ -278,6 +278,7 @@ ax[1].set_ylabel('gratings meeting the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
 ax[1].legend(fontsize=7.5, loc='lower left'); ax[1].grid(True, which='both', alpha=0.25)
 plt.tight_layout(); plt.savefig('figs/fig_s12_capacity.png', dpi=140)
+plt.savefig('figs/fig_s12_capacity.pdf')
 
 # ---------------------------------------------------------------------------
 # printed tables

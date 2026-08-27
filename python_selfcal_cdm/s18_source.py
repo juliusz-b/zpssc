@@ -205,6 +205,7 @@ ax[2].grid(True, which='both', alpha=0.25)
 
 fig.tight_layout()
 fig.savefig('figs/fig_s18_source.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s18_source.pdf', bbox_inches='tight')
 
 print('illustration only: excursion %.2f x FWHM, asymmetry %.2f, apparent shift %.1f pm'
       % (DELTA_DEMO / F, ASYM, p_chirp - p_true))

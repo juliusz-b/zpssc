@@ -259,6 +259,7 @@ ax[2].legend(fontsize=7, loc='lower left'); ax[2].grid(True, which='both', alpha
 
 fig.tight_layout()
 fig.savefig('figs/fig_s20_inversion.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s20_inversion.pdf', bbox_inches='tight')
 
 # ---------------------------------------------------------------------------
 # printed results

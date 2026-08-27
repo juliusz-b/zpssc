@@ -173,16 +173,20 @@ ax[0].plot(Dfr[::2], siml[::2], 's', color='#c0392b', ms=4, mfc='none',
            label='LSQ fit, simulated')
 ax[0].axvline(np.sqrt(1.5), color='#c0392b', ls=':', lw=0.8)
 ax[0].axvline(np.sqrt(2.0), color='#2980b9', ls=':', lw=0.8)
-ax[0].text(1.36, -0.14, r'$\Delta^{*}$', fontsize=8, color='0.3')
+ax[0].text(1.28, -0.47, r'$\Delta^{*}$', fontsize=8, color='0.3')
 # a co-tuned +/-10 K pair (S = 100 pm) sweeps detunings 0..2S over its
 # operating range and straddles the worst case (Sec. III-E placement rule)
 ax[0].axvspan(0.0, 200.0 / 106.2, color='0.5', alpha=0.12, lw=0)
-ax[0].text(0.94, 0.20, 'a co-tuned $\\pm$10 K pair\nsweeps $0\\ldots2S$',
-           fontsize=6.4, color='0.25', ha='center')
+ax[0].set_ylim(-1.03, 0.03)
+ax[0].text(0.94, -0.975, '$\\pm$10 K pair sweeps $0\\ldots2S$',
+           fontsize=6.0, color='0.3', ha='center')
 ax[0].set_xlabel(r'neighbour detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('pairwise shadowing bias [pm]  (R = 1%)')
 ax[0].set_title('(a) Law A, exact to first order', fontsize=9)
-ax[0].legend(fontsize=6.6, loc='lower right'); ax[0].grid(True, alpha=0.25)
+# curves occupy the flanks and the dip; the only clear pocket is top-centre
+ax[0].legend(fontsize=6.2, loc='upper center', frameon=False,
+             handlelength=1.5, labelspacing=0.25)
+ax[0].grid(True, alpha=0.25)
 
 ax[1].plot(pos, err, '.', ms=2, color='0.75', alpha=0.5)
 ax[1].plot(cent, binned, 'o', color='#2980b9', ms=5, label='binned mean, simulated')
@@ -211,6 +215,7 @@ ax[2].legend(fontsize=6.8, loc='lower right'); ax[2].grid(True, which='both', al
 
 fig.tight_layout()
 fig.savefig('figs/fig_s23_theory.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s23_theory.pdf', bbox_inches='tight')
 
 # ---------------------------------------------------------------------------
 # printed verification

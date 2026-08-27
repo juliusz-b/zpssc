@@ -125,24 +125,35 @@ axa.annotate('', xy=(9.4, 9.9), xytext=(0.6, 9.9),
 axa.text(0.6, 10.02, 'light', ha='left', fontsize=5.8, color='#555')
 
 
+BOX_H = 1.15
+ys = [6.55, 4.75, 2.95, 1.15]
+
+
 def step(y, text, fc='#eaf1fb'):
-    axa.add_patch(FancyBboxPatch((0.5, y), 9.0, 1.05,
+    axa.add_patch(FancyBboxPatch((0.5, y), 9.0, BOX_H,
                                  boxstyle='round,pad=0.05,rounding_size=0.12',
                                  fc=fc, ec='#1f4e79', lw=1.0))
-    axa.text(5.0, y + 0.52, text, ha='center', va='center', fontsize=5.9)
+    axa.text(5.0, y + BOX_H / 2, text, ha='center', va='center',
+             fontsize=6.9)
 
 
-step(6.65, 'fit grating 1: it sees the full source', )
-step(4.85, r'reconstruct its transmission $[1-R_1(\lambda)]^2$', fc='#fdf3e7')
-step(3.05, 'divide it out of gratings 2 ... K')
-step(1.25, 'repeat with grating 2, then 3, ...', fc='#eafaf0')
-for y in (6.65, 4.85, 3.05):
-    axa.add_patch(FancyArrowPatch((5.0, y), (5.0, y - 0.72), arrowstyle='-|>',
-                                  mutation_scale=10, lw=1.0, color='#333'))
-axa.add_patch(FancyArrowPatch((5.0, 8.55), (5.0, 7.75), arrowstyle='-|>',
-                              mutation_scale=10, lw=1.0, color='#333'))
-axa.text(5.0, 0.42, 'needs only the array order,\nwhich the delay bins already give',
-         fontsize=5.6, color='0.35', ha='center')
+step(ys[0], 'fit grating 1: it sees the full source')
+step(ys[1], r'reconstruct its transmission $[1-R_1(\lambda)]^2$',
+     fc='#fdf3e7')
+step(ys[2], r'divide it out of gratings $2 \ldots K$')
+step(ys[3], r'repeat with grating 2, then 3, $\ldots$', fc='#eafaf0')
+# arrows run exactly from one box's bottom edge to the next box's top edge
+axa.add_patch(FancyArrowPatch((5.0, 8.55), (5.0, ys[0] + BOX_H + 0.06),
+                              arrowstyle='-|>', mutation_scale=12, lw=1.2,
+                              color='#333', shrinkA=0, shrinkB=0))
+for y0, y1 in zip(ys[:-1], ys[1:]):
+    axa.add_patch(FancyArrowPatch((5.0, y0), (5.0, y1 + BOX_H + 0.06),
+                                  arrowstyle='-|>', mutation_scale=12,
+                                  lw=1.2, color='#333', shrinkA=0,
+                                  shrinkB=0))
+axa.text(5.0, 0.30, 'needs only the array order,\n'
+         'which the delay bins already give',
+         fontsize=6.2, color='0.35', ha='center')
 axa.set_title('(a) Sequential deshadowing', fontsize=7)
 
 # --- (b) one grating, before and after --------------------------------------
@@ -160,9 +171,9 @@ axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.42)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalised readout')
 axb.set_title('(b) 4th grating behind three, R = 20%', fontsize=7)
 axb.legend(fontsize=5.6, loc='upper left')
-axb.text(0.97, 0.04, 'peak error %.0f pm -> %.1f pm'
+axb.text(0.44, 0.04, 'peak error %.0f pm -> %.1f pm'
          % (abs(p_shad - p_true), abs(p_corr - p_true)),
-         transform=axb.transAxes, ha='right', fontsize=5.8)
+         transform=axb.transAxes, ha='center', fontsize=5.8)
 
 # --- (c) how far it gets -----------------------------------------------------
 axc = ax[2]
@@ -178,6 +189,7 @@ axc.legend(fontsize=5.8, loc='upper left'); axc.grid(True, which='both', alpha=0
 
 fig.tight_layout()
 fig.savefig('figs/fig_s19_deshadow.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s19_deshadow.pdf', bbox_inches='tight')
 
 print('panel (b): K=%d, R=%.2f, grating %d' % (K_B, R_B, kk + 1))
 print('  true %.1f pm, shadowed %.1f pm, deshadowed %.1f pm'

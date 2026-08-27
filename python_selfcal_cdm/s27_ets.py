@@ -68,4 +68,5 @@ b.set_xlabel(r'record time $N n_s/f_s$ (147 $\mu$s at 3.6 MS/s)',
 
 plt.tight_layout()
 fig.savefig('figs/fig_s27_ets.png', dpi=140)
+fig.savefig('figs/fig_s27_ets.pdf')
 print('saved figs/fig_s27_ets.png')

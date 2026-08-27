@@ -53,6 +53,10 @@ a.text(-0.115, 0.38, 'line\nas read', fontsize=6.6, color=FS.VERM,
 a.set_xlim(-0.42, 0.42); a.set_ylim(0, 1.22)
 a.set_yticks([])
 a.set_xlabel(r'$\lambda$ offset [nm]')
+# the law itself, compact numeric prefactor, in the empty left tail
+a.text(-0.41, 0.14, r'$\delta = -1.09\,R\,\Delta\,'
+       r'e^{-\Delta^{2}/3\sigma^{2}}$',
+       fontsize=6.6, color='0.15', ha='left')
 a.set_title('(a) Law A: the notch pulls the reading', fontsize=9)
 for sp in ('left',):
     a.spines[sp].set_visible(False)
@@ -93,11 +97,17 @@ b.text(550 + 2 * S + 25, -3.25, r'$\checkmark$', fontsize=10,
        color=FS.GREEN, va='center')
 b.text(550 - 2 * S - 25, -3.25, 'far-detuned: safe at every $T$',
        fontsize=6.2, va='center', ha='right', color=FS.GREEN)
+# where the curve comes from and where it peaks: Law A again, as |delta|
+b.text(430, 6.6, 'peak $0.81R\\sigma$\nat $\\Delta^{*}=1.22\\sigma$',
+       fontsize=6.2, color='0.25', ha='left')
+b.annotate('', xy=(SIG * np.sqrt(1.5) + 22, 8.05), xytext=(425, 7.2),
+           arrowprops=dict(arrowstyle='-|>', lw=0.6, color='0.45'))
 b.set_xlim(0, 700); b.set_ylim(0, 9.8)
 b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $\Delta$ [pm]', labelpad=26)
 b.set_ylabel(r'pairwise bias $|\delta|$ [pm]')
-b.set_title(r'(b) windows of a $\pm10$ K pair', fontsize=9)
+b.set_title(r'(b) Law A as a placement rule: $|\delta(\Delta)|>\epsilon$'
+            ' is off limits', fontsize=8.2)
 
 # ------------------------- (c) Law B: three rulers --------------------------
 c = ax[2]
@@ -125,8 +135,12 @@ for x0 in pos:
 for x0 in pos:
     c.plot([x0 * st, x0], [1.0 - 0.16, 0.0 + 0.16], color=FS.BLUE,
            lw=0.5, alpha=0.55)
-c.text(0, 2.62, r'$9.4 \rightarrow 2.3$ pm at $K=32$, $N=127$',
-       fontsize=6.6, ha='center', color='0.15')
+c.text(0, 2.62, r'mean pull $\approx \nu_k (K{-}1)/N$ (Law B, eq. 10):'
+       '  a gain error, not noise', fontsize=6.4, ha='center',
+       color='0.15')
+c.text(0, -0.38, 'two references (bold) pin gain and offset: '
+       r'$9.4 \rightarrow 2.3$ pm at $K{=}32$, $N{=}127$',
+       fontsize=6.2, ha='center', color=FS.BLUE)
 c.set_xlim(-W * st - 150, W * st + 40)
 c.set_ylim(-0.45, 2.95)
 c.set_xticks([]); c.set_yticks([])
@@ -137,6 +151,8 @@ c.set_title('(c) Law B: a stretch, pinned by references', fontsize=9)
 
 plt.tight_layout()
 fig.savefig('figs/fig_s26_laws_concept.png', dpi=140,
+            bbox_inches='tight', pad_inches=0.03)
+fig.savefig('figs/fig_s26_laws_concept.pdf',
             bbox_inches='tight', pad_inches=0.03)
 print('roots: Delta_lo=%.1f, Delta_hi=%.1f pm' % (dlo, dhi))
 print('saved figs/fig_s26_laws_concept.png')

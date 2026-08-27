@@ -145,7 +145,7 @@ ax[0].text(30, 1 / 127 * 1.3, 'm-sequence 1/N ', fontsize=7, color='0.4', ha='ri
 ax[0].set_ylim(1e-4, 2)
 ax[0].set_xlabel('lag [chip]'); ax[0].set_ylabel('|periodic autocorrelation|')
 ax[0].set_title('(a) Autocorrelation: what separates gratings')
-ax[0].legend(fontsize=7, loc='lower center'); ax[0].grid(True, which='both', alpha=0.25)
+ax[0].grid(True, which='both', alpha=0.25)
 
 for name, nchips, fsize, ac in FAMILIES:
     ax[1].plot(Ks, curves[name], 'o-', color=COL[name], label=name)
@@ -155,8 +155,16 @@ ax[1].text(0.97, 0.06, '10 pm target', transform=ax[1].transAxes, fontsize=7.5,
 ax[1].set_xlabel('gratings on the fiber, K')
 ax[1].set_ylabel('RMS Bragg error [pm]')
 ax[1].set_title('(b) Code-induced error vs array size')
-ax[1].legend(fontsize=7, loc='upper left'); ax[1].grid(True, alpha=0.25)
-plt.tight_layout(); plt.savefig('figs/fig_s14_codes.png', dpi=140)
+ax[1].grid(True, alpha=0.25)
+# one shared legend above both panels: same four families everywhere,
+# and nothing sits on top of the curves
+handles, labels = ax[0].get_legend_handles_labels()
+fig.legend(handles, labels, ncol=4, fontsize=6.8, loc='upper center',
+           frameon=False, bbox_to_anchor=(0.5, 1.005), handlelength=1.5,
+           columnspacing=1.1)
+plt.tight_layout(rect=(0, 0, 1, 0.92))
+plt.savefig('figs/fig_s14_codes.png', dpi=140)
+plt.savefig('figs/fig_s14_codes.pdf')
 
 # ---------------------------------------------------------------------------
 # printed tables

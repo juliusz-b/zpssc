@@ -65,4 +65,6 @@ b.set_title('stepped: autocorrelation separates, family $=1$',
 plt.tight_layout(h_pad=1.4)
 fig.savefig('figs/fig_s28_variants.png', dpi=140,
             bbox_inches='tight', pad_inches=0.03)
+fig.savefig('figs/fig_s28_variants.pdf',
+            bbox_inches='tight', pad_inches=0.03)
 print('saved figs/fig_s28_variants.png')

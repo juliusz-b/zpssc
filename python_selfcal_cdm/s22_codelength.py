@@ -132,8 +132,10 @@ for N in NS:
                    xytext=(dx, dy), fontsize=6.6, color='#2980b9')
 axr = ax[0].twinx()
 rng_km = NSarr * C_LIGHT / (2 * N_GROUP * B) / 1000.0
-axr.loglog(NSarr, rng_km, 's:', color='#c0392b', label='unambiguous range')
-axr.set_ylabel('unambiguous range at 25 Mchip/s [km]', color='#c0392b', fontsize=8)
+axr.loglog(NSarr, rng_km, 's:', color='#c0392b',
+           label='alias-free reach $Nc/(2nB)$')
+axr.set_ylabel('alias-free reach $Nc/(2nB)$ [km]\n(code period caps the'
+               ' delay window)', color='#c0392b', fontsize=7)
 axr.tick_params(axis='y', labelcolor='#c0392b', labelsize=7)
 ax[0].set_xlabel('code length N')
 ax[0].set_ylabel('leakage-limited gratings per band', color='#2980b9')
@@ -163,6 +165,7 @@ ax[1].grid(True, alpha=0.25)
 
 fig.tight_layout()
 fig.savefig('figs/fig_s22_codelength.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s22_codelength.pdf', bbox_inches='tight')
 
 # ---------------------------------------------------------------------------
 # design table

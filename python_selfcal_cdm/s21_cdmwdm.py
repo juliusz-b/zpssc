@@ -185,6 +185,7 @@ axc.grid(True, axis='y', alpha=0.25)
 
 fig.tight_layout()
 fig.savefig('figs/fig_s21_cdmwdm.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s21_cdmwdm.pdf', bbox_inches='tight')
 
 print('full model, R = %.0f%%: one band K=32: %.2f pm; 4 bands x 8: %.2f pm;'
       ' one band K=8: %.2f pm' % (R0 * 100, e_one32, e_band, e_one8))

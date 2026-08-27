@@ -216,6 +216,7 @@ ax[1].grid(True, which='both', alpha=0.2)
 
 fig2.tight_layout()
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=150, bbox_inches='tight')
+fig2.savefig('figs/fig_s16_mechanisms.pdf', bbox_inches='tight')
 
 print('ghost bins, uniform: %d in span, %.0f%% on a grating bin'
       % (len(ghost_bins(bu)), 100 * np.mean([g in bu for g in ghost_bins(bu)])))

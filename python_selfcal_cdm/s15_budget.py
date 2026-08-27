@@ -357,5 +357,6 @@ ax.grid(True, axis='x', which='both', alpha=0.25)
 ax.legend(fontsize=5.8, loc='upper center', frameon=False,
           bbox_to_anchor=(0.5, 1.14), ncol=1)
 fig.subplots_adjust(left=0.26, right=0.98, top=0.91, bottom=0.13); plt.savefig('figs/fig_s15_budget.png', dpi=140)
+plt.savefig('figs/fig_s15_budget.pdf')
 print()
 print('saved figs/fig_s15_budget.png')
