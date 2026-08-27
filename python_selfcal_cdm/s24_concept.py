@@ -102,7 +102,7 @@ axl.set_xticks([]); axl.set_yticks([0, M - 1])
 axl.set_yticklabels(['1', '$M$'])
 axl.tick_params(labelsize=5.5, pad=1.2)
 axl.set_xlabel(r'$\lambda_m$', fontsize=6, labelpad=1)
-axl.set_ylabel('sweep step $m$', fontsize=6, labelpad=0)
+axl.set_ylabel('wavelength step $m$', fontsize=6, labelpad=0)
 axl.spines['bottom'].set_visible(False)
 axb.imshow(rec, aspect='auto', origin='lower', cmap='Greys',
            extent=[0, NCH, -0.5, M - 0.5], interpolation='nearest',
