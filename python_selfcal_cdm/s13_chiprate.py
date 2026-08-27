@@ -174,7 +174,8 @@ ax[0].text(0.03, 0.04, 'dashed line: 10 pm target', transform=ax[0].transAxes,
 ax[0].set_xlabel('chip rate B [Mchip/s]')
 ax[0].set_ylabel('RMS Bragg error [pm]')
 ax[0].set_title('(a) Resolution: error vs chip rate')
-ax[0].legend(fontsize=5.6, loc='upper right'); ax[0].grid(True, which='both', alpha=0.25)
+ax[0].legend(fontsize=5.6, loc='lower left', frameon=True,
+             framealpha=0.95, edgecolor='none'); ax[0].grid(True, which='both', alpha=0.25)
 
 ax[1].plot(jit, np.maximum(e_jit_25, 0.05), '^-', color='#28b463',
                label='B = 25 Mchip/s (dz = 4.1 m, marginal)')
@@ -186,7 +187,9 @@ ax[1].text(0.97, 0.955, '10 pm target', transform=ax[1].transAxes, fontsize=5.6,
 ax[1].set_xlabel('RMS timing jitter [chip periods]')
 ax[1].set_ylabel('RMS Bragg error [pm]')
 ax[1].set_title('(b) Timing jitter tolerance')
-ax[1].legend(fontsize=7.5); ax[1].grid(True, which='both', alpha=0.25)
+ax[1].legend(fontsize=7.0, loc='lower right', frameon=True,
+             framealpha=0.95, edgecolor='none')
+ax[1].grid(True, which='both', alpha=0.25)
 plt.tight_layout(); plt.savefig('figs/fig_s13_chiprate.png', dpi=140)
 
 # ---------------------------------------------------------------------------
