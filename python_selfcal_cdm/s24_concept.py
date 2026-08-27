@@ -54,8 +54,8 @@ _MS = np.roll(_MS, -int(np.argmax(_MS == 1.0)))
 ACORR = C.periodic_xcorr(_MS, _MS)
 
 # --- model ------------------------------------------------------------------
-M = 24
-nu = np.linspace(-2.05 * F, 2.05 * F, M)
+M = 20
+nu = np.linspace(-1.75 * F, 1.75 * F, M)
 lam = nu * PM / 1000.0                       # nm offsets
 K = 4
 bins = np.array([16, 47, 76, 105])
@@ -72,6 +72,12 @@ corr = (Wl @ prim).T                         # (M, NCH)
 kern = np.array([0.45, 1.0, 0.45]); kern /= kern.max()
 corr_d = np.apply_along_axis(lambda r: np.convolve(r, kern, 'same'), 1, corr)
 corr_d = corr_d / (R)                        # ~unit peak scale
+# visible detector-noise floor for the display (honest: the record is noisy)
+rng2 = np.random.default_rng(11)
+nz = rng2.normal(0, 0.020, corr_d.shape)
+nz = np.apply_along_axis(lambda r: np.convolve(r, np.ones(3) / 3, 'same'),
+                         1, nz)
+corr_n = corr_d + nz
 HL = 1
 spec = corr[:, bins[HL]] / corr[:, bins[HL]].max()
 A_f, mu_f, sig_f, base_f = C.gauss_fit_full(nu, corr[:, bins[HL]])
@@ -95,68 +101,84 @@ def save(fig, name):
     print('saved', OUT + name)
 
 
-# --- shared vertical lambda frame for ridge + spec --------------------------
+# --- shared vertical lambda frame -------------------------------------------
 GAP = lam[1] - lam[0]                        # nm per step
-AMP = 4.6 * GAP                              # ridge amplitude
-YLO = lam[0] - 1.2 * GAP
-YHI = lam[-1] + AMP + 1.2 * GAP
+AMP = 5.2 * GAP                              # ridge amplitude
+YLO = lam[0] - 1.0 * GAP
+YHI = lam[-1] + 1.6 * GAP
+XLO, XHI = 6, 115                            # cropped delay axis
+lamB = mu_f * PM / 1000.0
 
-# =============================== hero: ridgeline ============================
-fig = plt.figure(figsize=(3.80, 2.45))
-ax = fig.add_axes([0.085, 0.125, 0.895, 0.860])
+# ================= hero: ridgeline map + attached spectrum ==================
+fig = plt.figure(figsize=(5.10, 1.95))
+axc = fig.add_axes([0.068, 0.150, 0.685, 0.830])
+axd = fig.add_axes([0.802, 0.150, 0.186, 0.830])
 x = np.arange(NCH)
 for m in range(M - 1, -1, -1):               # back to front
-    y = lam[m] + AMP * corr_d[m]
-    ax.fill_between(x, lam[m], y, color='white', lw=0, zorder=2 * m)
-    ax.plot(x, y, color='0.68', lw=0.4, zorder=2 * m + 1)
+    y = lam[m] + AMP * corr_n[m]
+    axc.fill_between(x, lam[m] - 0.4 * GAP, y, color='white', lw=0,
+                     zorder=2 * m)
+    axc.plot(x, y, color='0.55', lw=0.42, zorder=2 * m + 1)
     for k in range(K):
         if corr_d[m, bins[k]] < 0.055:       # colour only where a peak is
             continue
         s = slice(max(bins[k] - 3, 0), bins[k] + 4)
-        ax.fill_between(x[s], lam[m], y[s], color=ECOL[k], alpha=0.55,
-                        lw=0, zorder=2 * m + 1)
-        ax.plot(x[s], y[s], color=ECOL[k], lw=0.8, zorder=2 * m + 1)
-# envelope of the highlighted ridge
+        axc.fill_between(x[s], lam[m], y[s], color=ECOL[k], alpha=0.55,
+                         lw=0, zorder=2 * m + 1)
+        axc.plot(x[s], y[s], color=ECOL[k], lw=0.85, zorder=2 * m + 1)
 env = lam + AMP * corr_d[:, bins[HL]]
-ax.plot(np.full(M, bins[HL]), env, color='0.15', lw=0.6,
-        ls=(0, (2.5, 1.6)), zorder=100)
-ax.annotate('one ridge $=$ one grating', xy=(bins[3] + 2, env.max()),
-            xytext=(60, YHI - 0.35 * GAP), fontsize=6.2, color='0.15',
-            ha='left', va='top', zorder=101)
-ax.set_xlim(-2, NCH + 1)
-ax.set_ylim(YLO, YHI)
-ax.set_xticks(list(bins))
-ax.set_xticklabels([r'$\tau_1$', r'$\tau_2$', r'$\tau_3$', r'$\tau_4$'],
-                   fontsize=6.4)
-for t, col in zip(ax.get_xticklabels(), ECOL):
+axc.plot(np.full(M, bins[HL]), env, color='0.15', lw=0.6,
+         ls=(0, (2.5, 1.6)), zorder=100)
+axc.text(XHI - 2, YHI - 0.15 * GAP, 'one ridge $=$ one grating',
+         fontsize=6.4, color='0.15', ha='right', va='top', zorder=101)
+axc.set_xlim(XLO, XHI)
+axc.set_ylim(YLO, YHI)
+axc.set_xticks(list(bins))
+axc.set_xticklabels([r'$\tau_1$', r'$\tau_2$', r'$\tau_3$', r'$\tau_4$'],
+                    fontsize=6.6)
+for t, col in zip(axc.get_xticklabels(), ECOL):
     t.set_color(col)
-ax.set_yticks([-0.4, 0, 0.4])
-ax.tick_params(labelsize=5.8, pad=1.5)
-ax.set_xlabel(r'delay $\tau$ (chips)', fontsize=6.4, labelpad=1.5)
-ax.set_ylabel(r'wavelength $\lambda_m$ (nm)', fontsize=6.4, labelpad=0.5)
-save(fig, 'panel_ridge')
+axc.set_yticks([-0.3, 0, 0.3])
+axc.tick_params(labelsize=6.0, pad=1.5)
+axc.set_xlabel(r'delay $\tau$ (chips)', fontsize=6.6, labelpad=1.5)
+axc.set_ylabel(r'wavelength $\lambda_m$ (nm)', fontsize=6.6, labelpad=0.5)
 
-# =============================== spectrum ===================================
-fig = plt.figure(figsize=(1.52, 2.45))
-ax = fig.add_axes([0.10, 0.125, 0.86, 0.860])
+# attached spectrum, same wavelength frame
 fine = np.linspace(nu[0], nu[-1], 300)
 fitc = base_f + A_f * np.exp(-0.5 * ((fine - mu_f) / sig_f) ** 2)
 fitc = fitc / corr[:, bins[HL]].max()
-ax.plot(fitc, fine * PM / 1000.0, color=ECOL[HL], lw=1.0)
-ax.plot(spec, lam, ls='none', marker='o', ms=2.6, color=ECOL[HL],
-        mec='white', mew=0.35, zorder=5)
-ax.axhline(mu_f * PM / 1000.0, color='0.3', ls=(0, (3, 2)), lw=0.6)
-ax.text(0.02, mu_f * PM / 1000.0 + 0.035, r'$\lambda_B$', fontsize=7.2,
-        color='0.15')
-ax.text(0.98, YLO + 0.55 * GAP,
-        r'$\Delta\lambda_B \propto \Delta T,\ \varepsilon$',
-        fontsize=6.2, color='0.15', ha='right')
-ax.set_xlim(-0.06, 1.10)
-ax.set_ylim(YLO, YHI)
-ax.set_xticks([0, 1]); ax.set_yticks([])
-ax.tick_params(labelsize=5.8, pad=1.5)
-ax.set_xlabel('reflectivity', fontsize=6.4, labelpad=1.5)
-save(fig, 'panel_spec')
+axd.plot(fitc, fine * PM / 1000.0, color=ECOL[HL], lw=1.0)
+axd.plot(spec, lam, ls='none', marker='o', ms=2.7, color=ECOL[HL],
+         mec='white', mew=0.35, zorder=5)
+axd.axhline(lamB, color='0.3', ls=(0, (3, 2)), lw=0.6)
+axd.text(0.05, lamB + 0.35 * GAP, r'$\lambda_B$', fontsize=7.4,
+         color='0.15')
+axd.text(0.06, YHI - 0.35 * GAP,
+         r'$\Delta\lambda_B \propto \Delta T,\ \varepsilon$',
+         fontsize=6.4, color='0.15', ha='left', va='top')
+axd.set_xlim(-0.06, 1.10)
+axd.set_ylim(YLO, YHI)
+axd.set_xticks([0, 1]); axd.set_yticks([])
+axd.tick_params(labelsize=6.0, pad=1.5)
+axd.set_xlabel('reflectivity', fontsize=6.6, labelpad=1.5)
+
+# the cut: arrow from the tau_2 ridge into the spectrum, at lambda_B
+from matplotlib.patches import ConnectionPatch
+cp = ConnectionPatch(xyA=(XHI, lamB), coordsA=axc.transData,
+                     xyB=(-0.05, lamB), coordsB=axd.transData,
+                     arrowstyle='-|>', lw=0.9, color='0.45',
+                     mutation_scale=8)
+fig.add_artist(cp)
+yfig = 0.150 + 0.830 * (lamB - YLO) / (YHI - YLO)
+fig.text(0.7775, yfig + 0.205, '4', fontsize=5.6, color='0.15',
+         ha='center', va='center', zorder=11,
+         bbox=dict(boxstyle='circle,pad=0.28', fc='white', ec='0.4',
+                   lw=0.6))
+fig.text(0.7775, yfig + 0.085, 'cut', fontsize=6.2, color='0.15',
+         ha='center')
+fig.text(0.7775, yfig - 0.120, r'$\tau_2$', fontsize=6.8, color=ECOL[HL],
+         ha='center')
+save(fig, 'panel_hero')
 
 # =============================== raw-record stamp ===========================
 fig = plt.figure(figsize=(1.10, 0.92))
