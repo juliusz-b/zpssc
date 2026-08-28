@@ -132,18 +132,22 @@ for s_ in range(30):
 pos, err = np.array(pos), np.array(err)
 rms_raw = float(np.sqrt(np.mean(err ** 2)))
 
-res_ref = []
+res_ref, pos_r, err_r = [], [], []
 for s_ in range(30):
     nub, mus = leak_trial(np.random.default_rng(1000 + s_), refs=True)
     p = np.polyfit(mus[:2], nub[:2], 1)
     cor = np.polyval(p, mus[2:]) - nub[2:]
     res_ref.append(np.sqrt(np.mean((cor * PM) ** 2)))
+    pos_r.extend(nub[2:]); err_r.extend(cor * PM)
 rms_ref = float(np.mean(res_ref))
+pos_r, err_r = np.array(pos_r), np.array(err_r)
 
 edges = np.linspace(-W, W, 11)
 cent = 0.5 * (edges[:-1] + edges[1:])
 binned = np.array([err[(pos >= a) & (pos < b)].mean()
                    for a, b in zip(edges[:-1], edges[1:])])
+binned_r = np.array([err_r[(pos_r >= a) & (pos_r < b)].mean()
+                     for a, b in zip(edges[:-1], edges[1:])])
 pref = (K - 1) * SIG ** 2 / (W * NCH)
 lawB = pref * (np.exp(-(W - cent) ** 2 / (4 * SIG ** 2)) -
                np.exp(-(W + cent) ** 2 / (4 * SIG ** 2))) * PM
@@ -189,18 +193,20 @@ ax[0].legend(fontsize=6.2, loc='upper center', frameon=False,
 ax[0].grid(True, alpha=0.25)
 
 # positions plotted in pm, the unit the narrative uses (+/-200 pm window)
-ax[1].plot(pos * PM, err, '.', ms=2, color='0.75', alpha=0.5)
+ax[1].plot(pos * PM, err, '.', ms=2, color='0.75', alpha=0.5,
+           label='one grating, one layout')
 ax[1].plot(cent * PM, binned, 'o', color='#2980b9', ms=5,
-           label='binned mean, simulated')
+           label='binned mean, no references')
 ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#c0392b', lw=1.4,
            label='Law B, closed form')
+ax[1].plot(cent * PM, binned_r, 's-', color='#28b463', ms=3.6, lw=1.0,
+           mfc='none', label='mean after 2-reference fit')
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('multiple-access bias [pm]')
 ax[1].set_title('(b) Law B: an odd pull, K = 32, N = 127', fontsize=9)
-ax[1].text(0.03, 0.84, 'after 2-reference axis fit:\n%.1f pm -> %.1f pm'
-           % (rms_raw, rms_ref), transform=ax[1].transAxes, fontsize=7,
-           color='#28b463')
-ax[1].legend(fontsize=6.8, loc='lower right'); ax[1].grid(True, alpha=0.25)
+ax[1].text(0.03, 0.90, 'RMS %.1f pm -> %.1f pm' % (rms_raw, rms_ref),
+           transform=ax[1].transAxes, fontsize=6.5, color='#28b463')
+ax[1].legend(fontsize=6.0, loc='lower right'); ax[1].grid(True, alpha=0.25)
 
 Ns = sorted(products)
 ax[2].plot(Ns, [products[N] / 1e3 for N in Ns], 'o-', color='#2980b9',
