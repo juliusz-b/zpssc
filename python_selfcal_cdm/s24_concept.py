@@ -83,8 +83,8 @@ nu, lam_pm, primary, record, components, corr, m_sel, spec, nu_fit, fit, mu = \
 
 
 def title(ax, letter, text):
-    ax.set_title(r'$\bf{%s}$  %s' % (letter, text), loc='left', pad=4,
-                 fontsize=7.3)
+    ax.set_title(r'$\bf{%s}$  %s' % (letter, text), loc='left', pad=3,
+                 fontsize=7.1)
 
 
 def arrow(ax, xy1, xy2, color='0.35', lw=0.9, mutation=8, connection='arc3'):
@@ -93,17 +93,17 @@ def arrow(ax, xy1, xy2, color='0.35', lw=0.9, mutation=8, connection='arc3'):
                                  connectionstyle=connection))
 
 
-fig = plt.figure(figsize=(7.1, 3.12))
-outer = fig.add_gridspec(2, 1, height_ratios=[0.86, 1.18], hspace=0.46)
+fig = plt.figure(figsize=(7.1, 2.68))
+outer = fig.add_gridspec(2, 1, height_ratios=[0.74, 1.00], hspace=0.38)
 top = outer[0].subgridspec(1, 2, width_ratios=[1.15, 1.85], wspace=0.20)
 bottom = outer[1].subgridspec(1, 4, width_ratios=[1.15, 1.00, 1.43, 0.72],
-                              wspace=0.38)
+                              wspace=0.43)
 
 # ---------------------------------------------------------------------------
 # (a) One code period at each wavelength step
 # ---------------------------------------------------------------------------
 ax = fig.add_subplot(top[0])
-title(ax, 'a', 'One code period per wavelength')
+title(ax, 'a', 'One code period at each sweep step')
 ax.set_xlim(-0.18, 4.30)
 ax.set_ylim(-0.35, 2.95)
 ax.axis('off')
@@ -129,8 +129,6 @@ ax.text(-0.16, 1.32, 'nominal\nwavelength', ha='right', va='center',
 ax.annotate('', xy=(4.20, -0.20), xytext=(0.02, -0.20),
             arrowprops=dict(arrowstyle='-|>', color='0.35', lw=0.7))
 ax.text(4.20, -0.28, 'time', ha='right', va='top', fontsize=6.4, color='0.35')
-ax.text(2.02, 2.76, r'filled/open cells = $c(t)=1/0$', ha='center',
-        fontsize=6.4, color='0.30')
 
 # ---------------------------------------------------------------------------
 # (b) Fiber and delayed returns
@@ -138,7 +136,7 @@ ax.text(2.02, 2.76, r'filled/open cells = $c(t)=1/0$', ha='center',
 ax = fig.add_subplot(top[1])
 title(ax, 'b', 'Return delay identifies the FBG')
 ax.set_xlim(0, 10)
-ax.set_ylim(-0.3, 4.6)
+ax.set_ylim(-0.3, 4.8)
 ax.axis('off')
 
 source = FancyBboxPatch((0.05, 2.29), 1.45, 0.94,
@@ -158,9 +156,9 @@ cols = ['0.48', FS.ORANGE, '0.48', '0.48']
 for k, (zk, col) in enumerate(zip(z, cols), start=1):
     for dx in (-0.055, 0.0, 0.055):
         ax.plot([zk + dx, zk + dx], [2.50, 3.02], color=col, lw=1.0)
-    ax.text(zk, 3.16, 'FBG %d' % k, ha='center', fontsize=6.2,
+    ax.text(zk, 3.12, 'FBG %d' % k, ha='center', fontsize=6.2,
             color=col)
-    ax.text(zk, 2.30, r'$z_%d$' % k, ha='center', fontsize=6.4,
+    ax.text(zk, 2.12, r'$z_%d$' % k, ha='center', fontsize=6.4,
             color=col)
 
 ax.plot([2.15, 2.15], [2.51, 1.10], color='0.35', lw=0.9)
@@ -169,12 +167,10 @@ pd = FancyBboxPatch((1.55, 0.42), 1.20, 0.67,
                     fc='white', ec='0.35', lw=0.8)
 ax.add_patch(pd)
 ax.text(2.15, 0.755, 'photodiode', ha='center', va='center', fontsize=6.7)
-ax.text(5.95, 4.38, r'at $\lambda_m$: amplitude $A_k(\lambda_m)$',
-        ha='center', fontsize=6.5, color='0.30')
 for k, zk in enumerate(z):
     col = FS.ORANGE if k == SELECTED else FS.BLUE
-    arrow(ax, (zk - 0.10, 3.95 - 0.17 * k),
-          (2.43, 3.95 - 0.17 * k), col, lw=0.72, mutation=6)
+    arrow(ax, (zk - 0.10, 4.12 - 0.15 * k),
+          (2.43, 4.12 - 0.15 * k), col, lw=0.72, mutation=6)
 ax.text(6.15, 1.03,
         r'$p_m(t)=\sum_k A_k(\lambda_m)c(t-\tau_k)+n(t)$',
         ha='center', va='center', fontsize=7.2, color='0.18')
@@ -185,7 +181,7 @@ ax.text(6.15, 0.42, r'$\tau_k=2n_gz_k/c$  $\longrightarrow$  position',
 # (c) Raw detector row
 # ---------------------------------------------------------------------------
 ax_raw = fig.add_subplot(bottom[0])
-title(ax_raw, 'c', r'Raw PD sum')
+title(ax_raw, 'c', r'Overlapping PD trace')
 t = np.arange(record.shape[1]) / 2.0
 scale = record[m_sel].max()
 for k in range(K):
@@ -198,17 +194,13 @@ ax_raw.set_ylim(-0.10, 1.20)
 ax_raw.set_xticks([0, 64, 127])
 ax_raw.set_yticks([])
 ax_raw.set_xlabel('time [chips]')
-ax_raw.text(0.03, 0.90, 'sum seen by the PD', transform=ax_raw.transAxes,
-            fontsize=6.3, color='0.20')
-ax_raw.text(0.03, 0.06, 'grey: individual echoes', transform=ax_raw.transAxes,
-            fontsize=5.9, color='0.45')
 ax_raw.spines['left'].set_visible(False)
 
 # ---------------------------------------------------------------------------
 # (d) Correlation at one wavelength
 # ---------------------------------------------------------------------------
 ax_cor = fig.add_subplot(bottom[1])
-title(ax_cor, 'd', r'Correlation $\rightarrow$ delay peaks')
+title(ax_cor, 'd', r'Correlation peaks')
 delay = np.arange(NCH)
 row = corr[m_sel]
 ax_cor.plot(delay, row, color=FS.BLUE, lw=0.85)
@@ -223,45 +215,38 @@ ax_cor.set_ylim(min(-0.025, row.min() * 1.25), row.max() * 1.28)
 ax_cor.set_xticks([0, 64, 127])
 ax_cor.set_yticks([])
 ax_cor.set_xlabel(r'delay $\tau$ [chips]')
-ax_cor.text(0.04, 0.08, r'peak height $=A_k(\lambda_m)$',
-            transform=ax_cor.transAxes, fontsize=6.0, color='0.30')
 ax_cor.spines['left'].set_visible(False)
 
 # ---------------------------------------------------------------------------
 # (e) Delay-wavelength map
 # ---------------------------------------------------------------------------
 ax_map = fig.add_subplot(bottom[2])
-title(ax_map, 'e', r'Rows $\rightarrow$ map')
+title(ax_map, 'e', r'Delay--wavelength map')
 display = np.clip(corr, 0.0, None)
 ax_map.imshow(display, origin='lower', aspect='auto', cmap='Blues',
               extent=[0, NCH, lam_pm[0], lam_pm[-1]],
               vmin=0.0, vmax=np.percentile(display, 99.8))
-for k, bk in enumerate(BINS):
-    col = FS.ORANGE if k == SELECTED else '0.22'
-    ax_map.text(bk, lam_pm[-1] - 22, 'FBG %d' % (k + 1), ha='center',
-                va='top', fontsize=5.9, color=col)
 ax_map.axvline(BINS[SELECTED], color=FS.ORANGE, lw=1.0, ls=(0, (3, 2)))
 ax_map.set_xlim(5, 118)
-ax_map.set_xlabel(r'delay $\tau$  $\longrightarrow$  grating position')
+ax_map.set_xticks(BINS)
+ax_map.set_xticklabels([r'$\tau_1$', r'$\tau_2$', r'$\tau_3$', r'$\tau_4$'])
+ax_map.get_xticklabels()[SELECTED].set_color(FS.ORANGE)
+ax_map.set_xlabel('delay identifies grating')
 ax_map.set_ylabel(r'$\lambda_m-\lambda_0$ [pm]')
 ax_map.tick_params(pad=1)
-ax_map.text(0.04, 0.06, r'cut at $\tau_2$', transform=ax_map.transAxes,
-            fontsize=6.4, color=FS.ORANGE,
-            bbox=dict(boxstyle='round,pad=0.18', fc='white', ec=FS.ORANGE,
-                      lw=0.6, alpha=0.92))
 
 # ---------------------------------------------------------------------------
 # (f) One column is one spectrum
 # ---------------------------------------------------------------------------
 ax_fit = fig.add_subplot(bottom[3], sharey=ax_map)
-title(ax_fit, 'f', r'Cut $\rightarrow$ spectrum')
+title(ax_fit, 'f', r'FBG 2 spectrum')
 den = max(spec.max(), 1e-12)
 ax_fit.plot(spec / den, lam_pm, 'o', color=FS.ORANGE, ms=2.6,
             mec='white', mew=0.3)
 ax_fit.plot(fit / den, nu_fit * PM, color=FS.ORANGE, lw=1.0)
 lam_b_pm = mu * PM
 ax_fit.axhline(lam_b_pm, color='0.25', lw=0.75, ls=(0, (3, 2)))
-ax_fit.text(0.04, lam_b_pm + 25, r'$\hat{\lambda}_{B,2}$', fontsize=7.3,
+ax_fit.text(0.04, lam_b_pm + 25, r'$\hat{\lambda}_{B,2}$', fontsize=6.9,
             color='0.18', va='bottom')
 ax_fit.set_xlim(-0.05, 1.08)
 ax_fit.set_xticks([0, 1])
@@ -270,9 +255,9 @@ ax_fit.tick_params(axis='y', labelleft=False)
 ax_fit.spines['left'].set_visible(False)
 
 os.makedirs('figs', exist_ok=True)
-fig.savefig('figs/fig_s24_concept.pdf', bbox_inches='tight', pad_inches=0.025)
+fig.savefig('figs/fig_s24_concept.pdf', bbox_inches='tight', pad_inches=0.02)
 fig.savefig('figs/fig_s24_concept.png', dpi=300, bbox_inches='tight',
-            pad_inches=0.025)
+            pad_inches=0.02)
 plt.close(fig)
 
 print('selected FBG 2: true %.1f pm, fitted %.1f pm' %

@@ -250,34 +250,40 @@ bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
 # ---------------------------------------------------------------------------
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.7))
-ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#7d3c98', label='spectral shadowing only')
-ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#c0392b', label='ghosts only, uniform spacing')
-ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts only, randomized spacing')
-ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', label='code leakage + noise only')
-ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#2980b9', lw=1.8, label='full model, randomized')
+fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.86))
+ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#7d3c98', label='shadowing')
+ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#c0392b', label='ghosts, uniform')
+ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts, randomized')
+ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', label='leakage + noise')
+ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#2980b9', lw=1.8, label='full, randomized')
 ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#f39c12', lw=1.8,
-               label='full model + sequential deshadowing')
+               label='full + deshadowing')
 ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0)
-ax[0].text(Ks[-1], TARGET_PM * 1.25, '%.0f pm target ' % TARGET_PM, fontsize=7.5,
-           color='0.3', ha='right')
 ax[0].set_ylim(FLOOR, 400)
 ax[0].set_xlabel('gratings on the fiber, K')
 ax[0].set_ylabel('RMS Bragg error [pm]')
 ax[0].set_title('(a) Error mechanisms vs array size, R = %.0f%%' % (R_A * 100))
-ax[0].legend(fontsize=6.8, loc='lower right'); ax[0].grid(True, which='both', alpha=0.25)
+handles0, labels0 = ax[0].get_legend_handles_labels()
+ax[0].grid(True, which='both', alpha=0.25)
 
-ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#c0392b', label='uniform spacing')
-ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#2980b9', label='randomized spacing')
+ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#c0392b', label='uniform')
+ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#2980b9', label='randomized')
 ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#f39c12', label='randomized + deshadowing')
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0)
-ax[1].text(0.10 * 100, 52, 'procured R = 10% ', fontsize=7, ha='right', color='0.3')
 ax[1].set_ylim(0, 58)
 ax[1].set_xlabel('grating reflectivity R [%]')
 ax[1].set_ylabel('gratings meeting the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
-ax[1].legend(fontsize=7.5, loc='lower left'); ax[1].grid(True, which='both', alpha=0.25)
-plt.tight_layout(); plt.savefig('figs/fig_s12_capacity.png', dpi=140)
+handles1, labels1 = ax[1].get_legend_handles_labels()
+ax[1].grid(True, which='both', alpha=0.25)
+fig.subplots_adjust(left=0.075, right=0.99, top=0.88, bottom=0.29, wspace=0.30)
+fig.legend(handles0, labels0, fontsize=6.0, loc='lower center',
+           bbox_to_anchor=(0.30, 0.012), ncol=2, frameon=False,
+           handlelength=1.8, columnspacing=0.75, labelspacing=0.18)
+fig.legend(handles1, labels1, fontsize=6.1, loc='lower center',
+           bbox_to_anchor=(0.76, 0.020), ncol=1, frameon=False,
+           handlelength=1.8, labelspacing=0.18)
+plt.savefig('figs/fig_s12_capacity.png', dpi=140)
 plt.savefig('figs/fig_s12_capacity.pdf')
 
 # ---------------------------------------------------------------------------

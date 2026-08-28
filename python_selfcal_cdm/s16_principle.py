@@ -138,7 +138,7 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # This figure is included at 0.72 text width in the paper. Draw it at that
 # physical width so the 7 pt labels remain 7 pt after LaTeX placement.
-fig2, ax = plt.subplots(1, 2, figsize=(5.1, 2.35))
+fig2, ax = plt.subplots(1, 2, figsize=(5.1, 2.30))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
@@ -189,8 +189,8 @@ for row, (b, gbs, ttl, col) in enumerate(
     xg = 0.6 + 8.8 * gbs / 90.0
     axb.plot(xg[hit], [y0 + 0.55] * hit.sum(), 'x', color='#c0392b', ms=4.5, mew=1.0)
     axb.plot(xg[~hit], [y0 + 0.55] * (~hit).sum(), '.', color='0.6', ms=3)
-    axb.text(0.6, y0 - 0.75, '%s: %d%% of ghosts land on a grating bin'
-             % (ttl, round(100 * hit.mean())), fontsize=7.2, color=col)
+    axb.text(0.6, y0 - 0.75, '%s: %d%% collide'
+             % (ttl, round(100 * hit.mean())), fontsize=7.0, color=col)
 axb.text(5.0, -1.15, 'delay bin', ha='center', fontsize=7.2, color='0.35')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
@@ -210,11 +210,15 @@ ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
            color='#c0392b', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
-ax[1].set_title('(b) Side lobes add other spectra, K = %d' % Kc, fontsize=8.1)
-ax[1].legend(fontsize=6.6, loc='lower center')
+ax[1].set_title('(b) Side-lobe leakage, K = %d' % Kc, fontsize=8.1)
+handles, labels = ax[1].get_legend_handles_labels()
 ax[1].grid(True, which='both', alpha=0.2)
 
-fig2.tight_layout()
+fig2.subplots_adjust(left=0.055, right=0.99, top=0.88, bottom=0.36,
+                     wspace=0.30)
+fig2.legend(handles, labels, fontsize=6.3, loc='lower center',
+            bbox_to_anchor=(0.75, 0.015), frameon=False, ncol=1,
+            handlelength=2.3, labelspacing=0.16)
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=150, bbox_inches='tight')
 fig2.savefig('figs/fig_s16_mechanisms.pdf', bbox_inches='tight')
 

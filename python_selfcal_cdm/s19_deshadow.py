@@ -110,40 +110,38 @@ fixed = np.array([rms_error(K, 0.10, 200 + K, corrected=True) for K in Ks])
 # figure
 # ---------------------------------------------------------------------------
 # two panels: the recursion itself lives in eqs. (19)-(20) of the paper
-fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.4))
+fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.30))
 
 # --- (a) one grating, before and after --------------------------------------
 axb = ax[0]
 lam = nu * PM / 1000.0
 axb.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#2980b9', lw=2.2,
-         label='true line')
+         label='true')
 axb.plot(lam, shad_b[kk] / shad_b[kk].max(), color='#c0392b', lw=1.4,
-         label='as measured (shadowed)')
+         label='shadowed')
 axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12', lw=1.4,
-         ls='--', label='after deshadowing')
+         ls='--', label='corrected')
 axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
 axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.42)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
 axb.set_title('(a) 4th grating behind three, R = 20%', fontsize=7)
-axb.legend(fontsize=5.6, loc='upper left')
-axb.text(0.44, 0.04, 'peak error %.0f pm -> %.1f pm'
-         % (abs(p_shad - p_true), abs(p_corr - p_true)),
-         transform=axb.transAxes, ha='center', fontsize=5.8)
+axb.legend(fontsize=5.5, loc='upper center', bbox_to_anchor=(0.5, -0.20),
+           ncol=3, frameon=False, handlelength=1.4, columnspacing=0.65)
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
 axc.semilogy(Ks, raw, 'o-', color='#c0392b', label='uncorrected')
-axc.semilogy(Ks, fixed, 's-', color='#f39c12', label='after deshadowing')
-axc.axhline(10.0, color='0.3', ls='--', lw=0.8)
-axc.text(0.97, 0.06, '10 pm target', transform=axc.transAxes, fontsize=5.8,
-         color='0.3', ha='right')
+axc.semilogy(Ks, fixed, 's-', color='#f39c12', label='corrected')
+axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, K')
 axc.set_ylabel('RMS Bragg error [pm]')
 axc.set_title('(b) Gain and its limit, R = 10%', fontsize=7)
-axc.legend(fontsize=5.8, loc='upper left'); axc.grid(True, which='both', alpha=0.25)
+axc.legend(fontsize=5.5, loc='upper center', bbox_to_anchor=(0.5, -0.20),
+           ncol=3, frameon=False, handlelength=1.4, columnspacing=0.65)
+axc.grid(True, which='both', alpha=0.25)
 
-fig.tight_layout()
+fig.subplots_adjust(left=0.09, right=0.99, top=0.88, bottom=0.28, wspace=0.33)
 fig.savefig('figs/fig_s19_deshadow.png', dpi=150, bbox_inches='tight')
 fig.savefig('figs/fig_s19_deshadow.pdf', bbox_inches='tight')
 

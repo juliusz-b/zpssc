@@ -120,7 +120,7 @@ curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2,
 # ---------------------------------------------------------------------------
 # The paper places this at 0.85 text width (about 6.0 in). Draw at the final
 # physical width so annotations remain legible after inclusion.
-fig, ax = plt.subplots(1, 3, figsize=(6.0, 2.35))
+fig, ax = plt.subplots(1, 3, figsize=(6.0, 2.22))
 
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
@@ -131,38 +131,12 @@ ax[0].set_xlim(0, 8)
 ax[0].set_xlabel('time [chip periods]')
 ax[0].set_ylabel('optical frequency shift  ' + r'$\delta\nu/\Delta$')
 ax[0].set_title('(a) The code chirps the laser', fontsize=9)
-ax[0].text(0.15, -0.11, 'shaded: chip on', fontsize=6.6, color='0.45')
 ax[0].axhline(plateau, color='#c0392b', ls=':', lw=0.8)
-i_ov = 2 * OSR + int(np.argmax(nu_inst[2 * OSR:3 * OSR]))
-ax[0].annotate('transient overshoot', xy=(t[i_ov], nu_inst[i_ov]),
-               xytext=(0.22, 1.31), fontsize=6.8, color='#c0392b',
-               arrowprops=dict(arrowstyle='->', lw=0.7, color='#c0392b'))
-ax[0].annotate('adiabatic level', xy=(3.55, plateau),
-               xytext=(2.55, 0.30), fontsize=6.8, color='#c0392b',
-               arrowprops=dict(arrowstyle='->', lw=0.7, color='#c0392b'))
 ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
                arrowprops=dict(arrowstyle='<->', lw=0.9, color='#1f4e79'))
 ax[0].text(1.72, 0.5, r'$\Delta$', color='#1f4e79', fontsize=9.5, ha='left',
            va='center')
 ax[0].grid(True, alpha=0.2)
-
-axk = ax[0].inset_axes([0.615, 0.50, 0.365, 0.37])
-axk.set_facecolor('white')
-axk.patch.set_alpha(1.0)
-axk.set_zorder(10)
-for sp in axk.spines.values():
-    sp.set_visible(True); sp.set_linewidth(0.7); sp.set_color('0.45')
-axk.fill_between(centres, hist, color='#c0392b', alpha=0.35, lw=0)
-axk.plot(centres, hist, color='#c0392b', lw=0.9)
-axk.set_title('kernel ' + r'$p(\delta)$', fontsize=6.4, pad=2)
-axk.tick_params(labelsize=5.5, pad=1)
-axk.set_yticks([])
-axk.set_xlim(-0.05, 1.12)
-# leader: from the trace into the boxed inset
-ax[0].annotate('', xy=(4.66, 1.02), xytext=(3.92, plateau + 0.02),
-               arrowprops=dict(arrowstyle='->', lw=0.8, color='0.45',
-                               connectionstyle='arc3,rad=0.25'),
-               zorder=11, annotation_clip=False)
 
 # --- (b) -------------------------------------------------------------------
 ax[1].plot(g * PM / 1000.0, true_line, color='#2980b9', lw=1.4, label='no chirp')
@@ -172,22 +146,18 @@ nu_op = -0.62 * F
 kern = np.exp(-0.5 * ((g - nu_op) / (0.5 * DELTA_DEMO)) ** 2)
 ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#7d3c98', alpha=0.32,
                    lw=0)
-ax[1].annotate('a spread of frequencies\nsampled on a steep flank',
-               xy=(nu_op * PM / 1000.0, 0.34), xytext=(-0.60, 0.84),
-               fontsize=6.5, color='#7d3c98',
-               arrowprops=dict(arrowstyle='->', lw=0.7, color='#7d3c98'))
 ax[1].axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.9)
 ax[1].axvline(p_chirp / 1000.0, color='#c0392b', ls=':', lw=0.9)
 ax[1].annotate('', xy=(p_chirp / 1000.0, 1.09), xytext=(p_true / 1000.0, 1.09),
                arrowprops=dict(arrowstyle='<|-', lw=1.0, color='k'))
-ax[1].text(0.20, 1.14, 'apparent shift %.0f pm' % abs(p_chirp - p_true),
-           ha='center', fontsize=6.8)
 ax[1].set_ylim(0, 1.28)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 ax[1].set_title('(b) FM-to-AM on the flank', fontsize=9)
-ax[1].legend(fontsize=6.8, loc='lower right')
+ax[1].legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.22),
+             ncol=2, frameon=False, handlelength=1.5, columnspacing=0.8,
+             labelspacing=0.15)
 
 # --- (c) -------------------------------------------------------------------
 styles = {0: ('o-', '#c0392b', 'no reference'), 1: ('s-', '#e67e22', '1 reference'),
@@ -195,17 +165,18 @@ styles = {0: ('o-', '#c0392b', 'no reference'), 1: ('s-', '#e67e22', '1 referenc
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
     ax[2].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
-ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8)
-ax[2].text(0.97, 0.06, '10 pm target', transform=ax[2].transAxes, fontsize=7,
-           color='0.3', ha='right')
+ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[2].set_yscale('log')
 ax[2].set_xlabel('chirp excursion  ' + r'$\Delta/\mathrm{FWHM}$')
 ax[2].set_ylabel('residual Bragg error [pm]')
 ax[2].set_title('(c) What the references remove', fontsize=9)
-ax[2].legend(fontsize=6.8, loc='upper left')
+ax[2].legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.22),
+             ncol=2, frameon=False, handlelength=1.5, columnspacing=0.8,
+             labelspacing=0.15)
 ax[2].grid(True, which='both', alpha=0.25)
 
-fig.tight_layout()
+fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.27,
+                    wspace=0.34)
 fig.savefig('figs/fig_s18_source.png', dpi=150, bbox_inches='tight')
 fig.savefig('figs/fig_s18_source.pdf', bbox_inches='tight')
 

@@ -32,7 +32,7 @@ def panel_title(ax, letter, text):
                  fontsize=7.6)
 
 
-fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.62),
+fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.28),
                        gridspec_kw={'width_ratios': [1.10, 1.12, 1.18]})
 
 # ---------------------------------------------------------------------------
@@ -50,35 +50,26 @@ gaussian = lambda x, amp, centre, width, baseline: \
     gaussian, nu, received, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
 fit = base + amp * np.exp(-0.5 * ((nu - mu) / sig) ** 2)
 
-a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)))
+a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)),
+       label='undistorted')
 a.fill_between(nu, received, wanted, where=wanted >= received,
                color=FS.ORANGE, alpha=0.28, lw=0)
-a.plot(nu, received, color=FS.ORANGE, lw=1.25)
-a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)))
+a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='after notch')
+a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)), label='fit')
 a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
 a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
+a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)),
+          label=r'upstream centre $\Delta$')
 a.annotate('', xy=(mu, 1.035), xytext=(0.0, 1.035),
            arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.8))
-a.text(0.5 * mu, 1.085, r'fitted shift $\delta$', color=FS.VERM,
-       fontsize=6.5, ha='center')
-a.annotate(r'upstream centre $\Delta=130$ pm', xy=(DET, 0.46),
-           xytext=(235, 0.73), fontsize=6.1, color=FS.BLUE, ha='center',
-           arrowprops=dict(arrowstyle='-|>', color=FS.BLUE, lw=0.65))
-a.text(212, 0.24, 'power removed\nfrom one flank', color=FS.ORANGE,
-       fontsize=6.2, ha='center')
 a.set_xlim(-320, 340)
 a.set_ylim(0.0, 1.18)
 a.set_yticks([0, 0.5, 1.0])
 a.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
 a.set_ylabel('normalized reflectance')
-panel_title(a, 'a', 'Law A: a notch moves the fitted centre')
-a.plot([-300, -270], [1.12, 1.12], color='0.50', lw=1.0, ls=(0, (3, 2)))
-a.text(-262, 1.12, 'wanted line', va='center', fontsize=5.8, color='0.38')
-a.plot([-300, -270], [1.05, 1.05], color=FS.ORANGE, lw=1.25)
-a.text(-262, 1.05, 'after upstream notch', va='center', fontsize=5.8,
-       color=FS.ORANGE)
-a.plot([-300, -270], [0.98, 0.98], color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)))
-a.text(-262, 0.98, 'Gaussian fit', va='center', fontsize=5.8, color=FS.VERM)
+panel_title(a, 'a', 'Law A: one flank is attenuated')
+a.legend(loc='lower left', fontsize=5.6, frameon=False, handlelength=1.6,
+         labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
 # (b) Pairwise bias as a placement rule over the full sensor range
@@ -92,85 +83,74 @@ dhi = brentq(root_fn, SIG * np.sqrt(1.5), 700.0)
 dstar = SIG * np.sqrt(1.5)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35)
-b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)))
+b.plot(D, bias, color=FS.VERM, lw=1.35, label='pairwise bias')
+b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
+          label='1 pm tolerance')
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.plot(dstar, bias.max(), 'o', color=FS.VERM, ms=3.5)
-b.text(dstar, bias.max() + 0.48, 'worst overlap', ha='center',
-       fontsize=6.1, color=FS.VERM)
-b.text(0.5 * (dlo + dhi), 6.3, 'forbidden detuning', ha='center',
-       fontsize=6.4, color=FS.VERM)
-b.text(dlo, 0.25, r'$\Delta_{\rm lo}$', fontsize=6.0, color=FS.VERM,
-       ha='right')
-b.text(dhi, 0.25, r'$\Delta_{\rm hi}$', fontsize=6.0, color=FS.VERM,
-       ha='left')
-b.text(690, EPS + 0.25, r'tolerance $\epsilon=1$ pm', ha='right',
-       fontsize=6.1, color='0.35')
 
 # Full pair-detuning ranges. The bar, not just its centre, must avoid red.
 unsafe = (0.0, 200.0)
 safe = (dhi + 18.0, 690.0)
-b.plot(unsafe, [-0.82, -0.82], color=FS.VERM, lw=4.0,
+b.plot(unsafe, [-0.38, -0.38], color=FS.VERM, lw=3.2,
        solid_capstyle='butt', clip_on=False)
-b.text(np.mean(unsafe), -1.25, 'operating range crosses red', ha='center',
-       fontsize=5.9, color=FS.VERM, clip_on=False)
-b.plot(safe, [-1.72, -1.72], color=FS.GREEN, lw=4.0,
+b.text(np.mean(unsafe), -0.38, 'unsafe range', ha='center', va='center',
+       fontsize=5.6, color='white', clip_on=False)
+b.plot(safe, [-0.90, -0.90], color=FS.GREEN, lw=3.2,
        solid_capstyle='butt', clip_on=False)
-b.text(np.mean(safe), -1.30, 'full range stays safe', ha='center',
-       fontsize=5.9, color=FS.GREEN, clip_on=False)
+b.text(np.mean(safe), -0.90, 'safe range', ha='center', va='center',
+       fontsize=5.6, color='white', clip_on=False)
 
 b.set_xlim(0, 700)
-b.set_ylim(-2.55, 9.55)
+b.set_ylim(-1.25, 9.55)
 b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
-panel_title(b, 'b', 'Placement: keep the full range outside red')
+panel_title(b, 'b', 'Law A: avoid the shaded interval')
+b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
+         labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
 # (c) Law B is an axis stretch, removed by two reference anchors
 # ---------------------------------------------------------------------------
 c = ax[2]
 c.axis('off')
-c.set_xlim(-335, 275)
-c.set_ylim(-0.25, 3.35)
-panel_title(c, 'c', 'Law B: two references undo the stretch')
+c.set_xlim(-300, 275)
+c.set_ylim(-0.10, 3.08)
+panel_title(c, 'c', 'Law B: two anchors remove stretch')
 
 W = 180.0
 K, N = 32, 127
 stretch = 1.0 + (K - 1) / N
 true = np.linspace(-W, W, 7)
 read = true * stretch
-rows = [(2.55, true, 'true wavelength positions', '0.35'),
-        (1.50, read, r'after leakage: $\times[1+(K-1)/N]$', FS.VERM),
-        (0.45, true, 'after two-reference calibration', FS.BLUE)]
+rows = [(2.38, true, 'true', '0.35'),
+        (1.43, read, 'biased', FS.VERM),
+        (0.48, true, 'calibrated', FS.BLUE)]
 
 for y0, values, label, col in rows:
-    c.plot([-255, 255], [y0, y0], color='0.78', lw=0.75)
+    c.plot([-205, 205], [y0, y0], color='0.78', lw=0.75)
     for q, x0 in enumerate(values):
         is_ref = q in (0, len(values) - 1)
         tick_col = FS.BLUE if is_ref else col
         c.plot([x0, x0], [y0 - 0.13, y0 + 0.13], color=tick_col,
                lw=2.1 if is_ref else 1.15)
-    c.text(-270, y0, label, ha='right', va='center', fontsize=6.1,
+    c.text(-265, y0, label, ha='right', va='center', fontsize=6.2,
            color=col)
 
 for x0, xr in zip(true, read):
-    c.add_patch(FancyArrowPatch((x0, 2.38), (xr, 1.67),
+    c.add_patch(FancyArrowPatch((x0, 2.22), (xr, 1.59),
                                 arrowstyle='-', color=FS.VERM,
                                 lw=0.55, alpha=0.55))
-    c.add_patch(FancyArrowPatch((xr, 1.33), (x0, 0.62),
+    c.add_patch(FancyArrowPatch((xr, 1.27), (x0, 0.64),
                                 arrowstyle='-', color=FS.BLUE,
                                 lw=0.55, alpha=0.55))
 
-c.text(-W, 2.84, 'reference', ha='center', fontsize=5.7, color=FS.BLUE)
-c.text(W, 2.84, 'reference', ha='center', fontsize=5.7, color=FS.BLUE)
-c.text(0, 3.18, r'mean pull $\propto \nu_k(K-1)/N$ and is independent of $R$',
-       ha='center', fontsize=6.2, color='0.25')
-c.text(0, -0.02, r'anchors fix offset and scale: $9.4\rightarrow2.3$ pm RMS',
-       ha='center', fontsize=6.2, color=FS.BLUE)
+c.text(-W, 2.70, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
+c.text(W, 2.70, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
 
-fig.subplots_adjust(left=0.075, right=0.995, bottom=0.20, top=0.90,
+fig.subplots_adjust(left=0.075, right=0.995, bottom=0.21, top=0.88,
                     wspace=0.34)
 fig.savefig('figs/fig_s26_laws_concept.pdf', bbox_inches='tight',
             pad_inches=0.025)

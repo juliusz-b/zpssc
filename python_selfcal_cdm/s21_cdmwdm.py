@@ -113,7 +113,7 @@ e_one8 = avg(8, 1, R0, 300)
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.45))
+fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.20))
 
 # --- (a) addressing plane ---------------------------------------------------
 axa = ax[0]
@@ -133,8 +133,6 @@ for wί in range(Wb):
 shared = [b for b, ws in used.items() if len(ws) >= 2][:1]
 if shared:
     axa.axvline(shared[0], color='0.3', ls=':', lw=0.9)
-    axa.text(shared[0] + 1.5, 3.62, 'same delay bin,\ndifferent bands:\nno conflict',
-             fontsize=6.5, color='0.25')
 axa.set_xlim(0, NCH); axa.set_ylim(0, Wb)
 axa.set_yticks([]); axa.set_xlabel(r'delay bin  $\longrightarrow$  position')
 axa.set_ylabel('wavelength band')
