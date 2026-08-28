@@ -28,7 +28,7 @@ C_A = (4.0 / 3.0) * np.sqrt(2.0 / 3.0)
 
 
 def panel_title(ax, letter, text):
-    ax.set_title(r'$\bf{%s}$  %s' % (letter, text), loc='left', pad=4,
+    ax.set_title('(%s) %s' % (letter, text), loc='left', pad=4,
                  fontsize=7.6)
 
 
@@ -59,7 +59,7 @@ a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)), label='fit')
 a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
 a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
 a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)),
-          label=r'upstream centre $\Delta$')
+          label=r'upstream center $\Delta$')
 a.annotate('', xy=(mu, 1.035), xytext=(0.0, 1.035),
            arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.8))
 a.set_xlim(-320, 340)
@@ -91,19 +91,19 @@ b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.plot(dstar, bias.max(), 'o', color=FS.VERM, ms=3.5)
 
 # Full pair-detuning ranges. The bar, not just its centre, must avoid red.
-unsafe = (0.0, 200.0)
+forb = (dlo, dhi)
 safe = (dhi + 18.0, 690.0)
-b.plot(unsafe, [-0.38, -0.38], color=FS.VERM, lw=3.2,
+b.plot(forb, [-0.62, -0.62], color=FS.VERM, lw=8.0,
        solid_capstyle='butt', clip_on=False)
-b.text(np.mean(unsafe), -0.38, 'unsafe range', ha='center', va='center',
-       fontsize=5.6, color='white', clip_on=False)
-b.plot(safe, [-0.90, -0.90], color=FS.GREEN, lw=3.2,
+b.text(np.mean(forb), -0.62, 'forbidden', ha='center', va='center',
+       fontsize=5.8, color='white', clip_on=False)
+b.plot(safe, [-0.62, -0.62], color=FS.GREEN, lw=8.0,
        solid_capstyle='butt', clip_on=False)
-b.text(np.mean(safe), -0.90, 'safe range', ha='center', va='center',
-       fontsize=5.6, color='white', clip_on=False)
+b.text(np.mean(safe), -0.62, 'allowed', ha='center', va='center',
+       fontsize=5.8, color='white', clip_on=False)
 
 b.set_xlim(0, 700)
-b.set_ylim(-1.25, 9.55)
+b.set_ylim(-1.15, 9.55)
 b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')

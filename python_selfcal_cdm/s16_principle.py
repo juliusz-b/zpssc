@@ -181,7 +181,7 @@ def ghost_bins(b):
 for row, (b, gbs, ttl, col) in enumerate(
         [(bu, ghost_bins(bu), 'uniform spacing', '#c0392b'),
          (br, ghost_bins(br), 'randomized spacing', '#2980b9')]):
-    y0 = 3.3 - 2.6 * row
+    y0 = 3.1 - 2.7 * row
     axb.plot([0.6, 9.4], [y0, y0], color='0.8', lw=0.8)
     xs = 0.6 + 8.8 * (b - 0) / 90.0
     axb.plot(xs, [y0] * len(b), 'v', color=col, ms=6, label='gratings' if row == 0 else None)
@@ -189,9 +189,9 @@ for row, (b, gbs, ttl, col) in enumerate(
     xg = 0.6 + 8.8 * gbs / 90.0
     axb.plot(xg[hit], [y0 + 0.55] * hit.sum(), 'x', color='#c0392b', ms=4.5, mew=1.0)
     axb.plot(xg[~hit], [y0 + 0.55] * (~hit).sum(), '.', color='0.6', ms=3)
-    axb.text(0.6, y0 - 0.75, '%s: %d%% collide'
+    axb.text(0.6, y0 + 0.95, '%s: %d%% collide'
              % (ttl, round(100 * hit.mean())), fontsize=7.0, color=col)
-axb.text(5.0, -1.15, 'delay bin', ha='center', fontsize=7.2, color='0.35')
+axb.text(5.0, -1.35, 'delay bin', ha='center', fontsize=7.2, color='0.35')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
 # --- (c) code leakage ------------------------------------------------------
