@@ -118,7 +118,9 @@ curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2,
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.35))
+# The paper places this at 0.85 text width (about 6.0 in). Draw at the final
+# physical width so annotations remain legible after inclusion.
+fig, ax = plt.subplots(1, 3, figsize=(6.0, 2.35))
 
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
@@ -185,7 +187,7 @@ ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 ax[1].set_title('(b) FM-to-AM on the flank', fontsize=9)
-ax[1].legend(fontsize=6.8, loc='upper left')
+ax[1].legend(fontsize=6.8, loc='lower right')
 
 # --- (c) -------------------------------------------------------------------
 styles = {0: ('o-', '#c0392b', 'no reference'), 1: ('s-', '#e67e22', '1 reference'),

@@ -167,43 +167,48 @@ products = {N: k * f for N, (k, f) in table.items()}
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.4))
+# The manuscript places this figure at 0.85 text width, about 6.0 in. Drawing
+# at the final physical width preserves the intended label size in print.
+fig, ax = plt.subplots(1, 3, figsize=(6.0, 2.4))
 
-ax[0].plot(Dfr, thc, '-', color='#2980b9', lw=1.3, label='centroid, closed form')
+ax[0].plot(Dfr, thc, '-', color='#2980b9', lw=1.3, label='centroid')
 ax[0].plot(Dfr[::2], simc[::2], 'o', color='#2980b9', ms=4, mfc='none',
-           label='centroid, simulated')
-ax[0].plot(Dfr, thl, '-', color='#c0392b', lw=1.3, label='LSQ fit, closed form')
+           label='_nolegend_')
+ax[0].plot(Dfr, thl, '-', color='#c0392b', lw=1.3, label='Gaussian fit')
 ax[0].plot(Dfr[::2], siml[::2], 's', color='#c0392b', ms=4, mfc='none',
-           label='LSQ fit, simulated')
+           label='_nolegend_')
 ax[0].axvline(np.sqrt(1.5), color='#c0392b', ls=':', lw=0.8)
 ax[0].axvline(np.sqrt(2.0), color='#2980b9', ls=':', lw=0.8)
-ax[0].text(1.28, -0.47, r'$\Delta^{*}$', fontsize=8, color='0.3')
-# a co-tuned +/-10 K pair (S = 100 pm) sweeps detunings 0..2S over its
-# operating range and straddles the worst case (Sec. III-E placement rule)
-ax[0].axvspan(0.0, 200.0 / 106.2, color='0.5', alpha=0.12, lw=0)
 ax[0].set_ylim(-1.03, 0.03)
-ax[0].text(0.94, -0.975, '$\\pm$10 K pair sweeps $0\\ldots2S$',
-           fontsize=6.0, color='0.3', ha='center')
+ax[0].annotate('worst\noverlap', xy=(np.sqrt(1.5), thl.min()),
+               xytext=(1.30, -0.54), fontsize=5.9, color='#c0392b',
+               ha='center', arrowprops=dict(arrowstyle='-|>',
+               color='#c0392b', lw=0.55))
+ax[0].text(0.16, -0.10, r'$\delta=0$', fontsize=5.9, color='0.35')
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('pairwise shadowing bias [pm]  (R = 1%)')
-ax[0].set_title('(a) Law A, exact to first order', fontsize=9)
-# curves occupy the flanks and the dip; the only clear pocket is top-centre
-ax[0].legend(fontsize=6.2, loc='upper center', frameon=False,
-             handlelength=1.5, labelspacing=0.25)
+ax[0].set_title('(a) Law A: formula = model', fontsize=8.3)
+ax[0].legend(fontsize=6.1, loc='upper right', frameon=False,
+             handlelength=1.4, labelspacing=0.22)
+ax[0].text(0.96, 0.74, 'markers = model', transform=ax[0].transAxes,
+           fontsize=5.6, color='0.35', ha='right')
 ax[0].grid(True, alpha=0.25)
 
 # positions plotted in pm, the unit the narrative uses (+/-200 pm window)
 ax[1].plot(pos * PM, err, '.', ms=2, color='0.75', alpha=0.5,
-           label='one grating, one layout')
+           label='individual layouts')
 ax[1].plot(cent * PM, binned, 'o', color='#2980b9', ms=5,
-           label='binned mean, no references')
+           label='mean, no refs')
 ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#c0392b', lw=1.4,
-           label='Law B, closed form')
+           label='Law B')
 ax[1].plot(cent * PM, binned_r, 's-', color='#28b463', ms=3.6, lw=1.0,
-           mfc='none', label='mean after 2-reference fit')
+           mfc='none', label='mean, 2 refs')
+for xr in (-0.9 * W * PM, 0.9 * W * PM):
+    ax[1].axvline(xr, color='#28b463', lw=0.6, ls=(0, (2, 2)), alpha=0.75)
+    ax[1].plot(xr, 14.3, marker='v', color='#28b463', ms=3.5, clip_on=False)
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('multiple-access bias [pm]')
-ax[1].set_title('(b) Law B: an odd pull, K = 32, N = 127', fontsize=9)
+ax[1].set_title('(b) Law B: references remove the trend', fontsize=8.3)
 ax[1].text(0.03, 0.90, 'RMS %.1f pm -> %.1f pm' % (rms_raw, rms_ref),
            transform=ax[1].transAxes, fontsize=6.5, color='#28b463')
 ax[1].legend(fontsize=6.0, loc='lower right'); ax[1].grid(True, alpha=0.25)
@@ -219,7 +224,9 @@ ax[2].minorticks_off()
 ax[2].set_ylim(0, bound / 1e3 * 1.25)
 ax[2].set_xlabel('code length N')
 ax[2].set_ylabel(r'capacity-refresh product [10$^3$ sensor$\cdot$Hz]')
-ax[2].set_title('(c) Capacity-refresh invariant: N cancels', fontsize=9)
+ax[2].set_title(r'(c) Invariant: $N$ cancels', fontsize=8.3)
+ax[2].text(0.50, 0.88, r'longer code: more sensors, slower refresh',
+           transform=ax[2].transAxes, fontsize=5.9, color='0.35', ha='center')
 ax[2].legend(fontsize=6.8, loc='lower right'); ax[2].grid(True, which='both', alpha=0.25)
 
 fig.tight_layout()

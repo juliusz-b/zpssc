@@ -136,7 +136,9 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # FIGURE 2: error mechanisms
 # ===========================================================================
-fig2, ax = plt.subplots(1, 2, figsize=(7.1, 2.85))
+# This figure is included at 0.72 text width in the paper. Draw it at that
+# physical width so the 7 pt labels remain 7 pt after LaTeX placement.
+fig2, ax = plt.subplots(1, 2, figsize=(5.1, 2.35))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
@@ -155,8 +157,8 @@ axb.annotate('', xy=(7.4, 6.8), xytext=(2.0, 6.8),
              arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
 axb.annotate('', xy=(0.7, 6.25), xytext=(7.4, 6.25),
              arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
-axb.text(5.0, 5.55, r'apparent delay $\tau_a-\tau_b+\tau_c$,  power $\propto R^3$',
-         ha='center', fontsize=7.6)
+axb.text(5.0, 5.55, r'ghost: $\tau_a-\tau_b+\tau_c$, power $\propto R^3$',
+         ha='center', fontsize=7.0)
 
 Kg = 10
 bu = 3 + 7 * np.arange(Kg)
@@ -178,7 +180,7 @@ def ghost_bins(b):
 
 for row, (b, gbs, ttl, col) in enumerate(
         [(bu, ghost_bins(bu), 'uniform spacing', '#c0392b'),
-         (br, ghost_bins(br), 'randomised spacing', '#2980b9')]):
+         (br, ghost_bins(br), 'randomized spacing', '#2980b9')]):
     y0 = 3.3 - 2.6 * row
     axb.plot([0.6, 9.4], [y0, y0], color='0.8', lw=0.8)
     xs = 0.6 + 8.8 * (b - 0) / 90.0
@@ -189,10 +191,8 @@ for row, (b, gbs, ttl, col) in enumerate(
     axb.plot(xg[~hit], [y0 + 0.55] * (~hit).sum(), '.', color='0.6', ms=3)
     axb.text(0.6, y0 - 0.75, '%s: %d%% of ghosts land on a grating bin'
              % (ttl, round(100 * hit.mean())), fontsize=7.2, color=col)
-axb.text(9.4, 4.80, 'x  lands on a grating bin', fontsize=6.6, ha='right', color='0.35')
-axb.text(9.4, 4.40, '.  lands in an empty bin', fontsize=6.6, ha='right', color='0.35')
 axb.text(5.0, -1.15, 'delay bin', ha='center', fontsize=7.2, color='0.35')
-axb.set_title('(a) Multiple reflections and spacing', fontsize=9)
+axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
 # --- (c) code leakage ------------------------------------------------------
 Mc = 96
@@ -210,7 +210,7 @@ ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
            color='#c0392b', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
-ax[1].set_title('(b) Code leakage, K = %d' % Kc, fontsize=9)
+ax[1].set_title('(b) Side lobes add other spectra, K = %d' % Kc, fontsize=8.1)
 ax[1].legend(fontsize=6.6, loc='lower center')
 ax[1].grid(True, which='both', alpha=0.2)
 

@@ -136,8 +136,8 @@ if shared:
     axa.text(shared[0] + 1.5, 3.62, 'same delay bin,\ndifferent bands:\nno conflict',
              fontsize=6.5, color='0.25')
 axa.set_xlim(0, NCH); axa.set_ylim(0, Wb)
-axa.set_yticks([]); axa.set_xlabel('delay bin  ->  position')
-axa.set_ylabel('wavelength  ->  band')
+axa.set_yticks([]); axa.set_xlabel(r'delay bin  $\longrightarrow$  position')
+axa.set_ylabel('wavelength band')
 axa.set_title('(a) CDM-WDM addressing', fontsize=9)
 
 # --- (b) banding resets the mechanisms ---------------------------------------
