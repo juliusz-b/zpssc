@@ -33,7 +33,15 @@ routes are checked.
    the paper's mean-removed matched receiver. Cost 2: the filter uses the DC
    bin, so a constant record offset is no longer rejected. Measured below: the
    offset leaks as a delay-independent pedestal, which the baseline term of
-   the spectral fit removes anyway.
+   the spectral fit removes anyway. POSTSCRIPT, same session: this filter is
+   not new and has a name. For an m-sequence the cyclic inverse coincides,
+   up to the scale (N+1)/2, with the bipolar replica in the bit-1 -> +1
+   convention (replica sum = +1) used WITHOUT mean removal. That pairing is
+   periodic non-coherent pulse compression: Ipatov 1992, Levanon et al.,
+   IET RSN 10(1):216, 2016, Jahangir & Ali, Aerosp. Sci. Technol. 53:188,
+   2016 (pointer: Bhatt, Trait. Signal 37(3):477, 2020, Sec. 3). The -1/N
+   floor of the paper's receiver is created by the mean removal itself,
+   given the correctly signed replica. Verified in section 3b below.
 
 4. ANALOG DRIVE. Intensity modulation is not restricted to binary levels. An
    alternating-projection search (flat spectrum <-> box constraint 0..1) looks
@@ -191,6 +199,22 @@ print('  0.5 offset -> pedestal mean %.4f, flatness (std) %.1e '
 print()
 
 # ---------------------------------------------------------------------------
+# 3b. the inverse filter has a name: the NCPC replica (Ipatov/Levanon)
+# ---------------------------------------------------------------------------
+xc_ncpc = np.real(np.fft.ifft(np.fft.fft(c01) * np.fft.fft(msb).conj()))
+xm_mr = np.real(np.fft.ifft(np.fft.fft(c01 - c01.mean()) * np.fft.fft(msb).conj()))
+print("=== 3b. equivalence: inverse filter == NCPC bipolar replica ===")
+print('  replica sum = %+d (bit 1 -> +1), no mean removal:' % int(msb.sum()))
+print('    peak %.0f = (N+1)/2, max side lobe %.1e (exact zero)'
+      % (xc_ncpc[0], np.abs(xc_ncpc[1:]).max()))
+print('  b vs (N+1)/2 * r_inv: max deviation %.1e (identical up to scale)'
+      % np.abs(msb - (N + 1) / 2.0 * r_inv).max())
+print('  same replica AFTER mean removal: side lobe %.6f, i.e. the -1/N'
+      % (xm_mr[1] / xm_mr[0]))
+print('  floor of the paper is created by the mean removal itself')
+print()
+
+# ---------------------------------------------------------------------------
 # 4. analog nonnegative drive with perfect periodic autocorrelation
 # ---------------------------------------------------------------------------
 x = rng_global.random(N)
@@ -254,5 +278,7 @@ for name, rho, nch, shots in rows:
 print()
 print('VERDICT: single binary cannot beat the m-sequence (parity). Pairs at')
 print('odd N buy nothing, triples reach at best 1/3N and are dominated by the')
-print('Golay pair. The real free lunch is receiver-side: the cyclic inverse')
-print('filter zeroes the leakage in ONE transmission for a fraction of a dB.')
+print('Golay pair. The real free lunch is receiver-side and has a name:')
+print('periodic NCPC (Ipatov/Levanon), i.e. the correctly signed bipolar')
+print('replica without mean removal. Zero periodic leakage, one transmission,')
+print('no SNR cost, and no extra computation over the matched correlator.')
