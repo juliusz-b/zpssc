@@ -160,8 +160,10 @@ lawB_fine = pref * (np.exp(-(W - nu_fine) ** 2 / (4 * SIG ** 2)) -
 # ---------------------------------------------------------------------------
 EPS, FS, NSAMP, MST, C_L = 10.0, 20e6, 4, 64, 27.0
 bound = EPS * FS / (C_L * NSAMP * MST)
+# K przy celu 10 pm i tempo odswiezania. Wiersze do 511 z s22,
+# dwa dlugie kody z s36_long_codes.py, ktory rozszerza drabine K do 896.
 table = {63: (24.6, 1033.0), 127: (49.2, 513.0), 255: (94.2, 306.0),
-         511: (191.6, 127.0)}
+         511: (191.6, 127.0), 1023: (379.5, 63.6), 2047: (749.2, 31.8)}
 products = {N: k * f for N, (k, f) in table.items()}
 
 # ---------------------------------------------------------------------------
@@ -177,8 +179,6 @@ ax[0].plot(Dfr[::2], simc[::2], 'o', color='#2980b9', ms=4, mfc='none',
 ax[0].plot(Dfr, thl, '-', color='#c0392b', lw=1.3, label='Gaussian fit')
 ax[0].plot(Dfr[::2], siml[::2], 's', color='#c0392b', ms=4, mfc='none',
            label='_nolegend_')
-ax[0].axvline(np.sqrt(1.5), color='#c0392b', ls=':', lw=0.8)
-ax[0].axvline(np.sqrt(2.0), color='#2980b9', ls=':', lw=0.8)
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('pairwise shadowing bias [pm]  (R = 1%)')
@@ -197,15 +197,11 @@ ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#c0392b', lw=1.4,
            label='Law B')
 ax[1].plot(cent * PM, binned_r, 's-', color='#28b463', ms=3.6, lw=1.0,
            mfc='none', label='mean, 2 refs')
-for xr in (-0.9 * W * PM, 0.9 * W * PM):
-    ax[1].axvline(xr, color='#28b463', lw=0.6, ls=(0, (2, 2)), alpha=0.75)
-    ax[1].plot(xr, 14.3, marker='v', color='#28b463', ms=3.5, clip_on=False)
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('multiple-access bias [pm]')
 ax[1].set_title('(b) Law B and two references', fontsize=8.3)
-ax[1].legend(fontsize=5.7, loc='upper left',
-             ncol=2, frameon=False, handlelength=1.4, labelspacing=0.16,
-             columnspacing=0.65)
+ax[1].legend(fontsize=5.7, loc='upper left', ncol=1, frameon=False,
+             handlelength=1.4, labelspacing=0.2)
 ax[1].grid(True, alpha=0.25)
 
 Ns = sorted(products)
@@ -214,7 +210,8 @@ ax[2].plot(Ns, [products[N] / 1e3 for N in Ns], 'o-', color='#2980b9',
 ax[2].axhline(bound / 1e3, color='#c0392b', ls='--', lw=1.2,
               label=r'bound  $\epsilon f_s / (c_L n_s M)$')
 ax[2].set_xscale('log')
-ax[2].set_xticks(Ns); ax[2].set_xticklabels([str(N) for N in Ns], fontsize=7.5)
+ax[2].set_xticks(Ns)
+ax[2].set_xticklabels([str(N) for N in Ns], fontsize=5.8)
 ax[2].minorticks_off()
 ax[2].set_ylim(0, bound / 1e3 * 1.25)
 ax[2].set_xlabel('code length N')

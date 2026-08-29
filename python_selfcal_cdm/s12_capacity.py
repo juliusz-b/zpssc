@@ -277,7 +277,7 @@ ax[1].set_xlabel('grating reflectivity R [%]')
 ax[1].set_ylabel('gratings meeting the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
 ax[1].grid(True, which='both', alpha=0.25)
-ax[0].legend(handles0, labels0, fontsize=5.5, loc='upper left', ncol=2,
+ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
              frameon=False, handlelength=1.5, columnspacing=0.7,
              labelspacing=0.16, borderaxespad=0.25)
 ax[1].legend(fontsize=5.8, loc='lower left', frameon=False,

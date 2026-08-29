@@ -216,8 +216,11 @@ ax[1].set_title('(b) Side-lobe leakage, K = %d' % Kc, fontsize=8.1)
 ax[1].grid(True, which='both', alpha=0.2)
 # legenda w pustym lewym gornym rogu, a nie pod osiami: pod osiami
 # zabierala ponad jedna trzecia wysokosci calej figury
-ax[1].legend(fontsize=5.7, loc='upper left', frameon=False,
-             handlelength=1.9, labelspacing=0.22, borderaxespad=0.25)
+# dol posrodku: trzy kolumny mieszcza sie pod dzwonami, a gorny rog
+# zostaje wolny dla samych krzywych
+ax[1].legend(fontsize=5.0, loc='lower center', ncol=3, frameon=False,
+             handlelength=1.2, columnspacing=0.6, labelspacing=0.15,
+             borderaxespad=0.2)
 
 fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
                      wspace=0.30)

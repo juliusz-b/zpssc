@@ -154,16 +154,15 @@ ax[1].axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.9)
 ax[1].axvline(p_chirp / 1000.0, color='#c0392b', ls=':', lw=0.9)
 ax[1].annotate('', xy=(p_chirp / 1000.0, 1.09), xytext=(p_true / 1000.0, 1.09),
                arrowprops=dict(arrowstyle='<|-', lw=1.0, color='k'))
-ax[1].text(0.5 * (p_true + p_chirp) / 1000.0, 1.13,
-           '%.0f pm' % abs(p_chirp - p_true), ha='center', va='bottom',
+ax[1].text(min(p_true, p_chirp) / 1000.0 - 0.035, 1.09,
+           '%.0f pm' % abs(p_chirp - p_true), ha='right', va='center',
            fontsize=6.4)
 ax[1].set_ylim(0, 1.28)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 ax[1].set_title('(b) FM-to-AM on the flank', fontsize=9)
-# lewy dolny rog: gorny zajmuje strzalka z przesunieciem 67 pm
-ax[1].legend(fontsize=5.8, loc='lower left',
+ax[1].legend(fontsize=5.8, loc='upper right',
              ncol=1, frameon=False, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.18, borderaxespad=0.25)
 

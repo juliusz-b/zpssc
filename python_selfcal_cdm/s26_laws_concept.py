@@ -62,17 +62,17 @@ a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)),
           label=r'upstream center $\Delta\lambda_{jk}$')
 a.annotate('', xy=(mu, 1.035), xytext=(0.0, 1.035),
            arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.8))
-a.text(-118, 1.10, r'$\delta\lambda_{k\leftarrow j}$', ha='left',
+a.text(96, 1.10, r'$\delta\lambda_{k\leftarrow j}$', ha='left',
        va='center', fontsize=6.4, color=FS.VERM)
-a.annotate('', xy=(0.5 * mu, 1.055), xytext=(-52, 1.10),
+a.annotate('', xy=(0.5 * mu, 1.055), xytext=(88, 1.10),
            arrowprops=dict(arrowstyle='-', color=FS.VERM, lw=0.5))
 a.set_xlim(-320, 340)
-a.set_ylim(0.0, 1.18)
+a.set_ylim(0.0, 1.46)   # miejsce na legende nad szczytem krzywej
 a.set_yticks([0, 0.5, 1.0])
 a.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
 a.set_ylabel('normalized reflectance')
 panel_title(a, 'a', 'Law A: one flank is attenuated')
-a.legend(loc='lower left', fontsize=5.6, frameon=False, handlelength=1.6,
+a.legend(loc='upper left', fontsize=5.6, frameon=False, handlelength=1.6,
          labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------

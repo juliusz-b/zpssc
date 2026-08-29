@@ -134,7 +134,8 @@ axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.44)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
 axb.set_title('(a) 4th grating behind three, R = 20%', fontsize=7)
 axb.legend(fontsize=5.5, loc='upper left',
-           ncol=3, frameon=False, handlelength=1.4, columnspacing=0.65)
+           ncol=2, frameon=False, handlelength=1.4, columnspacing=0.65,
+           labelspacing=0.2)
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
