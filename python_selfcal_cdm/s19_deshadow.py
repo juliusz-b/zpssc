@@ -123,7 +123,14 @@ axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12', lw=1.4,
          ls='--', label='corrected')
 axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
-axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.42)
+axb.annotate('', xy=(p_true / 1000.0, 1.17), xytext=(p_shad / 1000.0, 1.17),
+             arrowprops=dict(arrowstyle='<->', color='#c0392b', lw=0.8))
+axb.text(0.5 * (p_true + p_shad) / 1000.0, 1.21,
+         '%.0f pm' % abs(p_shad - p_true), ha='center', va='bottom',
+         fontsize=6.4, color='#c0392b')
+axb.text(p_true / 1000.0 + 0.006, 0.06, 'true $\\lambda_{B,4}$',
+         fontsize=6.0, color='#2980b9', rotation=90, va='bottom', ha='left')
+axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.44)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
 axb.set_title('(a) 4th grating behind three, R = 20%', fontsize=7)
 axb.legend(fontsize=5.5, loc='upper center', bbox_to_anchor=(0.5, -0.20),

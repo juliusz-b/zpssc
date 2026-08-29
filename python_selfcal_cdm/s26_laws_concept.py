@@ -62,6 +62,10 @@ a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)),
           label=r'upstream center $\Delta\lambda_{jk}$')
 a.annotate('', xy=(mu, 1.035), xytext=(0.0, 1.035),
            arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.8))
+a.text(-118, 1.10, r'$\delta\lambda_{k\leftarrow j}$', ha='left',
+       va='center', fontsize=6.4, color=FS.VERM)
+a.annotate('', xy=(0.5 * mu, 1.055), xytext=(-52, 1.10),
+           arrowprops=dict(arrowstyle='-', color=FS.VERM, lw=0.5))
 a.set_xlim(-320, 340)
 a.set_ylim(0.0, 1.18)
 a.set_yticks([0, 0.5, 1.0])
@@ -115,9 +119,14 @@ b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
 # (c) Law B is an axis stretch, removed by two reference anchors
 # ---------------------------------------------------------------------------
 c = ax[2]
-c.axis('off')
+for sp in ('top', 'right', 'left'):
+    c.spines[sp].set_visible(False)
+c.set_yticks([])
+c.set_xticks([-180, -90, 0, 90, 180])
+c.tick_params(axis='x', labelsize=6.0, length=2.2, width=0.6)
+c.set_xlabel(r'position in the band $\nu_k$ [pm]')
 c.set_xlim(-300, 275)
-c.set_ylim(-0.10, 3.08)
+c.set_ylim(-0.32, 3.08)
 panel_title(c, 'c', 'Law B: two anchors remove stretch')
 
 W = 180.0

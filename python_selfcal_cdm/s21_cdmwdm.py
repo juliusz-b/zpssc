@@ -123,18 +123,19 @@ for wί in range(Wb):
     axa.axhspan(wί, wί + 1, color=BAND_COLS[wί], alpha=0.10)
     axa.text(2, wί + 0.82, 'band %d' % (wί + 1), fontsize=6.8,
              color=BAND_COLS[wί])
-used = {}
+SHARED = 84                      # one delay bin deliberately reused by every band
+pool = np.array([x for x in range(5, NCH - 5) if abs(x - SHARED) > 6])
 for wί in range(Wb):
-    b = np.sort(rng.choice(np.arange(5, NCH - 5), size=7, replace=False))
-    lam = rng.uniform(0.15, 0.72, size=7)
+    b = np.sort(np.append(rng.choice(pool, size=6, replace=False), SHARED))
+    lam = rng.uniform(0.15, 0.72, size=b.size)
     axa.plot(b, wί + lam, 'v', ms=5, color=BAND_COLS[wί])
-    for bb in b:
-        used.setdefault(int(bb), []).append(wί)
-shared = [b for b, ws in used.items() if len(ws) >= 2][:1]
-if shared:
-    axa.axvline(shared[0], color='0.3', ls=':', lw=0.9)
-axa.set_xlim(0, NCH); axa.set_ylim(0, Wb)
-axa.set_yticks([]); axa.set_xlabel(r'delay bin  $\longrightarrow$  position')
+axa.axvline(SHARED, color='0.3', ls=':', lw=0.9)
+axa.annotate('one bin, four bands', xy=(SHARED, 3.92), xytext=(SHARED - 6, 4.16),
+             fontsize=5.8, color='0.3', ha='right',
+             arrowprops=dict(arrowstyle='-', color='0.3', lw=0.5))
+axa.set_xlim(0, NCH); axa.set_ylim(0, Wb + 0.30)
+axa.set_yticks([])
+axa.set_xlabel('delay bin, that is grating position')
 axa.set_ylabel('wavelength band')
 axa.set_title('(a) CDM-WDM addressing', fontsize=9)
 
