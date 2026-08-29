@@ -18,6 +18,7 @@ Spectral shadowing, the third array term, has its own figure in s19 because it
 comes with a correction.
 """
 import numpy as np, matplotlib; matplotlib.use('Agg')
+from collections import Counter
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle, Circle
 import warnings; warnings.filterwarnings('ignore')
@@ -142,7 +143,8 @@ fig2, ax = plt.subplots(1, 2, figsize=(5.1, 1.98))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
-axb.set_xlim(-2, 102); axb.set_ylim(-0.35, 10.6); axb.axis('off')
+axb.set_xlim(-2, 102); axb.set_ylim(-0.35, 10.9); axb.axis('off')
+DOT = 0.24                          # odstep kropek w slupku
 
 UNI = [10, 25, 40, 55, 70]          # skok 15
 RND = [15, 25, 41, 67, 86]          # odstepy 10, 16, 26, 19
@@ -161,39 +163,40 @@ def in_span_ghosts(bins):
 
 
 def draw_row(y, bins, col, title):
-    g = in_span_ghosts(bins)
-    hits = [x for x in g if x in bins]
+    paths = in_span_ghosts(bins)
+    mult = Counter(paths)
+    hits = [x for x in paths if x in bins]
     # wlokno z siatkami: fizyczny uklad, ten sam w obu wierszach
     axb.plot([0, 100], [y, y], color='#555', lw=1.2, zorder=1)
     for x in bins:
         axb.add_patch(Rectangle((x - 1.5, y - 0.26), 3.0, 0.52, fc=col,
                                 ec='#333', lw=0.5, zorder=3))
-    # komplet duchow pod wloknem, jeden znacznik na bin
-    for x in sorted(set(g)):
+    # jedna kropka na sciezke, slupek na wspolne opoznienie
+    for x in sorted(mult):
         on = x in bins
-        axb.plot([x, x], [y - 1.30, y - 0.78],
-                 color='#c0392b' if on else '0.62',
-                 lw=1.6 if on else 1.0, zorder=2)
-        if on:
-            axb.plot([x], [y - 0.44], marker='^', ms=4.2, color='#c0392b',
-                     zorder=4)
+        c = '#c0392b' if on else '0.62'
+        axb.plot([x, x], [y - 0.30, y - 0.70], color=c,
+                 lw=1.0 if on else 0.7, zorder=2)
+        for i in range(mult[x]):
+            axb.plot([x], [y - 0.84 - DOT * i], marker='o', ms=2.3,
+                     color=c, mec='none', zorder=4)
     axb.text(0, y + 0.62, title, fontsize=6.8, color=col)
-    axb.text(0, y - 2.05, '%d ghost paths return inside the array, %d on a grating'
-             % (len(g), len(hits)), fontsize=6.2,
+    # podpis pod najglebszym slupkiem wiersza, bo slupki maja rozna dlugosc
+    deep = y - 0.84 - DOT * (max(mult.values()) - 1)
+    axb.text(0, deep - 0.78, '%d ghost paths return inside the array, %d on a grating'
+             % (len(paths), len(hits)), fontsize=6.2,
              color='#c0392b' if hits else '0.45')
 
 
-axb.text(0, 10.1, r'a ghost returns at $\tau_a-\tau_b+\tau_c$ (Fig. 5)',
+axb.text(0, 10.45, r'a ghost returns at $\tau_a-\tau_b+\tau_c$ (Fig. 5)',
          fontsize=6.4, color='0.35')
-draw_row(8.05, UNI, '#c0392b', 'uniform spacing: every ghost lands on a grating')
-draw_row(3.55, RND, '#2980b9', 'randomized spacing: almost none does')
+draw_row(9.00, UNI, '#c0392b', 'uniform spacing: every ghost lands on a grating')
+draw_row(4.35, RND, '#2980b9', 'randomized spacing: almost none does')
 
 axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
 axb.text(50, 0.02, 'delay bin, that is grating position', ha='center',
          fontsize=6.8, color='0.4')
-axb.plot([88], [6.75], marker='^', ms=4.2, color='#c0392b', clip_on=False)
-axb.text(90.5, 6.75, 'hit', fontsize=6.0, color='#c0392b', va='center')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
 # --- (c) code leakage ------------------------------------------------------
