@@ -58,22 +58,37 @@ a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='after notch')
 a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)), label='fit')
 a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
 a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
-a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)),
-          label=r'upstream center $\Delta\lambda_{jk}$')
-a.annotate('', xy=(mu, 1.035), xytext=(0.0, 1.035),
-           arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.8))
-a.text(96, 1.10, r'$\delta\lambda_{k\leftarrow j}$', ha='left',
-       va='center', fontsize=6.4, color=FS.VERM)
-a.annotate('', xy=(0.5 * mu, 1.055), xytext=(88, 1.10),
-           arrowprops=dict(arrowstyle='-', color=FS.VERM, lw=0.5))
+a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)))
+a.text(DET + 11, 0.78, 'upstream' '\n' r'center $\Delta\lambda_{jk}$',
+       fontsize=5.6, color=FS.BLUE, va='center', ha='left')
+# powiekszenie szczytu: sam przesuw to okolo procenta szerokosci panelu
+zoom = a.inset_axes([0.55, 0.58, 0.43, 0.40])
+zoom.plot(nu, wanted, color='0.50', lw=1.2, ls=(0, (3, 2)))
+zoom.plot(nu, received, color=FS.ORANGE, lw=1.4)
+zoom.plot(nu, fit, color=FS.VERM, lw=1.0, ls=(0, (3, 1.7)))
+zoom.axvline(0.0, color='0.45', lw=0.7, ls=(0, (2, 2)))
+zoom.axvline(mu, color=FS.VERM, lw=0.8, ls=(0, (2, 2)))
+# groty musza byc mniejsze od dlugosci strzalki, a okno na tyle waskie,
+# zeby 9 pm zajmowalo widoczny ulamek jego szerokosci
+zoom.annotate('', xy=(mu, 1.036), xytext=(0.0, 1.036),
+              arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.9,
+                              mutation_scale=5.0, shrinkA=0, shrinkB=0))
+zoom.text(0.5 * mu, 1.052, r'$\delta\lambda_{k\leftarrow j}$', ha='center',
+          va='bottom', fontsize=6.2, color=FS.VERM)
+zoom.set_xlim(mu - 19, 19); zoom.set_ylim(0.875, 1.095)
+zoom.set_xticks([]); zoom.set_yticks([])
+for sp in zoom.spines.values():
+    sp.set_visible(True); sp.set_linewidth(0.5); sp.set_color('0.55')
 a.set_xlim(-320, 340)
-a.set_ylim(0.0, 1.46)   # miejsce na legende nad szczytem krzywej
+a.set_ylim(0.0, 1.62)   # miejsce na legende i na powiekszenie szczytu
 a.set_yticks([0, 0.5, 1.0])
 a.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
 a.set_ylabel('normalized reflectance')
 panel_title(a, 'a', 'Law A: one flank is attenuated')
 a.legend(loc='upper left', fontsize=5.6, frameon=False, handlelength=1.6,
          labelspacing=0.18, borderaxespad=0.25)
+a.indicate_inset_zoom(zoom, edgecolor='0.55', lw=0.5, alpha=0.9)
+print('Fig. 2(a): przesuw dopasowanego srodka %.2f pm' % abs(mu))
 
 # ---------------------------------------------------------------------------
 # (b) Pairwise bias as a placement rule over the full sensor range

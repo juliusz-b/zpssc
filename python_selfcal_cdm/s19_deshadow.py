@@ -123,19 +123,41 @@ axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12', lw=1.4,
          ls='--', label='corrected')
 axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
-axb.annotate('', xy=(p_true / 1000.0, 1.17), xytext=(p_shad / 1000.0, 1.17),
-             arrowprops=dict(arrowstyle='<->', color='#c0392b', lw=0.8))
-axb.text(0.5 * (p_true + p_shad) / 1000.0, 1.21,
-         '%.0f pm' % abs(p_shad - p_true), ha='center', va='bottom',
-         fontsize=6.4, color='#c0392b')
+# powiekszenie okolic obu szczytow: w skali glownej 21 pm to cztery
+# procent szerokosci panelu i strzalka zlewa sie w jeden znak
+# okno obejmuje takze widoczne maksimum zacienionej linii, ktore lezy
+# dalej niz sam przesuw dopasowanego srodka
+a_shad = nu[int(np.argmax(shad_b[kk]))] * PM
+zlo = min(p_true, p_shad, a_shad) / 1000.0 - 0.022
+zhi = max(p_true, p_shad, a_shad) / 1000.0 + 0.026
+zoom = axb.inset_axes([0.60, 0.62, 0.39, 0.33])
+zoom.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#2980b9', lw=1.8)
+zoom.plot(lam, shad_b[kk] / shad_b[kk].max(), color='#c0392b', lw=1.2)
+zoom.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12',
+          lw=1.2, ls='--')
+zoom.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
+zoom.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
+zoom.annotate('', xy=(p_true / 1000.0, 1.022), xytext=(p_shad / 1000.0, 1.022),
+              arrowprops=dict(arrowstyle='<->', lw=0.9, color='#c0392b',
+                              shrinkA=0, shrinkB=0))
+zoom.text(0.5 * (p_true + p_shad) / 1000.0, 1.030,
+          '%.0f pm' % abs(p_shad - p_true), ha='center', va='bottom',
+          fontsize=6.2, color='#c0392b')
+zoom.text(a_shad / 1000.0, 0.947, 'max', fontsize=5.4, color='#c0392b',
+          ha='center', va='bottom')
+zoom.set_xlim(zlo, zhi); zoom.set_ylim(0.940, 1.070)
+zoom.set_xticks([]); zoom.set_yticks([])
+for sp in zoom.spines.values():
+    sp.set_visible(True); sp.set_linewidth(0.5); sp.set_color('0.55')
 axb.text(p_true / 1000.0 + 0.006, 0.06, 'true $\\lambda_{B,4}$',
          fontsize=6.0, color='#2980b9', rotation=90, va='bottom', ha='left')
-axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.44)
+axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.60)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
 axb.set_title('(a) 4th grating behind three, R = 20%', fontsize=7)
 axb.legend(fontsize=5.5, loc='upper left',
            ncol=2, frameon=False, handlelength=1.4, columnspacing=0.65,
            labelspacing=0.2)
+axb.indicate_inset_zoom(zoom, edgecolor='0.55', lw=0.5, alpha=0.9)
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]

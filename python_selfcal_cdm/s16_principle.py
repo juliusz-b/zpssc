@@ -218,9 +218,8 @@ ax[1].grid(True, which='both', alpha=0.2)
 # zabierala ponad jedna trzecia wysokosci calej figury
 # dol posrodku: trzy kolumny mieszcza sie pod dzwonami, a gorny rog
 # zostaje wolny dla samych krzywych
-ax[1].legend(fontsize=5.0, loc='lower center', ncol=3, frameon=False,
-             handlelength=1.2, columnspacing=0.6, labelspacing=0.15,
-             borderaxespad=0.2)
+ax[1].legend(fontsize=5.2, loc='lower center', ncol=1, frameon=False,
+             handlelength=1.4, labelspacing=0.2, borderaxespad=0.3)
 
 fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
                      wspace=0.30)

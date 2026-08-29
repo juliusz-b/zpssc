@@ -152,11 +152,26 @@ ax[1].annotate(r'$p(\xi)$', xy=(nu_op * PM / 1000.0, 0.30),
                arrowprops=dict(arrowstyle='-', color='#7d3c98', lw=0.6))
 ax[1].axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.9)
 ax[1].axvline(p_chirp / 1000.0, color='#c0392b', ls=':', lw=0.9)
-ax[1].annotate('', xy=(p_chirp / 1000.0, 1.09), xytext=(p_true / 1000.0, 1.09),
-               arrowprops=dict(arrowstyle='<|-', lw=1.0, color='k'))
-ax[1].text(min(p_true, p_chirp) / 1000.0 - 0.035, 1.09,
-           '%.0f pm' % abs(p_chirp - p_true), ha='right', va='center',
-           fontsize=6.4)
+# powiekszenie: przesuniecie miedzy maksimami to 67 pm na panelu szerokim
+# na 1240 pm, wiec w skali glownej jest niewidoczne
+lo = min(p_true, p_chirp) / 1000.0 - 0.055
+hi = max(p_true, p_chirp) / 1000.0 + 0.055
+zoom = ax[1].inset_axes([0.035, 0.60, 0.40, 0.38])
+zoom.plot(g * PM / 1000.0, true_line, color='#2980b9', lw=1.2)
+zoom.plot(g * PM / 1000.0, chirped, color='#c0392b', lw=1.2)
+zoom.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
+zoom.axvline(p_chirp / 1000.0, color='#c0392b', ls=':', lw=0.8)
+zoom.annotate('', xy=(p_chirp / 1000.0, 1.012), xytext=(p_true / 1000.0, 1.012),
+              arrowprops=dict(arrowstyle='<->', lw=0.9, color='k',
+                              shrinkA=0, shrinkB=0))
+zoom.text(0.5 * (p_true + p_chirp) / 1000.0, 1.019,
+          '%.0f pm' % abs(p_chirp - p_true), ha='center', va='bottom',
+          fontsize=6.2)
+zoom.set_xlim(lo, hi); zoom.set_ylim(0.955, 1.042)
+zoom.set_xticks([]); zoom.set_yticks([])
+for sp in zoom.spines.values():
+    sp.set_visible(True); sp.set_linewidth(0.5); sp.set_color('0.55')
+ax[1].indicate_inset_zoom(zoom, edgecolor='0.55', lw=0.5, alpha=0.9)
 ax[1].set_ylim(0, 1.28)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
