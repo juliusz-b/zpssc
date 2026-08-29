@@ -142,64 +142,58 @@ fig2, ax = plt.subplots(1, 2, figsize=(5.1, 1.98))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
-axb.set_xlim(0, 100); axb.set_ylim(-1.05, 10.4); axb.axis('off')
+axb.set_xlim(-2, 102); axb.set_ylim(-0.35, 10.6); axb.axis('off')
 
-# ta sama piatka siatek w obu wierszach, przesuwane sa tylko pozycje
-UNI = [10, 25, 40, 55, 70]          # rownomierny skok 15
-RND = [6, 30, 50, 62, 90]           # ten sam K, pozycje rozrzucone
-IB, IA, IC = 0, 1, 2                # ktore siatki tworza pokazana sciezke
+UNI = [10, 25, 40, 55, 70]          # skok 15
+RND = [15, 25, 41, 67, 86]          # odstepy 10, 16, 26, 19
 
 
-def ghost_of(bins):
-    return bins[IA] - bins[IB] + bins[IC]
+def in_span_ghosts(bins):
+    """Wszystkie sciezki trzeciego rzedu, ktore wracaja w obrebie tablicy."""
+    out = []
+    for ib, b in enumerate(bins):
+        for a in bins[ib + 1:]:
+            for c in bins[ib + 1:]:
+                g = a - b + c
+                if bins[0] <= g <= bins[-1]:
+                    out.append(g)
+    return out
 
 
-def draw_row(y, bins, title, col, note_fmt):
-    """Jeden wiersz: os opoznien, siatki, duch a-b+c i arytmetyka."""
-    g = ghost_of(bins)
-    on_grating = g in bins
-    axb.plot([2, 98], [y, y], color='0.82', lw=0.8, zorder=0)
-    for i, x in enumerate(bins):
-        axb.plot([x], [y + 0.30], 'v', color=col, ms=5.6, clip_on=False,
-                 zorder=3)
-        lbl = {IB: 'b', IA: 'a', IC: 'c'}.get(i)
-        if lbl:
-            axb.text(x, y + 0.78, lbl, ha='center', fontsize=6.6, color=col)
-    ghost_col = '#c0392b' if on_grating else '0.55'
-    axb.plot([g], [y - 0.68], 'D', color=ghost_col, ms=3.4, clip_on=False,
-             zorder=3)
-    axb.annotate('', xy=(g, y - 0.20), xytext=(g, y - 0.56),
-                 arrowprops=dict(arrowstyle='-|>', color=ghost_col, lw=0.8))
-    if on_grating:
-        axb.plot([g], [y + 0.30], 'o', ms=8.4, mfc='none', mec='#c0392b',
-                 mew=1.0, clip_on=False, zorder=4)
-    axb.text(2, y + 1.28, title, fontsize=6.8, color=col)
-    axb.text(2, y - 1.52, note_fmt % (bins[IA], bins[IB], bins[IC], g),
-             fontsize=6.2, color=ghost_col)
+def draw_row(y, bins, col, title):
+    g = in_span_ghosts(bins)
+    hits = [x for x in g if x in bins]
+    # wlokno z siatkami: fizyczny uklad, ten sam w obu wierszach
+    axb.plot([0, 100], [y, y], color='#555', lw=1.2, zorder=1)
+    for x in bins:
+        axb.add_patch(Rectangle((x - 1.5, y - 0.26), 3.0, 0.52, fc=col,
+                                ec='#333', lw=0.5, zorder=3))
+    # komplet duchow pod wloknem, jeden znacznik na bin
+    for x in sorted(set(g)):
+        on = x in bins
+        axb.plot([x, x], [y - 1.30, y - 0.78],
+                 color='#c0392b' if on else '0.62',
+                 lw=1.6 if on else 1.0, zorder=2)
+        if on:
+            axb.plot([x], [y - 0.44], marker='^', ms=4.2, color='#c0392b',
+                     zorder=4)
+    axb.text(0, y + 0.62, title, fontsize=6.8, color=col)
+    axb.text(0, y - 2.05, '%d ghost paths return inside the array, %d on a grating'
+             % (len(g), len(hits)), fontsize=6.2,
+             color='#c0392b' if hits else '0.45')
 
 
-# --- sciezka trzech odbic nad tablica rownomierna -------------------------
-axb.plot([2, 98], [9.55, 9.55], color='#555', lw=1.4)
-for i, x in enumerate(UNI):
-    axb.add_patch(Rectangle((x - 1.4, 9.32), 2.8, 0.46, fc='#c0392b',
-                            ec='#7b241c', hatch='///', lw=0.6))
-for idx, nm in ((IB, 'b'), (IA, 'a'), (IC, 'c')):
-    axb.text(UNI[idx], 9.95, nm, ha='center', fontsize=7.0)
-for (x0, x1, yy) in ((2, UNI[IA], 8.95), (UNI[IA], UNI[IB], 8.55),
-                     (UNI[IB], UNI[IC], 8.15), (UNI[IC], 2, 7.75)):
-    axb.annotate('', xy=(x1, yy), xytext=(x0, yy),
-                 arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.0))
-axb.text(98, 7.75, r'three reflections, power $\propto R^3$', ha='right',
+axb.text(0, 10.1, r'a ghost returns at $\tau_a-\tau_b+\tau_c$ (Fig. 5)',
          fontsize=6.4, color='0.35')
+draw_row(8.05, UNI, '#c0392b', 'uniform spacing: every ghost lands on a grating')
+draw_row(3.55, RND, '#2980b9', 'randomized spacing: almost none does')
 
-draw_row(5.35, UNI, 'uniform spacing: the ghost lands on a grating',
-         '#c0392b', r'$%d-%d+%d=%d$, an occupied bin')
-draw_row(1.95, RND, 'randomized spacing: the same ghost falls in a gap',
-         '#2980b9', r'$%d-%d+%d=%d$, an empty bin')
-
-axb.annotate('', xy=(98, -0.55), xytext=(2, -0.55),
+axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
-axb.text(50, -0.92, 'delay bin', ha='center', fontsize=7.0, color='0.4')
+axb.text(50, 0.02, 'delay bin, that is grating position', ha='center',
+         fontsize=6.8, color='0.4')
+axb.plot([88], [6.75], marker='^', ms=4.2, color='#c0392b', clip_on=False)
+axb.text(90.5, 6.75, 'hit', fontsize=6.0, color='#c0392b', va='center')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
 # --- (c) code leakage ------------------------------------------------------
