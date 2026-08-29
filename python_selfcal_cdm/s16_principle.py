@@ -138,7 +138,7 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # This figure is included at 0.72 text width in the paper. Draw it at that
 # physical width so the 7 pt labels remain 7 pt after LaTeX placement.
-fig2, ax = plt.subplots(1, 2, figsize=(5.1, 2.30))
+fig2, ax = plt.subplots(1, 2, figsize=(5.1, 1.98))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
@@ -177,18 +177,25 @@ def ghost_bins(b):
 for row, (b, gbs, ttl, col) in enumerate(
         [(bu, ghost_bins(bu), 'uniform spacing', '#c0392b'),
          (br, ghost_bins(br), 'randomized spacing', '#2980b9')]):
-    y0 = 5.00 - 3.35 * row
+    y0 = 5.15 - 3.30 * row
     axb.plot([0.6, 9.4], [y0, y0], color='0.82', lw=0.8)
     xs = 0.6 + 8.8 * b / 90.0
     # siatki nad osia, duchy pod nia: zadne dwa markery nie zajmuja tego
     # samego miejsca, wiec kolizje widac, a nie domysla sie ich
-    axb.plot(xs, [y0 + 0.20] * len(b), 'v', color=col, ms=5.5, clip_on=False)
     hit = np.array([g in b for g in gbs])
     xg = 0.6 + 8.8 * gbs / 90.0
-    axb.plot(xg[~hit], [y0 - 0.32] * (~hit).sum(), '.', color='0.62', ms=2.8)
-    axb.plot(xg[hit], [y0 - 0.32] * hit.sum(), 'x', color='#c0392b', ms=4.2,
-             mew=1.0)
-    axb.text(0.6, y0 + 0.62, '%s: %d%% of ghosts land on a grating'
+    # duchy w pustych binach: drobne kropki pod linia, bez wlasnego rzedu
+    axb.plot(xg[~hit], [y0 - 0.42] * (~hit).sum(), '.', color='0.66', ms=2.4,
+             zorder=1)
+    # siatki na linii, trafione obwiedzione: kolizja jest cecha SIATKI,
+    # a nie osobnym rzedem markerow do porownywania wzrokiem
+    struck = np.array([bb in set(np.round(gbs).astype(int)) for bb in b])
+    axb.plot(xs, [y0 + 0.30] * len(b), 'v', color=col, ms=5.2, clip_on=False,
+             zorder=3)
+    if struck.any():
+        axb.plot(xs[struck], [y0 + 0.30] * struck.sum(), 'o', ms=8.0,
+                 mfc='none', mec='#c0392b', mew=0.9, clip_on=False, zorder=4)
+    axb.text(0.6, y0 + 0.78, '%s: %d%% of ghosts land on a grating'
              % (ttl, round(100 * hit.mean())), fontsize=6.6, color=col)
 axb.annotate('', xy=(9.4, -0.62), xytext=(0.6, -0.62),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
@@ -212,14 +219,14 @@ ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
 ax[1].set_title('(b) Side-lobe leakage, K = %d' % Kc, fontsize=8.1)
-handles, labels = ax[1].get_legend_handles_labels()
 ax[1].grid(True, which='both', alpha=0.2)
+# legenda w pustym lewym gornym rogu, a nie pod osiami: pod osiami
+# zabierala ponad jedna trzecia wysokosci calej figury
+ax[1].legend(fontsize=5.7, loc='upper left', frameon=False,
+             handlelength=1.9, labelspacing=0.22, borderaxespad=0.25)
 
-fig2.subplots_adjust(left=0.055, right=0.99, top=0.88, bottom=0.36,
+fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
                      wspace=0.30)
-fig2.legend(handles, labels, fontsize=6.3, loc='lower center',
-            bbox_to_anchor=(0.75, 0.015), frameon=False, ncol=1,
-            handlelength=2.3, labelspacing=0.16)
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=150, bbox_inches='tight')
 fig2.savefig('figs/fig_s16_mechanisms.pdf', bbox_inches='tight')
 
