@@ -142,64 +142,64 @@ fig2, ax = plt.subplots(1, 2, figsize=(5.1, 1.98))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
-axb.set_xlim(0, 10); axb.set_ylim(-1.15, 10.1); axb.axis('off')
-axb.plot([0.6, 9.4], [9.35, 9.35], color='#555', lw=1.4)
-gz = [2.0, 4.4, 7.4]
-for z, nm in zip(gz, ['b', 'a', 'c']):
-    axb.add_patch(Rectangle((z - 0.16, 9.10), 0.32, 0.5, fc='#c0392b',
-                            ec='#7b241c', hatch='///', lw=0.7))
-    axb.text(z, 9.72, nm, ha='center', fontsize=8)
-for (x0, x1, y) in ((0.7, 4.4, 8.72), (4.4, 2.0, 8.28),
-                    (2.0, 7.4, 7.84), (7.4, 0.7, 7.40)):
-    axb.annotate('', xy=(x1, y), xytext=(x0, y),
-                 arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
-axb.text(5.0, 6.72, r'ghost: $\tau_a-\tau_b+\tau_c$, power $\propto R^3$',
-         ha='center', fontsize=7.0)
+axb.set_xlim(0, 100); axb.set_ylim(-1.05, 10.4); axb.axis('off')
 
-Kg = 10
-bu = 3 + 7 * np.arange(Kg)
-rng2 = np.random.default_rng(11)
-br = np.sort(rng2.choice(np.arange(1, 90), size=Kg, replace=False))
+# ta sama piatka siatek w obu wierszach, przesuwane sa tylko pozycje
+UNI = [10, 25, 40, 55, 70]          # rownomierny skok 15
+RND = [6, 30, 50, 62, 90]           # ten sam K, pozycje rozrzucone
+IB, IA, IC = 0, 1, 2                # ktore siatki tworza pokazana sciezke
 
 
-def ghost_bins(b):
-    out = []
-    for a in range(len(b)):
-        for bb in range(len(b)):
-            for c in range(len(b)):
-                if bb < a and bb < c:
-                    gb = b[a] - b[bb] + b[c]
-                    if b.min() <= gb <= b.max():
-                        out.append(gb)
-    return np.array(out)
+def ghost_of(bins):
+    return bins[IA] - bins[IB] + bins[IC]
 
 
-for row, (b, gbs, ttl, col) in enumerate(
-        [(bu, ghost_bins(bu), 'uniform spacing', '#c0392b'),
-         (br, ghost_bins(br), 'randomized spacing', '#2980b9')]):
-    y0 = 5.15 - 3.30 * row
-    axb.plot([0.6, 9.4], [y0, y0], color='0.82', lw=0.8)
-    xs = 0.6 + 8.8 * b / 90.0
-    # siatki nad osia, duchy pod nia: zadne dwa markery nie zajmuja tego
-    # samego miejsca, wiec kolizje widac, a nie domysla sie ich
-    hit = np.array([g in b for g in gbs])
-    xg = 0.6 + 8.8 * gbs / 90.0
-    # duchy w pustych binach: drobne kropki pod linia, bez wlasnego rzedu
-    axb.plot(xg[~hit], [y0 - 0.42] * (~hit).sum(), '.', color='0.66', ms=2.4,
-             zorder=1)
-    # siatki na linii, trafione obwiedzione: kolizja jest cecha SIATKI,
-    # a nie osobnym rzedem markerow do porownywania wzrokiem
-    struck = np.array([bb in set(np.round(gbs).astype(int)) for bb in b])
-    axb.plot(xs, [y0 + 0.30] * len(b), 'v', color=col, ms=5.2, clip_on=False,
+def draw_row(y, bins, title, col, note_fmt):
+    """Jeden wiersz: os opoznien, siatki, duch a-b+c i arytmetyka."""
+    g = ghost_of(bins)
+    on_grating = g in bins
+    axb.plot([2, 98], [y, y], color='0.82', lw=0.8, zorder=0)
+    for i, x in enumerate(bins):
+        axb.plot([x], [y + 0.30], 'v', color=col, ms=5.6, clip_on=False,
+                 zorder=3)
+        lbl = {IB: 'b', IA: 'a', IC: 'c'}.get(i)
+        if lbl:
+            axb.text(x, y + 0.78, lbl, ha='center', fontsize=6.6, color=col)
+    ghost_col = '#c0392b' if on_grating else '0.55'
+    axb.plot([g], [y - 0.68], 'D', color=ghost_col, ms=3.4, clip_on=False,
              zorder=3)
-    if struck.any():
-        axb.plot(xs[struck], [y0 + 0.30] * struck.sum(), 'o', ms=8.0,
-                 mfc='none', mec='#c0392b', mew=0.9, clip_on=False, zorder=4)
-    axb.text(0.6, y0 + 0.78, '%s: %d%% of ghosts land on a grating'
-             % (ttl, round(100 * hit.mean())), fontsize=6.6, color=col)
-axb.annotate('', xy=(9.4, -0.62), xytext=(0.6, -0.62),
+    axb.annotate('', xy=(g, y - 0.20), xytext=(g, y - 0.56),
+                 arrowprops=dict(arrowstyle='-|>', color=ghost_col, lw=0.8))
+    if on_grating:
+        axb.plot([g], [y + 0.30], 'o', ms=8.4, mfc='none', mec='#c0392b',
+                 mew=1.0, clip_on=False, zorder=4)
+    axb.text(2, y + 1.28, title, fontsize=6.8, color=col)
+    axb.text(2, y - 1.52, note_fmt % (bins[IA], bins[IB], bins[IC], g),
+             fontsize=6.2, color=ghost_col)
+
+
+# --- sciezka trzech odbic nad tablica rownomierna -------------------------
+axb.plot([2, 98], [9.55, 9.55], color='#555', lw=1.4)
+for i, x in enumerate(UNI):
+    axb.add_patch(Rectangle((x - 1.4, 9.32), 2.8, 0.46, fc='#c0392b',
+                            ec='#7b241c', hatch='///', lw=0.6))
+for idx, nm in ((IB, 'b'), (IA, 'a'), (IC, 'c')):
+    axb.text(UNI[idx], 9.95, nm, ha='center', fontsize=7.0)
+for (x0, x1, yy) in ((2, UNI[IA], 8.95), (UNI[IA], UNI[IB], 8.55),
+                     (UNI[IB], UNI[IC], 8.15), (UNI[IC], 2, 7.75)):
+    axb.annotate('', xy=(x1, yy), xytext=(x0, yy),
+                 arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.0))
+axb.text(98, 7.75, r'three reflections, power $\propto R^3$', ha='right',
+         fontsize=6.4, color='0.35')
+
+draw_row(5.35, UNI, 'uniform spacing: the ghost lands on a grating',
+         '#c0392b', r'$%d-%d+%d=%d$, an occupied bin')
+draw_row(1.95, RND, 'randomized spacing: the same ghost falls in a gap',
+         '#2980b9', r'$%d-%d+%d=%d$, an empty bin')
+
+axb.annotate('', xy=(98, -0.55), xytext=(2, -0.55),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
-axb.text(5.0, -1.05, 'delay bin', ha='center', fontsize=7.2, color='0.4')
+axb.text(50, -0.92, 'delay bin', ha='center', fontsize=7.0, color='0.4')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
 # --- (c) code leakage ------------------------------------------------------
@@ -229,6 +229,27 @@ fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
                      wspace=0.30)
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=150, bbox_inches='tight')
 fig2.savefig('figs/fig_s16_mechanisms.pdf', bbox_inches='tight')
+
+# --- kontrola liczbowa: statystyka zbiorcza cytowana w III-B --------------
+# Rysunek pokazuje jednego ducha, bo to on niesie mechanizm. Skala zjawiska
+# jest w tekscie, wiec liczona jest tutaj, na dziesieciu siatkach.
+Kg = 10
+bu = 3 + 7 * np.arange(Kg)
+br = np.sort(np.random.default_rng(11).choice(np.arange(1, 90), size=Kg,
+                                              replace=False))
+
+
+def ghost_bins(b):
+    out = []
+    for a in range(len(b)):
+        for bb in range(len(b)):
+            for c in range(len(b)):
+                if bb < a and bb < c:
+                    gb = b[a] - b[bb] + b[c]
+                    if b.min() <= gb <= b.max():
+                        out.append(gb)
+    return np.array(out)
+
 
 print('ghost bins, uniform: %d in span, %.0f%% on a grating bin'
       % (len(ghost_bins(bu)), 100 * np.mean([g in bu for g in ghost_bins(bu)])))
