@@ -146,10 +146,17 @@ nu_op = -0.62 * F
 kern = np.exp(-0.5 * ((g - nu_op) / (0.5 * DELTA_DEMO)) ** 2)
 ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#7d3c98', alpha=0.32,
                    lw=0)
+ax[1].annotate(r'$p(\xi)$', xy=(nu_op * PM / 1000.0, 0.30),
+               xytext=(-0.52, 0.62), fontsize=7.4, color='#7d3c98',
+               ha='center', va='center',
+               arrowprops=dict(arrowstyle='-', color='#7d3c98', lw=0.6))
 ax[1].axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.9)
 ax[1].axvline(p_chirp / 1000.0, color='#c0392b', ls=':', lw=0.9)
 ax[1].annotate('', xy=(p_chirp / 1000.0, 1.09), xytext=(p_true / 1000.0, 1.09),
                arrowprops=dict(arrowstyle='<|-', lw=1.0, color='k'))
+ax[1].text(0.5 * (p_true + p_chirp) / 1000.0, 1.13,
+           '%.0f pm' % abs(p_chirp - p_true), ha='center', va='bottom',
+           fontsize=6.4)
 ax[1].set_ylim(0, 1.28)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')

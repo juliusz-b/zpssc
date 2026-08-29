@@ -142,22 +142,18 @@ fig2, ax = plt.subplots(1, 2, figsize=(5.1, 2.30))
 
 # --- (b) ghost delays ------------------------------------------------------
 axb = ax[0]
-axb.set_xlim(0, 10); axb.set_ylim(-1.6, 10); axb.axis('off')
-axb.plot([0.6, 9.4], [8.6, 8.6], color='#555', lw=1.4)
+axb.set_xlim(0, 10); axb.set_ylim(-1.15, 10.1); axb.axis('off')
+axb.plot([0.6, 9.4], [9.35, 9.35], color='#555', lw=1.4)
 gz = [2.0, 4.4, 7.4]
 for z, nm in zip(gz, ['b', 'a', 'c']):
-    axb.add_patch(Rectangle((z - 0.16, 8.35), 0.32, 0.5, fc='#c0392b',
+    axb.add_patch(Rectangle((z - 0.16, 9.10), 0.32, 0.5, fc='#c0392b',
                             ec='#7b241c', hatch='///', lw=0.7))
-    axb.text(z, 9.15, nm, ha='center', fontsize=8)
-axb.annotate('', xy=(4.4, 7.9), xytext=(0.7, 7.9),
-             arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
-axb.annotate('', xy=(2.0, 7.35), xytext=(4.4, 7.35),
-             arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
-axb.annotate('', xy=(7.4, 6.8), xytext=(2.0, 6.8),
-             arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
-axb.annotate('', xy=(0.7, 6.25), xytext=(7.4, 6.25),
-             arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
-axb.text(5.0, 5.55, r'ghost: $\tau_a-\tau_b+\tau_c$, power $\propto R^3$',
+    axb.text(z, 9.72, nm, ha='center', fontsize=8)
+for (x0, x1, y) in ((0.7, 4.4, 8.72), (4.4, 2.0, 8.28),
+                    (2.0, 7.4, 7.84), (7.4, 0.7, 7.40)):
+    axb.annotate('', xy=(x1, y), xytext=(x0, y),
+                 arrowprops=dict(arrowstyle='-|>', color='#28b463', lw=1.1))
+axb.text(5.0, 6.72, r'ghost: $\tau_a-\tau_b+\tau_c$, power $\propto R^3$',
          ha='center', fontsize=7.0)
 
 Kg = 10
@@ -181,17 +177,22 @@ def ghost_bins(b):
 for row, (b, gbs, ttl, col) in enumerate(
         [(bu, ghost_bins(bu), 'uniform spacing', '#c0392b'),
          (br, ghost_bins(br), 'randomized spacing', '#2980b9')]):
-    y0 = 3.1 - 2.7 * row
-    axb.plot([0.6, 9.4], [y0, y0], color='0.8', lw=0.8)
-    xs = 0.6 + 8.8 * (b - 0) / 90.0
-    axb.plot(xs, [y0] * len(b), 'v', color=col, ms=6, label='gratings' if row == 0 else None)
+    y0 = 5.00 - 3.35 * row
+    axb.plot([0.6, 9.4], [y0, y0], color='0.82', lw=0.8)
+    xs = 0.6 + 8.8 * b / 90.0
+    # siatki nad osia, duchy pod nia: zadne dwa markery nie zajmuja tego
+    # samego miejsca, wiec kolizje widac, a nie domysla sie ich
+    axb.plot(xs, [y0 + 0.20] * len(b), 'v', color=col, ms=5.5, clip_on=False)
     hit = np.array([g in b for g in gbs])
     xg = 0.6 + 8.8 * gbs / 90.0
-    axb.plot(xg[hit], [y0 + 0.55] * hit.sum(), 'x', color='#c0392b', ms=4.5, mew=1.0)
-    axb.plot(xg[~hit], [y0 + 0.55] * (~hit).sum(), '.', color='0.6', ms=3)
-    axb.text(0.6, y0 + 0.95, '%s: %d%% collide'
-             % (ttl, round(100 * hit.mean())), fontsize=7.0, color=col)
-axb.text(5.0, -1.35, 'delay bin', ha='center', fontsize=7.2, color='0.35')
+    axb.plot(xg[~hit], [y0 - 0.32] * (~hit).sum(), '.', color='0.62', ms=2.8)
+    axb.plot(xg[hit], [y0 - 0.32] * hit.sum(), 'x', color='#c0392b', ms=4.2,
+             mew=1.0)
+    axb.text(0.6, y0 + 0.62, '%s: %d%% of ghosts land on a grating'
+             % (ttl, round(100 * hit.mean())), fontsize=6.6, color=col)
+axb.annotate('', xy=(9.4, -0.62), xytext=(0.6, -0.62),
+             arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
+axb.text(5.0, -1.05, 'delay bin', ha='center', fontsize=7.2, color='0.4')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
 # --- (c) code leakage ------------------------------------------------------

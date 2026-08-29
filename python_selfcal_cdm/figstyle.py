@@ -22,9 +22,13 @@ LGREY = '#AAAAAA'
 def apply(base=7.0):
     plt.rcParams.update({
         'font.size': base,
-        'font.family': 'sans-serif',
-        'font.sans-serif': ['Helvetica', 'Arial', 'DejaVu Sans'],
-        'mathtext.fontset': 'dejavusans',
+        # Times, jak tekst artykulu skladany IEEEtranem. Figury przestaja
+        # wygladac jak wklejone z innego dokumentu, a wzory w podpisach osi
+        # maja ten sam krój co wzory w tekscie. STIX to wolny odpowiednik
+        # Timesa z pelnym zestawem matematycznym.
+        'font.family': 'serif',
+        'font.serif': ['Times New Roman', 'STIXGeneral', 'DejaVu Serif'],
+        'mathtext.fontset': 'stix',
         'axes.titlesize': base,
         'axes.labelsize': base,
         'xtick.labelsize': base - 0.5,
