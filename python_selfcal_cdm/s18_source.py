@@ -129,12 +129,12 @@ ax[0].plot(t, nu_inst, color='#c0392b', lw=1.4)
 ax[0].set_ylim(-0.18, 1.45)
 ax[0].set_xlim(0, 8)
 ax[0].set_xlabel('time [chip periods]')
-ax[0].set_ylabel('optical frequency shift  ' + r'$\delta\nu/\Delta$')
+ax[0].set_ylabel('optical frequency shift  ' + r'$\delta\nu/\Delta\lambda_{\mathrm{ch}}$')
 ax[0].set_title('(a) The code chirps the laser', fontsize=9)
 ax[0].axhline(plateau, color='#c0392b', ls=':', lw=0.8)
 ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
                arrowprops=dict(arrowstyle='<->', lw=0.9, color='#1f4e79'))
-ax[0].text(1.72, 0.5, r'$\Delta$', color='#1f4e79', fontsize=9.5, ha='left',
+ax[0].text(1.72, 0.5, r'$\Delta\lambda_{\mathrm{ch}}$', color='#1f4e79', fontsize=8.0, ha='left',
            va='center')
 ax[0].grid(True, alpha=0.2)
 
@@ -167,7 +167,7 @@ for n in (0, 1, 2, 3):
     ax[2].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
 ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[2].set_yscale('log')
-ax[2].set_xlabel('chirp excursion  ' + r'$\Delta/\mathrm{FWHM}$')
+ax[2].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[2].set_ylabel('residual Bragg error [pm]')
 ax[2].set_title('(c) What the references remove', fontsize=9)
 ax[2].legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.22),

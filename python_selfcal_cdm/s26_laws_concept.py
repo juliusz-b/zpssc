@@ -59,7 +59,7 @@ a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)), label='fit')
 a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
 a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
 a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)),
-          label=r'upstream center $\Delta$')
+          label=r'upstream center $\Delta\lambda_{jk}$')
 a.annotate('', xy=(mu, 1.035), xytext=(0.0, 1.035),
            arrowprops=dict(arrowstyle='<->', color=FS.VERM, lw=0.8))
 a.set_xlim(-320, 340)
