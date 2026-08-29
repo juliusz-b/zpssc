@@ -120,7 +120,7 @@ curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2,
 # ---------------------------------------------------------------------------
 # The paper places this at 0.85 text width (about 6.0 in). Draw at the final
 # physical width so annotations remain legible after inclusion.
-fig, ax = plt.subplots(1, 3, figsize=(6.0, 2.22))
+fig, ax = plt.subplots(1, 3, figsize=(6.0, 1.95))
 
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
@@ -162,9 +162,10 @@ ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 ax[1].set_title('(b) FM-to-AM on the flank', fontsize=9)
-ax[1].legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.22),
-             ncol=2, frameon=False, handlelength=1.5, columnspacing=0.8,
-             labelspacing=0.15)
+# lewy dolny rog: gorny zajmuje strzalka z przesunieciem 67 pm
+ax[1].legend(fontsize=5.8, loc='lower left',
+             ncol=1, frameon=False, handlelength=1.5, columnspacing=0.8,
+             labelspacing=0.18, borderaxespad=0.25)
 
 # --- (c) -------------------------------------------------------------------
 styles = {0: ('o-', '#c0392b', 'no reference'), 1: ('s-', '#e67e22', '1 reference'),
@@ -177,12 +178,12 @@ ax[2].set_yscale('log')
 ax[2].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[2].set_ylabel('residual Bragg error [pm]')
 ax[2].set_title('(c) What the references remove', fontsize=9)
-ax[2].legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.22),
+ax[2].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.15)
 ax[2].grid(True, which='both', alpha=0.25)
 
-fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.27,
+fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.17,
                     wspace=0.34)
 fig.savefig('figs/fig_s18_source.png', dpi=150, bbox_inches='tight')
 fig.savefig('figs/fig_s18_source.pdf', bbox_inches='tight')

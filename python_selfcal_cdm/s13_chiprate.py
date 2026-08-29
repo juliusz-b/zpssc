@@ -157,7 +157,7 @@ def quant_jitter(bits, headroom=0.5, ntrials=300, seed=7):
 # figure
 # ---------------------------------------------------------------------------
 # single panel: the resolution criterion (jitter is one sentence in the text)
-fig, ax0 = plt.subplots(figsize=(3.45, 2.58))
+fig, ax0 = plt.subplots(figsize=(3.45, 2.30))
 ax0.loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#c0392b',
            label='0.5 m')
 ax0.loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#2980b9',
@@ -170,10 +170,10 @@ for d, col in [(0.5, '#c0392b'), (2.0, '#2980b9'), (4.0, '#28b463')]:
 ax0.axhline(10.0, color='0.3', ls='--', lw=0.8)
 ax0.set_xlabel('chip rate B [Mchip/s]')
 ax0.set_ylabel('RMS Bragg error [pm]')
-ax0.legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.18),
+ax0.legend(fontsize=5.8, loc='lower left',
            ncol=3, frameon=False, handlelength=1.4, columnspacing=0.8)
 ax0.grid(True, which='both', alpha=0.25)
-fig.subplots_adjust(left=0.18, right=0.99, top=0.97, bottom=0.25)
+fig.subplots_adjust(left=0.18, right=0.99, top=0.97, bottom=0.16)
 plt.savefig('figs/fig_s13_chiprate.png', dpi=140)
 plt.savefig('figs/fig_s13_chiprate.pdf')
 

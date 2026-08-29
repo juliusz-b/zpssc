@@ -250,7 +250,7 @@ bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
 # ---------------------------------------------------------------------------
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.86))
+fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.45))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#7d3c98', label='shadowing')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#c0392b', label='ghosts, uniform')
 ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts, randomized')
@@ -276,15 +276,13 @@ ax[1].set_ylim(0, 58)
 ax[1].set_xlabel('grating reflectivity R [%]')
 ax[1].set_ylabel('gratings meeting the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
-handles1, labels1 = ax[1].get_legend_handles_labels()
 ax[1].grid(True, which='both', alpha=0.25)
-fig.subplots_adjust(left=0.075, right=0.99, top=0.88, bottom=0.29, wspace=0.30)
-fig.legend(handles0, labels0, fontsize=6.0, loc='lower center',
-           bbox_to_anchor=(0.30, 0.012), ncol=2, frameon=False,
-           handlelength=1.8, columnspacing=0.75, labelspacing=0.18)
-fig.legend(handles1, labels1, fontsize=6.1, loc='lower center',
-           bbox_to_anchor=(0.76, 0.020), ncol=1, frameon=False,
-           handlelength=1.8, labelspacing=0.18)
+ax[0].legend(handles0, labels0, fontsize=5.5, loc='upper left', ncol=2,
+             frameon=False, handlelength=1.5, columnspacing=0.7,
+             labelspacing=0.16, borderaxespad=0.25)
+ax[1].legend(fontsize=5.8, loc='lower left', frameon=False,
+             handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
+fig.subplots_adjust(left=0.075, right=0.99, top=0.88, bottom=0.17, wspace=0.30)
 plt.savefig('figs/fig_s12_capacity.png', dpi=140)
 plt.savefig('figs/fig_s12_capacity.pdf')
 

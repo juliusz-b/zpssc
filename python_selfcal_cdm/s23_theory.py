@@ -169,7 +169,7 @@ products = {N: k * f for N, (k, f) in table.items()}
 # ---------------------------------------------------------------------------
 # The manuscript places this figure at 0.85 text width, about 6.0 in. Drawing
 # at the final physical width preserves the intended label size in print.
-fig, ax = plt.subplots(1, 3, figsize=(6.0, 2.22))
+fig, ax = plt.subplots(1, 3, figsize=(6.0, 1.95))
 
 ax[0].plot(Dfr, thc, '-', color='#2980b9', lw=1.3, label='centroid')
 ax[0].plot(Dfr[::2], simc[::2], 'o', color='#2980b9', ms=4, mfc='none',
@@ -183,7 +183,7 @@ ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('pairwise shadowing bias [pm]  (R = 1%)')
 ax[0].set_title('(a) Law A', fontsize=8.3)
-ax[0].legend(fontsize=5.8, loc='upper center', bbox_to_anchor=(0.5, -0.21),
+ax[0].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.4, labelspacing=0.18,
              columnspacing=0.8)
 ax[0].grid(True, alpha=0.25)
@@ -203,7 +203,7 @@ for xr in (-0.9 * W * PM, 0.9 * W * PM):
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('multiple-access bias [pm]')
 ax[1].set_title('(b) Law B and two references', fontsize=8.3)
-ax[1].legend(fontsize=5.7, loc='upper center', bbox_to_anchor=(0.5, -0.21),
+ax[1].legend(fontsize=5.7, loc='upper left',
              ncol=2, frameon=False, handlelength=1.4, labelspacing=0.16,
              columnspacing=0.65)
 ax[1].grid(True, alpha=0.25)
@@ -220,11 +220,11 @@ ax[2].set_ylim(0, bound / 1e3 * 1.25)
 ax[2].set_xlabel('code length N')
 ax[2].set_ylabel(r'capacity-refresh product [10$^3$ sensor$\cdot$Hz]')
 ax[2].set_title(r'(c) Invariant: $N$ cancels', fontsize=8.3)
-ax[2].legend(fontsize=5.7, loc='upper center', bbox_to_anchor=(0.5, -0.21),
+ax[2].legend(fontsize=5.7, loc='lower left',
              ncol=1, frameon=False, handlelength=1.5, labelspacing=0.16)
 ax[2].grid(True, which='both', alpha=0.25)
 
-fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.29,
+fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.17,
                     wspace=0.36)
 fig.savefig('figs/fig_s23_theory.png', dpi=150, bbox_inches='tight')
 fig.savefig('figs/fig_s23_theory.pdf', bbox_inches='tight')
