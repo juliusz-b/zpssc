@@ -112,7 +112,7 @@ def chirp_residual(ratio, nref, nsen=8, seed=3):
     return float(np.sqrt(np.mean((se - np.polyval(p, sen_nu)) ** 2)))
 
 
-ratios = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5])
+ratios = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0])
 curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2, 3)}
 
 # ---------------------------------------------------------------------------

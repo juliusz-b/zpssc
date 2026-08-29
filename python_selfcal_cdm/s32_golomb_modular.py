@@ -48,17 +48,34 @@ def is_modular_golomb(marks, N):
     return len(np.unique(d)) == len(d)
 
 
+def max_marks(N):
+    """Counting bound on a modular Golomb ruler (Sidon set) mod N.
+
+    Every ordered pair of distinct marks gives a nonzero difference mod N,
+    and all k(k-1) of them must differ, so k(k-1) <= N-1. This is a theorem,
+    not a search result, and it is what the paper should quote.
+    """
+    k = 1
+    while (k + 1) * k <= N - 1:
+        k += 1
+    return k
+
+
 def search_modular(N, k, tries, rng):
-    """Randomized greedy search for a k-mark modular Golomb ruler mod N."""
+    """Randomized greedy search for a k-mark modular Golomb ruler mod N.
+
+    Greedy with many restarts beats depth-first search here: the tree is
+    wide, a node budget truncates it long before it pays off, and a fresh
+    random order explores more of the space per unit time.
+    """
     for _ in range(tries):
         marks = [0]
         used = set()
-        cand = list(rng.permutation(np.arange(1, N)))
-        for x in cand:
-            diffs = {(x - y) % N for y in marks} | {(y - x) % N for y in marks}
-            if len(diffs) == 2 * len(marks) and not (diffs & used):
+        for x in rng.permutation(np.arange(1, N)):
+            d = {(x - y) % N for y in marks} | {(y - x) % N for y in marks}
+            if len(d) == 2 * len(marks) and not (d & used):
                 marks.append(int(x))
-                used |= diffs
+                used |= d
                 if len(marks) == k:
                     return sorted(marks)
     return None
@@ -89,17 +106,18 @@ print('  randomized (300) : mean %.1f%% collisions' % (100 * np.mean(fr)))
 
 print()
 print('=== repair: modular Golomb rulers (all differences distinct mod N) ===')
-for NN in (127, 511):
+for NN in (63, 127, 255, 511, 1023):
+    kb = max_marks(NN)
     best = None
-    for k in range(8, 30):
-        m = search_modular(NN, k, tries=400, rng=rng)
+    for k in range(6, kb + 1):
+        m = search_modular(NN, k, tries=3000, rng=rng)
         if m is None:
             break
         best = (k, m)
     k, m = best
     assert is_modular_golomb(m, NN)
     p, beyond, coll, near = stats(m, NN)
-    print('  N = %3d: found k = %2d marks, sqrt(N) = %.1f, collisions after wrap %d of %d,'
-          ' one bin from a mark %d' % (NN, k, np.sqrt(NN), coll, p, near))
+    print('  N = %4d: counting bound k <= %2d, search found %2d, collisions after wrap %d of %d,'
+          ' within one bin %d' % (NN, kb, k, coll, p, near))
     if NN == 127:
-        print('           marks:', m)
+        print('            marks at N = 127:', m)
