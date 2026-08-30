@@ -109,9 +109,10 @@ def ghost_bins(tau_chips):
             for c in range(n):
                 if b < a and b < c:
                     tg = tau_chips[a] - tau_chips[b] + tau_chips[c]
-                    hit = np.where(np.abs(tau_chips - tg) < 1.0)[0]
-                    for k in hit:
-                        out.setdefault(int(k), []).append((a, b, c))
+                    for k in range(n):
+                        w = 1.0 - abs(tau_chips[k] - tg)
+                        if w > 0.02:
+                            out.setdefault(k, []).append((a, b, c, w))
     return out
 
 
@@ -148,9 +149,9 @@ def run(cfg):
         err_shadow.append(p_sh - truth[k])
 
         g = base.copy()
-        for (a, b, c) in ghosts.get(k, []):
+        for (a, b, c, w) in ghosts.get(k, []):
             prod = shapes[a] * shapes[b] * shapes[c]
-            g = g + R ** 3 * prod
+            g = g + w * R ** 3 * prod
         p_g = C.gauss_fit_peak(nu, g)
         err_ghost.append(p_g - p_sh)
 
