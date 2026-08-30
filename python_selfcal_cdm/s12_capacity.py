@@ -255,7 +255,7 @@ ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#CC79A7', lw=1.2,
                label='shadowing')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#D55E00', lw=1.2,
                label='ghosts, uniform')
-ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#009E73', lw=1.2,
+ax[0].semilogy(Ks, cl(only_ghost), 'X:', color='#009E73', lw=1.2,
                label='ghosts, randomized')
 ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.2,
                label='leakage + noise')
