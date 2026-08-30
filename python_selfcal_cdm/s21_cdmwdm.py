@@ -142,7 +142,9 @@ axa.set_title('(a) CDM-WDM addressing', fontsize=9)
 # --- (b) banding resets the mechanisms ---------------------------------------
 axc = ax[1]
 vals = [e_one32, e_band, e_one8]
-labels = ['one band\nK = 32', '4 bands\nof 8\n(K = 32)', 'one band\nK = 8\n(reference)']
+labels = ['one band' '\n' r'$K = 32$',
+          '4 bands' '\n' 'of 8' '\n' r'($K = 32$)',
+          'one band' '\n' r'$K = 8$' '\n' '(reference)']
 cols = ['#c0392b', '#f39c12', '#2980b9']
 bars = axc.bar(np.arange(3), vals, 0.6, color=cols)
 for i, v in enumerate(vals):
@@ -151,6 +153,7 @@ axc.set_xticks(np.arange(3)); axc.set_xticklabels(labels, fontsize=7)
 axc.set_ylabel('RMS Bragg error [pm]')
 axc.set_ylim(0, max(vals) * 1.22)
 axc.set_title('(b) Banding resets the error chain', fontsize=9)
+axc.set_axisbelow(True)      # siatka pod slupkami, nie na nich
 axc.grid(True, axis='y', alpha=0.25)
 
 fig.tight_layout()

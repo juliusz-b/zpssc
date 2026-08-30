@@ -168,7 +168,10 @@ for d, col in [(0.5, '#c0392b'), (2.0, '#2980b9'), (4.0, '#28b463')]:
     B_req = C_LIGHT / (2.0 * N_GROUP * d) / 1e6
     ax0.axvline(B_req, color=col, ls=':', lw=0.9)
 ax0.axhline(10.0, color='0.3', ls='--', lw=0.8)
-ax0.set_xlabel('chip rate B [Mchip/s]')
+# zapas, zeby kreska kryterium dla 0,5 m nie siadala na ramce
+ax0.set_xlim(0.85 * Bs.min() / 1e6, 300.0)
+ax0.set_ylim(1.45, 220.0)
+ax0.set_xlabel('chip rate $B$ [Mchip/s]')
 ax0.set_ylabel('RMS Bragg error [pm]')
 ax0.legend(fontsize=5.8, loc='lower left',
            ncol=3, frameon=False, handlelength=1.4, columnspacing=0.8)

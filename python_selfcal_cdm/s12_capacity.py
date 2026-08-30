@@ -260,10 +260,13 @@ ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#f39c12', lw=1.8,
                label='full + deshadowing')
 ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0,
               label='%.0f pm target' % TARGET_PM)
-ax[0].set_ylim(FLOOR, 400)
-ax[0].set_xlabel('gratings on the fiber, K')
+# os schodzi ponizej podlogi, zeby znaczniki punktow docietych byly cale
+ax[0].axhline(FLOOR, color='0.75', lw=0.6)
+ax[0].set_ylim(0.125, 400)
+ax[0].set_xlabel('gratings on the fiber, $K$')
 ax[0].set_ylabel('RMS Bragg error [pm]')
-ax[0].set_title('(a) Error mechanisms vs array size, R = %.0f%%' % (R_A * 100))
+ax[0].set_title(r'(a) Error mechanisms vs array size, $R = %.0f\%%$'
+                % (R_A * 100))
 handles0, labels0 = ax[0].get_legend_handles_labels()
 ax[0].grid(True, which='both', alpha=0.25)
 
@@ -273,7 +276,7 @@ ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#f39c12', label='randomized + de
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
               label='gratings of the bench, $R = 10\\%$')
 ax[1].set_ylim(0, 58)
-ax[1].set_xlabel('grating reflectivity R [%]')
+ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('gratings meeting the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
 ax[1].grid(True, which='both', alpha=0.25)

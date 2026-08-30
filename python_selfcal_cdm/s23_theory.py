@@ -181,8 +181,8 @@ ax[0].plot(Dfr[::2], siml[::2], 's', color='#c0392b', ms=4, mfc='none',
            label='_nolegend_')
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
-ax[0].set_ylabel('pairwise shadowing bias [pm]  (R = 1%)')
-ax[0].set_title('(a) Law A', fontsize=8.3)
+ax[0].set_ylabel('pairwise shadowing bias [pm]')
+ax[0].set_title(r'(a) Law A, $R = 1\%$', fontsize=8.3)
 ax[0].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.4, labelspacing=0.18,
              columnspacing=0.8)
@@ -214,7 +214,7 @@ ax[2].set_xticks(Ns)
 ax[2].set_xticklabels([str(N) for N in Ns], fontsize=5.8)
 ax[2].minorticks_off()
 ax[2].set_ylim(0, bound / 1e3 * 1.25)
-ax[2].set_xlabel('code length N')
+ax[2].set_xlabel('code length $N$')
 ax[2].set_ylabel(r'capacity-refresh product [10$^3$ sensor$\cdot$Hz]')
 ax[2].set_title(r'(c) Invariant: $N$ cancels', fontsize=8.3)
 ax[2].legend(fontsize=5.7, loc='lower left',

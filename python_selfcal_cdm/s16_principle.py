@@ -215,7 +215,7 @@ ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
            color='#c0392b', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
-ax[1].set_title('(b) Side-lobe leakage, K = %d' % Kc, fontsize=8.1)
+ax[1].set_title('(b) Side-lobe leakage, $K = %d$' % Kc, fontsize=8.1)
 ax[1].grid(True, which='both', alpha=0.2)
 # legenda w pustym lewym gornym rogu, a nie pod osiami: pod osiami
 # zabierala ponad jedna trzecia wysokosci calej figury

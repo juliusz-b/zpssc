@@ -131,7 +131,7 @@ axb.text(p_true / 1000.0 + 0.006, 0.06, 'true $\\lambda_{B,4}$',
          fontsize=6.0, color='#2980b9', rotation=90, va='bottom', ha='left')
 axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.36)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
-axb.set_title('(a) 4th grating behind three, R = 20%', fontsize=7)
+axb.set_title(r'(a) 4th grating behind three, $R = 20\%$', fontsize=7)
 axb.legend(fontsize=5.5, loc='upper left',
            ncol=2, frameon=False, handlelength=1.4, columnspacing=0.65,
            labelspacing=0.2)
@@ -141,9 +141,9 @@ axc = ax[1]
 axc.semilogy(Ks, raw, 'o-', color='#c0392b', label='uncorrected')
 axc.semilogy(Ks, fixed, 's-', color='#f39c12', label='corrected')
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
-axc.set_xlabel('gratings on the fiber, K')
+axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS Bragg error [pm]')
-axc.set_title('(b) Gain and its limit, R = 10%', fontsize=7)
+axc.set_title(r'(b) Gain and its limit, $R = 10\%$', fontsize=7)
 axc.legend(fontsize=5.5, loc='lower right',
            ncol=3, frameon=False, handlelength=1.4, columnspacing=0.65)
 axc.grid(True, which='both', alpha=0.25)
