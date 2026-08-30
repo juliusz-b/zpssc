@@ -2,7 +2,7 @@
 
 Table V adds the mechanisms into a single number for a whole array. That is
 the right way to compare two designs, and the wrong way to find out which
-sensor is the problem. A user who has to certify eight thermometers wants to
+sensor is the problem. A user who has to certify eight sensors wants to
 know what each one is worth, in kelvin, not what their root-sum-square is in
 picometres.
 
@@ -10,9 +10,9 @@ So this builds two concrete eight-sensor instruments with every parameter
 written down, runs the same serial optical model both times, and reports the
 temperature error of each sensor with the mechanisms kept apart.
 
-  naive     what the datasheet suggests: the procured 10 percent gratings at
-            their declared 250 pm width, uniform 4 m spacing, wavelengths
-            spread evenly over the band, two references inline at the front,
+  naive     what the datasheet suggests: 10 percent gratings at their
+            declared 250 pm width, uniform 4 m spacing, wavelengths spread
+            evenly over the band, two references inline at the front,
             N = 127 at 25 Mchip/s, no correction.
 
   designed  every choice taken from the rules of the paper: 1 percent
@@ -22,17 +22,23 @@ temperature error of each sensor with the mechanisms kept apart.
 
 The optical model is the one used elsewhere: a grating sees the light that
 survived two passes through everything in front of it, third-order ghosts land
-in whatever bin their delay arithmetic points at, and the correlation side
-lobe adds a scaled copy of every other spectrum. The wavelength axis carries
-the residual of Section III-D after the reference fit of s38.
+in whatever bin their delay arithmetic points at, weighted by the triangular
+correlation overlap, and the correlation side lobe adds a scaled copy of every
+other spectrum. The wavelength axis carries the residual of Section III-D
+after the reference fit of s38.
 
-Output: figs/fig_s39_example.pdf, full text width.
+One panel: both arrays side by side per sensor, solid bars for the datasheet
+array and hatched bars for the designed one, the net as a cross.
+
+Output: figs/fig_s39_example.pdf, column width.
 """
 import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import common as C
 import figstyle as FS
 
@@ -189,42 +195,53 @@ res_d, dz_d = run(DESIGNED)
 ORDER = ['shadowing', 'ghosts', 'leakage', 'axis', 'delay']
 COLS = {'shadowing': VERM, 'ghosts': PURP, 'leakage': GREE,
         'axis': BLUE, 'delay': GREY}
+WBAR = 0.36
+OFF = {'naive': -0.20, 'designed': +0.20}
 
-fig, ax = plt.subplots(1, 2, figsize=(7.16, 2.45), sharey=True)
+fig, ax = plt.subplots(figsize=(3.45, 2.55))
 x = np.arange(1, K + 1)
-for a, res, cfg, ttl in ((ax[0], res_n, NAIVE, '(a) from the datasheet'),
-                         (ax[1], res_d, DESIGNED, '(b) from the design rules')):
+for res, cfg in ((res_n, NAIVE), (res_d, DESIGNED)):
+    xs = x + OFF[cfg['name']]
+    hatched = cfg['name'] == 'designed'
     up = np.zeros(K)
     dn = np.zeros(K)
     for name in ORDER:
         v = res[name]
         pos, neg = np.clip(v, 0, None), np.clip(v, None, 0)
-        a.bar(x, pos, 0.62, bottom=up, color=COLS[name], label=name,
-              edgecolor='white', lw=0.3)
-        a.bar(x, neg, 0.62, bottom=dn, color=COLS[name], edgecolor='white',
-              lw=0.3)
+        kw = dict(color=COLS[name], edgecolor='white', lw=0.3)
+        if hatched:
+            kw = dict(facecolor=COLS[name], alpha=0.55, hatch='/////',
+                      edgecolor='white', lw=0.3)
+        ax.bar(xs, pos, WBAR, bottom=up, **kw)
+        ax.bar(xs, neg, WBAR, bottom=dn, **kw)
         up = up + pos
         dn = dn + neg
     tot = sum(res[n] for n in ORDER)
-    a.plot(x, tot, 'o', color='0.15', ms=3.4, zorder=6, label='net')
-    a.axhline(1.0, color='0.25', ls=(0, (4, 2)), lw=0.9)
-    a.axhline(-1.0, color='0.25', ls=(0, (4, 2)), lw=0.9)
-    a.set_xticks(x)
-    a.set_xlabel('sensor, in fiber order', labelpad=1.5)
-    a.set_title(ttl, fontsize=7.4)
-    a.set_xlim(0.4, K + 0.6)
-    a.grid(True, axis='y', alpha=0.22)
-    a.set_axisbelow(True)
+    ax.plot(xs, tot, 'x', color='0.10', ms=4.6, mew=1.1, zorder=6)
 
-ax[0].set_ylabel('temperature error [K]', labelpad=1.5)
-ax[0].set_ylim(-2.55, 4.75)
-ax[0].text(0.55, 1.10, '1 K', fontsize=5.6, color='0.25', va='bottom')
-ax[0].legend(fontsize=5.4, loc='upper left', ncol=2, frameon=False,
-             handlelength=1.1, columnspacing=0.7, labelspacing=0.18,
-             borderaxespad=0.25)
+ax.axhline(1.0, color='0.25', ls=(0, (4, 2)), lw=0.85)
+ax.axhline(-1.0, color='0.25', ls=(0, (4, 2)), lw=0.85)
+ax.axhline(0.0, color='0.6', lw=0.5)
+ax.set_xticks(x)
+ax.set_xlabel('sensor, in fiber order', labelpad=1.5)
+ax.set_ylabel('temperature error [K]', labelpad=1.5)
+ax.set_xlim(0.4, K + 0.6)
+ax.set_ylim(-2.55, 5.0)
+ax.grid(True, axis='y', alpha=0.22)
+ax.set_axisbelow(True)
+ax.text(0.5, 1.10, '1 K', fontsize=5.6, color='0.25', va='bottom')
 
-fig.subplots_adjust(left=0.072, right=0.995, top=0.88, bottom=0.165,
-                    wspace=0.06)
+handles = [Patch(color=COLS[n], label=n) for n in ORDER]
+handles += [Patch(facecolor='0.7', hatch='/////', edgecolor='white',
+                  label='hatched: from the rules'),
+            Patch(facecolor='0.4', label='solid: from the datasheet'),
+            Line2D([], [], ls='none', marker='x', color='0.10', ms=4.6,
+                   mew=1.1, label='net error')]
+ax.legend(handles=handles, fontsize=5.2, loc='upper left', ncol=2,
+          frameon=False, handlelength=1.2, columnspacing=0.8,
+          labelspacing=0.2, borderaxespad=0.25, handleheight=0.9)
+
+fig.subplots_adjust(left=0.13, right=0.99, top=0.985, bottom=0.14)
 os.makedirs('figs', exist_ok=True)
 fig.savefig('figs/fig_s39_example.pdf', bbox_inches='tight', pad_inches=0.01)
 fig.savefig('figs/fig_s39_example.png', dpi=200, bbox_inches='tight',

@@ -1,10 +1,14 @@
 """s26_laws_concept.py - physical meaning of Law A and Law B.
 
-Panel (a) follows the downstream spectrum through the two-pass transmission
-notch of one upstream grating. Panel (b) turns the same pairwise bias into a
-placement rule over the complete sensor operating range. Panel (c) shows why
-the mean code-leakage bias behaves like a wavelength-axis stretch and why two
-stabilized references remove its offset and scale.
+Row (a) shows Law A on the spectrum itself, in its three regimes: the
+upstream neighbour co-tuned, at the worst detuning sigma*sqrt(3/2), and far
+away. Each panel has the undistorted line, the two-pass transmission of the
+upstream grating, the line that reaches the detector, and the Gaussian
+fitted to it, so the bias is the visible distance between two centres.
+Panel (b) turns the same pairwise bias into a placement rule over the
+complete sensor operating range. Panel (c) shows why the mean code-leakage
+bias behaves like a wavelength-axis stretch and why two stabilized references
+remove its offset and scale.
 """
 import warnings
 
@@ -22,9 +26,12 @@ FS.apply(base=7.1)
 
 SIG = 106.2
 R = 0.10
-DET = 130.0
 EPS = 1.0
 C_A = (4.0 / 3.0) * np.sqrt(2.0 / 3.0)
+DSTAR = SIG * np.sqrt(1.5)
+DETS = [(0.0, 'co-tuned, $\\Delta\\lambda_{jk}=0$'),
+        (DSTAR, 'worst, $\\Delta\\lambda_{jk}=\\sigma\\sqrt{3/2}$'),
+        (400.0, 'far, $\\Delta\\lambda_{jk}=400$ pm')]
 
 
 def panel_title(ax, letter, text):
@@ -32,69 +39,94 @@ def panel_title(ax, letter, text):
                  fontsize=7.6)
 
 
-fig, ax = plt.subplots(1, 3, figsize=(7.1, 2.28),
-                       gridspec_kw={'width_ratios': [1.10, 1.12, 1.18]})
+def gaussian(x, amp, centre, width, baseline):
+    return baseline + amp * np.exp(-0.5 * ((x - centre) / width) ** 2)
+
+
+fig = plt.figure(figsize=(7.1, 4.05))
+gs = fig.add_gridspec(2, 6, height_ratios=[1.0, 1.15], hspace=0.62,
+                      wspace=1.15, left=0.075, right=0.995, bottom=0.10,
+                      top=0.93)
+axa = [fig.add_subplot(gs[0, 2 * i:2 * i + 2]) for i in range(3)]
+b = fig.add_subplot(gs[1, 0:3])
+c = fig.add_subplot(gs[1, 3:6])
 
 # ---------------------------------------------------------------------------
-# (a) One upstream transmission notch distorts the downstream return
+# (a) the three regimes, on the spectrum itself
 # ---------------------------------------------------------------------------
-a = ax[0]
 nu = np.linspace(-5.0 * SIG, 5.0 * SIG, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
-upstream = R * np.exp(-0.5 * ((nu - DET) / SIG) ** 2)
-two_pass = (1.0 - upstream) ** 2
-received = wanted * two_pass
-gaussian = lambda x, amp, centre, width, baseline: \
-    baseline + amp * np.exp(-0.5 * ((x - centre) / width) ** 2)
-(amp, mu, sig, base), _ = curve_fit(
-    gaussian, nu, received, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
-fit = base + amp * np.exp(-0.5 * ((nu - mu) / sig) ** 2)
+shifts = []
+for a, (det, label) in zip(axa, DETS):
+    upstream = R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)
+    two_pass = (1.0 - upstream) ** 2
+    received = wanted * two_pass
+    (amp, mu, sig, base), _ = curve_fit(
+        gaussian, nu, received, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
+    fit = gaussian(nu, amp, mu, sig, base)
+    shifts.append(mu)
 
-a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)),
-       label='undistorted')
-a.fill_between(nu, received, wanted, where=wanted >= received,
-               color=FS.ORANGE, alpha=0.28, lw=0)
-a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='after notch')
-a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)), label='fit')
-a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
-a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
-a.axvline(DET, color=FS.BLUE, lw=0.65, ls=(0, (2, 2)))
-a.text(DET + 11, 0.78, 'upstream' '\n' r'center $\Delta\lambda_{jk}$',
-       fontsize=5.6, color=FS.BLUE, va='center', ha='left')
-# 9 pm na osi szerokiej na 660 pm: groty na zewnatrz, liczba obok
-FS.dim_gap(a, 0.0, mu, 1.11,
-           r'$\delta\lambda_{k\leftarrow j}$', color=FS.VERM,
-           tail=52.0, side='right', fontsize=6.4)
-a.set_xlim(-320, 340)
-a.set_ylim(0.0, 1.40)   # miejsce na legende i na linie wymiarowa
-a.set_yticks([0, 0.5, 1.0])
-a.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
-a.set_ylabel('normalized reflectance')
-panel_title(a, 'a', 'Law A: one flank is attenuated')
-a.legend(loc='upper left', fontsize=5.6, frameon=False, handlelength=1.6,
-         labelspacing=0.18, borderaxespad=0.25)
-print('Fig. 2(a): przesuw dopasowanego srodka %.2f pm' % abs(mu))
+    a.plot(nu, two_pass, color=FS.BLUE, lw=0.8,
+           label='two-pass transmission of $j$')
+    a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)),
+           label='undistorted line $k$')
+    a.fill_between(nu, received, wanted, where=wanted >= received,
+                   color=FS.ORANGE, alpha=0.28, lw=0)
+    a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='at the detector')
+    a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)),
+           label='Gaussian fit')
+    a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
+    a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
+    lab = ('%.1f' % mu).replace('-0.0', '0.0')
+    if abs(mu) > 1.0:
+        FS.dim_gap(a, 0.0, mu, 1.13,
+                   r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
+                   color=FS.VERM, tail=55.0, side='right', fontsize=6.0)
+    else:
+        a.text(8.0, 1.13, r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
+               fontsize=6.0, color=FS.VERM, va='center')
+    a.text(0.975, 0.05, label, transform=a.transAxes, ha='right',
+           va='bottom', fontsize=5.9, color='0.25')
+    a.set_xlim(-330, 500)
+    a.set_ylim(0.0, 1.30)
+    a.set_yticks([0, 0.5, 1.0])
+    a.set_xticks([-200, 0, 200, 400])
+    a.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
+axa[0].set_ylabel('normalized reflectance')
+for a in axa[1:]:
+    a.set_yticklabels([])
+panel_title(axa[0], 'a', 'Law A on the spectrum')
+handles, labels = axa[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.995, 1.005),
+           ncol=4, fontsize=5.6, frameon=False, handlelength=1.4,
+           columnspacing=0.9, borderaxespad=0.1)
+print('Fig. 2(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
+      '400 pm' % (shifts[0], shifts[1], shifts[2], DSTAR))
 
 # ---------------------------------------------------------------------------
 # (b) Pairwise bias as a placement rule over the full sensor range
 # ---------------------------------------------------------------------------
-b = ax[1]
 D = np.linspace(0, 700, 1000)
 bias = C_A * R * D * np.exp(-D ** 2 / (3.0 * SIG ** 2))
 root_fn = lambda x: C_A * R * x * np.exp(-x ** 2 / (3.0 * SIG ** 2)) - EPS
-dlo = brentq(root_fn, 1.0, SIG * np.sqrt(1.5))
-dhi = brentq(root_fn, SIG * np.sqrt(1.5), 700.0)
-dstar = SIG * np.sqrt(1.5)
+dlo = brentq(root_fn, 1.0, DSTAR)
+dhi = brentq(root_fn, DSTAR, 700.0)
+half_fn = (lambda x: C_A * R * x * np.exp(-x ** 2 / (3.0 * SIG ** 2))
+           - 0.5 * bias.max())
+hlo = brentq(half_fn, 1.0, DSTAR)
+hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35, label='pairwise bias')
+b.plot(D, bias, color=FS.VERM, lw=1.35, label='pairwise bias, Law A')
 b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
           label='1 pm tolerance')
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
-b.plot(dstar, bias.max(), 'o', color=FS.VERM, ms=3.5)
+b.plot(DSTAR, bias.max(), 'o', color=FS.VERM, ms=3.5)
+b.text(DSTAR + 14, bias.max() + 0.05,
+       'maximum $0.81R\\sigma$\nat $\\sigma\\sqrt{3/2}$',
+       fontsize=5.6, color=FS.VERM, va='center', ha='left')
 
-# Full pair-detuning ranges. The bar, not just its centre, must avoid red.
 forb = (dlo, dhi)
 safe = (dhi + 18.0, 690.0)
 b.plot(forb, [-0.62, -0.62], color=FS.VERM, lw=8.0,
@@ -111,23 +143,22 @@ b.set_ylim(-1.15, 9.55)
 b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
-panel_title(b, 'b', 'Law A: avoid the shaded interval')
+panel_title(b, 'b', 'Law A as a placement rule')
 b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
          labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
 # (c) Law B is an axis stretch, removed by two reference anchors
 # ---------------------------------------------------------------------------
-c = ax[2]
 for sp in ('top', 'right', 'left'):
     c.spines[sp].set_visible(False)
 c.set_yticks([])
 c.set_xticks([-180, -90, 0, 90, 180])
 c.tick_params(axis='x', labelsize=6.0, length=2.2, width=0.6)
-c.set_xlabel(r'position in the band $\nu_k$ [pm]')
+c.set_xlabel(r'position in the band $\nu_k=\lambda_{B,k}-\lambda_0$ [pm]')
 c.set_xlim(-300, 275)
 c.set_ylim(-0.32, 3.08)
-panel_title(c, 'c', 'Law B: two anchors remove stretch')
+panel_title(c, 'c', 'Law B: an axis stretch, two references remove it')
 
 W = 180.0
 K, N = 32, 127
@@ -135,7 +166,7 @@ stretch = 1.0 + (K - 1) / N
 true = np.linspace(-W, W, 7)
 read = true * stretch
 rows = [(2.38, true, 'true', '0.35'),
-        (1.43, read, 'biased', FS.VERM),
+        (1.43, read, 'read, Law B', FS.VERM),
         (0.48, true, 'calibrated', FS.BLUE)]
 
 for y0, values, label, col in rows:
@@ -158,16 +189,17 @@ for x0, xr in zip(true, read):
 
 c.text(-W, 2.70, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
 c.text(W, 2.70, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
+c.text(0.0, 1.90, 'every grating pulled outward by $1+(K-1)/N$',
+       ha='center', fontsize=5.6, color=FS.VERM,
+       bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.85))
 
-fig.subplots_adjust(left=0.075, right=0.995, bottom=0.21, top=0.88,
-                    wspace=0.34)
 fig.savefig('figs/fig_s26_laws_concept.pdf', bbox_inches='tight',
             pad_inches=0.025)
 fig.savefig('figs/fig_s26_laws_concept.png', dpi=300, bbox_inches='tight',
             pad_inches=0.025)
 plt.close(fig)
 
-print('Law A roots: Delta_lo=%.1f pm, Delta_hi=%.1f pm' % (dlo, dhi))
-print('Panel (a) fitted shift: %.2f pm at Delta=%.0f pm, R=%.0f%%' %
-      (mu, DET, 100 * R))
+print('Law A roots at 1 pm: Delta_lo=%.1f pm, Delta_hi=%.1f pm' % (dlo, dhi))
+print('Law A at least half its maximum between %.0f and %.0f pm '
+      '(%.2f and %.2f sigma)' % (hlo, hhi, hlo / SIG, hhi / SIG))
 print('saved figs/fig_s26_laws_concept.pdf and .png')

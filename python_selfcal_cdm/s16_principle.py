@@ -188,7 +188,7 @@ def draw_row(y, bins, col, title):
              color='#D55E00' if hits else '0.45')
 
 
-axb.text(0, 10.45, r'a ghost returns at $\tau_a-\tau_b+\tau_c$ (Fig. 5)',
+axb.text(0, 10.45, r'a ghost returns at $\tau_a-\tau_b+\tau_c$',
          fontsize=6.4, color='0.35')
 draw_row(9.00, UNI, '#D55E00', 'uniform spacing: every ghost lands on a grating')
 draw_row(4.35, RND, '#0072B2', 'randomized spacing: almost none does')
