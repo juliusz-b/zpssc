@@ -135,7 +135,7 @@ axa.annotate('one bin, four bands', xy=(SHARED, 3.92), xytext=(SHARED - 6, 4.16)
              arrowprops=dict(arrowstyle='-', color='0.3', lw=0.5))
 axa.set_xlim(0, NCH); axa.set_ylim(0, Wb + 0.30)
 axa.set_yticks([])
-axa.set_xlabel('delay bin, that is grating position')
+axa.set_xlabel('delay bin (grating position)')
 axa.set_ylabel('wavelength band')
 axa.set_title('(a) CDM-WDM addressing', fontsize=9)
 

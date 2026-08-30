@@ -195,7 +195,7 @@ draw_row(4.35, RND, '#0072B2', 'randomized spacing: almost none does')
 
 axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
-axb.text(50, 0.02, 'delay bin, that is grating position', ha='center',
+axb.text(50, 0.02, 'delay bin (grating position)', ha='center',
          fontsize=6.8, color='0.4')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
