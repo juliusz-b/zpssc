@@ -129,7 +129,7 @@ ax[0].plot(t, nu_inst, color='#c0392b', lw=1.4)
 ax[0].set_ylim(-0.18, 1.45)
 ax[0].set_xlim(0, 8)
 ax[0].set_xlabel('time [chip periods]')
-ax[0].set_ylabel('optical frequency shift  ' + r'$\delta\nu/\Delta\lambda_{\mathrm{ch}}$')
+ax[0].set_ylabel('code-induced shift  ' + r'$\delta\lambda/\Delta\lambda_{\mathrm{ch}}$')
 ax[0].set_title('(a) The code chirps the laser', fontsize=9)
 ax[0].axhline(plateau, color='#c0392b', ls=':', lw=0.8)
 ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
