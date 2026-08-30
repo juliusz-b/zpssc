@@ -117,7 +117,7 @@ axc.set_xticklabels([r'$\tau_%d$' % (i + 1) for i in range(len(DELAYS))])
 for lbl, col in zip(axc.get_xticklabels(), COLS):
     lbl.set_color(col)
 axc.set_yticks([0.0, 0.05, 0.10])
-axc.set_xlabel(r'delay $\tau$ (chips)', labelpad=1.2)
+axc.set_xlabel(r'delay $\tau$ [chips]', labelpad=1.2)
 axc.set_ylabel('reflectance', labelpad=1.2)
 axc.tick_params(length=2.0, pad=1.4)
 axc.text(0, 1.28 * row.max(), r'one step, $\lambda_m$', fontsize=6.0,
@@ -146,7 +146,7 @@ axd.set_ylim(-0.012, 1.32 * R)
 axd.set_xticks([-0.4, 0.0, 0.4])
 axd.set_yticks([])
 axd.spines['left'].set_visible(False)
-axd.set_xlabel(r'$\lambda_m$ (nm)', labelpad=1.2)
+axd.set_xlabel(r'$\lambda_m$ [nm]', labelpad=1.2)
 axd.tick_params(length=2.0, pad=1.4)
 
 # the one link the figure is about: this peak is that point
