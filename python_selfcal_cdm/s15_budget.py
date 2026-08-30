@@ -315,12 +315,15 @@ for name, cfg in CFG.items():
 # ---------------------------------------------------------------------------
 print()
 print('=== REFERENCE COUNT: chirp residual [pm] over the +-225 pm bench window ===')
-print('   references   fit order   chirp/FWHM 0.1   0.2   0.3   0.5')
+SWEEP = (0.1, 0.2, 0.3, 0.5, 0.9)
+print('   references   fit order   chirp/FWHM ' +
+      '   '.join('%.1f' % c for c in SWEEP))
 for nr, order in [(0, None), (1, 'constant'), (2, 'linear'), (3, 'quadratic'),
                   (4, 'quadratic')]:
-    vals = [fmam_residual(c, nr) for c in (0.1, 0.2, 0.3, 0.5)]
-    print('   %10d   %9s   %14.2f  %5.2f  %5.2f  %5.2f'
-          % (nr, order if order else 'none', *vals))
+    vals = [fmam_residual(c, nr) for c in SWEEP]
+    print('   %10d   %9s   %14.2f' % (nr, order if order else 'none',
+                                      vals[0])
+          + ''.join('  %5.2f' % v for v in vals[1:]))
 print('   the references remove the smooth band dependence of the chirp offset;')
 print('   what stays scales with the chirp and with the lineshape spread')
 
