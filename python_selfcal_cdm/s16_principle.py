@@ -48,7 +48,7 @@ ax.set_xlim(0, 10.4); ax.set_ylim(0, 6.2)
 def box(x, y, w, h, t, fc='#eaf1fb', fs=7.6):
     ax.add_patch(FancyBboxPatch((x, y), w, h,
                                 boxstyle='round,pad=0.05,rounding_size=0.12',
-                                fc=fc, ec='#1f4e79', lw=1.2))
+                                fc=fc, ec='#0072B2', lw=1.2))
     ax.text(x + w / 2, y + h / 2, t, ha='center', va='center', fontsize=fs)
 
 
@@ -62,10 +62,10 @@ box(0.15, 4.20, 2.55, 1.35, 'swept VCSEL,\ncode-modulated', fs=7.4)
 tt = np.linspace(0.35, 2.35, 300)
 bits = MSEQ[:16]
 cw = np.repeat(bits, len(tt) // 16 + 1)[:len(tt)]
-ax.plot(tt, 3.55 + 0.18 * cw, color='#1f4e79', lw=0.9)
-ax.text(1.35, 3.15, 'code c(t)', ha='center', fontsize=7, color='#1f4e79')
+ax.plot(tt, 3.55 + 0.18 * cw, color='#0072B2', lw=0.9)
+ax.text(1.35, 3.15, 'code c(t)', ha='center', fontsize=7, color='#0072B2')
 
-ax.add_patch(Circle((3.5, 4.85), 0.42, fc='#fdf3e7', ec='#1f4e79', lw=1.2))
+ax.add_patch(Circle((3.5, 4.85), 0.42, fc='#fdf3e7', ec='#0072B2', lw=1.2))
 ax.text(3.5, 4.85, 'circ', ha='center', va='center', fontsize=7)
 arrow(2.72, 4.85, 3.05, 4.85)
 
@@ -73,7 +73,7 @@ arrow(2.72, 4.85, 3.05, 4.85)
 ax.plot([3.95, 10.2], [4.85, 4.85], color='#555', lw=1.6)
 zpos = [4.7, 5.9, 7.6, 8.5, 9.7]
 for i, z in enumerate(zpos):
-    ax.add_patch(Rectangle((z - 0.16, 4.62), 0.32, 0.46, fc='#c0392b',
+    ax.add_patch(Rectangle((z - 0.16, 4.62), 0.32, 0.46, fc='#D55E00',
                            ec='#7b241c', hatch='///', lw=0.8))
     ax.text(z, 5.30, r'$z_%d$' % (i + 1), ha='center', fontsize=7)
 ax.annotate('', xy=(4.7, 4.35), xytext=(5.9, 4.35),
@@ -98,7 +98,7 @@ box(6.6, 0.35, 3.7, 1.0, 'delay-wavelength map  ->  peak fit  ->  $\\lambda_B$',
 
 ax.text(0.1, 1.3, 'one code on the fiber\nat a time: the sweep\nvisits wavelengths\n'
                   'in sequence, so gratings\nare separated by the\nAUTOCORRELATION\n'
-                  'side lobe', fontsize=7.2, va='center', color='#1f4e79')
+                  'side lobe', fontsize=7.2, va='center', color='#0072B2')
 ax.set_title('(a) Coded interrogation of a grating array', fontsize=9)
 
 # --- (b) despread map ------------------------------------------------------
@@ -174,7 +174,7 @@ def draw_row(y, bins, col, title):
     # jedna kropka na sciezke, slupek na wspolne opoznienie
     for x in sorted(mult):
         on = x in bins
-        c = '#c0392b' if on else '0.62'
+        c = '#D55E00' if on else '0.62'
         axb.plot([x, x], [y - 0.30, y - 0.70], color=c,
                  lw=1.0 if on else 0.7, zorder=2)
         for i in range(mult[x]):
@@ -185,13 +185,13 @@ def draw_row(y, bins, col, title):
     deep = y - 0.84 - DOT * (max(mult.values()) - 1)
     axb.text(0, deep - 0.78, '%d ghost paths return inside the array, %d on a grating'
              % (len(paths), len(hits)), fontsize=6.2,
-             color='#c0392b' if hits else '0.45')
+             color='#D55E00' if hits else '0.45')
 
 
 axb.text(0, 10.45, r'a ghost returns at $\tau_a-\tau_b+\tau_c$ (Fig. 5)',
          fontsize=6.4, color='0.35')
-draw_row(9.00, UNI, '#c0392b', 'uniform spacing: every ghost lands on a grating')
-draw_row(4.35, RND, '#2980b9', 'randomized spacing: almost none does')
+draw_row(9.00, UNI, '#D55E00', 'uniform spacing: every ghost lands on a grating')
+draw_row(4.35, RND, '#0072B2', 'randomized spacing: almost none does')
 
 axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
@@ -208,11 +208,11 @@ nubs = rng3.uniform(-25, 25, Kc)
 Ac = 0.05 * np.exp(-0.5 * ((nuc[None, :] - nubs[:, None]) / SIG) ** 2)
 wanted = Ac[0]
 leak = (-1.0 / NCH) * (Ac[1:].sum(axis=0))
-ax[1].plot(nuc * PM / 1000.0, wanted, color='#2980b9', lw=1.4, label='wanted grating')
+ax[1].plot(nuc * PM / 1000.0, wanted, color='#0072B2', lw=1.4, label='wanted grating')
 ax[1].plot(nuc * PM / 1000.0, np.abs(leak), color='0.45', lw=1.2,
            label=r'|leakage|, side lobe $1/N$')
 ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
-           color='#c0392b', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
+           color='#D55E00', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
 ax[1].set_title('(b) Side-lobe leakage, $K = %d$' % Kc, fontsize=8.1)

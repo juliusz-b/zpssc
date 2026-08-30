@@ -125,33 +125,33 @@ fig, ax = plt.subplots(1, 3, figsize=(6.0, 1.95))
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
                    color='0.88', lw=0)
-ax[0].plot(t, nu_inst, color='#c0392b', lw=1.4)
+ax[0].plot(t, nu_inst, color='#D55E00', lw=1.4)
 ax[0].set_ylim(-0.18, 1.45)
 ax[0].set_xlim(0, 8)
 ax[0].set_xlabel('time [chip periods]')
 ax[0].set_ylabel('code-induced shift  ' + r'$\delta\lambda/\Delta\lambda_{\mathrm{ch}}$')
 ax[0].set_title('(a) The code chirps the laser', fontsize=9)
-ax[0].axhline(plateau, color='#c0392b', ls=':', lw=0.8)
+ax[0].axhline(plateau, color='#D55E00', ls=':', lw=0.8)
 ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
-               arrowprops=dict(arrowstyle='<->', lw=0.9, color='#1f4e79'))
-ax[0].text(1.72, 0.5, r'$\Delta\lambda_{\mathrm{ch}}$', color='#1f4e79', fontsize=8.0, ha='left',
+               arrowprops=dict(arrowstyle='<->', lw=0.9, color='#0072B2'))
+ax[0].text(1.72, 0.5, r'$\Delta\lambda_{\mathrm{ch}}$', color='#0072B2', fontsize=8.0, ha='left',
            va='center')
 ax[0].grid(True, alpha=0.2)
 
 # --- (b) -------------------------------------------------------------------
-ax[1].plot(g * PM / 1000.0, true_line, color='#2980b9', lw=1.4, label='no chirp')
-ax[1].plot(g * PM / 1000.0, chirped, color='#c0392b', lw=1.4,
+ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='no chirp')
+ax[1].plot(g * PM / 1000.0, chirped, color='#D55E00', lw=1.4,
            label='chirped source')
 nu_op = -0.62 * F
 kern = np.exp(-0.5 * ((g - nu_op) / (0.5 * DELTA_DEMO)) ** 2)
-ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#7d3c98', alpha=0.32,
+ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#CC79A7', alpha=0.32,
                    lw=0)
 ax[1].annotate(r'$p(\xi)$', xy=(nu_op * PM / 1000.0, 0.30),
-               xytext=(-0.52, 0.62), fontsize=7.4, color='#7d3c98',
+               xytext=(-0.52, 0.62), fontsize=7.4, color='#CC79A7',
                ha='center', va='center',
-               arrowprops=dict(arrowstyle='-', color='#7d3c98', lw=0.6))
-ax[1].axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.9)
-ax[1].axvline(p_chirp / 1000.0, color='#c0392b', ls=':', lw=0.9)
+               arrowprops=dict(arrowstyle='-', color='#CC79A7', lw=0.6))
+ax[1].axvline(p_true / 1000.0, color='#0072B2', ls=':', lw=0.9)
+ax[1].axvline(p_chirp / 1000.0, color='#D55E00', ls=':', lw=0.9)
 # 67 pm to piec procent szerokosci panelu, wiec groty ida na zewnatrz
 # linii wymiarowych i pokazuja do srodka, a liczba przenosi sie obok
 FS.dim_gap(ax[1], p_true / 1000.0, p_chirp / 1000.0, 1.10,
@@ -167,8 +167,8 @@ ax[1].legend(fontsize=5.8, loc='upper right',
              labelspacing=0.18, borderaxespad=0.25)
 
 # --- (c) -------------------------------------------------------------------
-styles = {0: ('o-', '#c0392b', 'no reference'), 1: ('s-', '#e67e22', '1 reference'),
-          2: ('^-', '#2980b9', '2 references'), 3: ('d-', '#28b463', '3 references')}
+styles = {0: ('o-', '#D55E00', 'no reference'), 1: ('s-', '#E69F00', '1 reference'),
+          2: ('^-', '#0072B2', '2 references'), 3: ('d-', '#009E73', '3 references')}
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
     ax[2].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)

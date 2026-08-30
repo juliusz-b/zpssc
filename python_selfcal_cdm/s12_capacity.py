@@ -251,12 +251,16 @@ bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
 fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.45))
-ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#7d3c98', label='shadowing')
-ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#c0392b', label='ghosts, uniform')
-ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#28b463', label='ghosts, randomized')
-ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', label='leakage + noise')
-ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#2980b9', lw=1.8, label='full, randomized')
-ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#f39c12', lw=1.8,
+ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#CC79A7', lw=1.2,
+               label='shadowing')
+ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#D55E00', lw=1.2,
+               label='ghosts, uniform')
+ax[0].semilogy(Ks, cl(only_ghost), 'v:', color='#009E73', lw=1.2,
+               label='ghosts, randomized')
+ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.2,
+               label='leakage + noise')
+ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#0072B2', lw=1.8, label='full, randomized')
+ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#E69F00', lw=1.8,
                label='full + deshadowing')
 ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0,
               label='%.0f pm target' % TARGET_PM)
@@ -270,9 +274,9 @@ ax[0].set_title(r'(a) Error mechanisms vs array size, $R = %.0f\%%$'
 handles0, labels0 = ax[0].get_legend_handles_labels()
 ax[0].grid(True, which='both', alpha=0.25)
 
-ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#c0392b', label='uniform')
-ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#2980b9', label='randomized')
-ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#f39c12', label='randomized + deshadowing')
+ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#D55E00', label='uniform')
+ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#0072B2', label='randomized')
+ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#E69F00', label='randomized + deshadowing')
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
               label='gratings of the bench, $R = 10\\%$')
 ax[1].set_ylim(0, 58)

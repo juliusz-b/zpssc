@@ -115,20 +115,20 @@ fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.02))
 # --- (a) one grating, before and after --------------------------------------
 axb = ax[0]
 lam = nu * PM / 1000.0
-axb.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#2980b9', lw=2.2,
+axb.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#0072B2', lw=2.2,
          label='true')
-axb.plot(lam, shad_b[kk] / shad_b[kk].max(), color='#c0392b', lw=1.4,
+axb.plot(lam, shad_b[kk] / shad_b[kk].max(), color='#D55E00', lw=1.4,
          label='shadowed')
-axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#f39c12', lw=1.4,
+axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#009E73', lw=1.4,
          ls='--', label='corrected')
-axb.axvline(p_true / 1000.0, color='#2980b9', ls=':', lw=0.8)
-axb.axvline(p_shad / 1000.0, color='#c0392b', ls=':', lw=0.8)
+axb.axvline(p_true / 1000.0, color='#0072B2', ls=':', lw=0.8)
+axb.axvline(p_shad / 1000.0, color='#D55E00', ls=':', lw=0.8)
 # 21 pm na osi szerokiej na 560 pm: groty na zewnatrz, liczba obok
 FS.dim_gap(axb, p_true / 1000.0, p_shad / 1000.0, 1.13,
-           '%.0f pm' % abs(p_shad - p_true), color='#c0392b',
+           '%.0f pm' % abs(p_shad - p_true), color='#D55E00',
            tail=0.055, side='right')
 axb.text(p_true / 1000.0 + 0.006, 0.06, 'true $\\lambda_{B,4}$',
-         fontsize=6.0, color='#2980b9', rotation=90, va='bottom', ha='left')
+         fontsize=6.0, color='#0072B2', rotation=90, va='bottom', ha='left')
 axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.36)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
 axb.set_title(r'(a) 4th grating behind three, $R = 20\%$', fontsize=7)
@@ -138,8 +138,8 @@ axb.legend(fontsize=5.5, loc='upper left',
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
-axc.semilogy(Ks, raw, 'o-', color='#c0392b', label='uncorrected')
-axc.semilogy(Ks, fixed, 's-', color='#f39c12', label='corrected')
+axc.semilogy(Ks, raw, 'o-', color='#D55E00', label='uncorrected')
+axc.semilogy(Ks, fixed, 's-', color='#009E73', label='corrected')
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS Bragg error [pm]')

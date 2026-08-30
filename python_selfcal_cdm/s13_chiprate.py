@@ -158,13 +158,13 @@ def quant_jitter(bits, headroom=0.5, ntrials=300, seed=7):
 # ---------------------------------------------------------------------------
 # single panel: the resolution criterion (jitter is one sentence in the text)
 fig, ax0 = plt.subplots(figsize=(3.45, 2.30))
-ax0.loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#c0392b',
+ax0.loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#D55E00',
            label='0.5 m')
-ax0.loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#2980b9',
+ax0.loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#0072B2',
            label='2 m')
-ax0.loglog(Bs / 1e6, np.maximum(e_4, 0.05), '^-', color='#28b463',
+ax0.loglog(Bs / 1e6, np.maximum(e_4, 0.05), '^-', color='#009E73',
            label='4 m (bench)')
-for d, col in [(0.5, '#c0392b'), (2.0, '#2980b9'), (4.0, '#28b463')]:
+for d, col in [(0.5, '#D55E00'), (2.0, '#0072B2'), (4.0, '#009E73')]:
     B_req = C_LIGHT / (2.0 * N_GROUP * d) / 1e6
     ax0.axvline(B_req, color=col, ls=':', lw=0.9)
 ax0.axhline(10.0, color='0.3', ls='--', lw=0.8)

@@ -29,8 +29,8 @@ import figstyle as FS
 FS.apply(6.4)
 
 # the grating colours of fig1_concept.tex, so the spine and the peaks agree
-VERM = '#C74E0A'
-ORAN = '#E8A200'
+VERM = '#D55E00'
+ORAN = '#E69F00'
 GREE = '#009E73'
 PURP = '#CC79A7'
 COLS = [VERM, ORAN, GREE, PURP]

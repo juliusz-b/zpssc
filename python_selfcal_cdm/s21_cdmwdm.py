@@ -46,7 +46,7 @@ SIGMA_N = 1.1e-6
 DETUNE = 25.0                     # +-200 pm detuning inside a band
 BAND_STEP = 8.0 * F               # band pitch, 2 nm: no spectral interaction
 
-BAND_COLS = ['#2980b9', '#28b463', '#f39c12', '#7d3c98']
+BAND_COLS = ['#0072B2', '#009E73', '#E69F00', '#CC79A7']
 
 
 # ---------------------------------------------------------------------------
@@ -145,7 +145,7 @@ vals = [e_one32, e_band, e_one8]
 labels = ['one band' '\n' r'$K = 32$',
           '4 bands' '\n' 'of 8' '\n' r'($K = 32$)',
           'one band' '\n' r'$K = 8$' '\n' '(reference)']
-cols = ['#c0392b', '#f39c12', '#2980b9']
+cols = ['#D55E00', '#E69F00', '#0072B2']
 bars = axc.bar(np.arange(3), vals, 0.6, color=cols)
 for i, v in enumerate(vals):
     axc.text(i, v * 1.04, '%.1f pm' % v, ha='center', fontsize=7.5)

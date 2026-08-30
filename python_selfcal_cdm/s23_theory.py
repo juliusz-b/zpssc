@@ -173,11 +173,11 @@ products = {N: k * f for N, (k, f) in table.items()}
 # at the final physical width preserves the intended label size in print.
 fig, ax = plt.subplots(1, 3, figsize=(6.0, 1.95))
 
-ax[0].plot(Dfr, thc, '-', color='#2980b9', lw=1.3, label='centroid')
-ax[0].plot(Dfr[::2], simc[::2], 'o', color='#2980b9', ms=4, mfc='none',
+ax[0].plot(Dfr, thc, '-', color='#0072B2', lw=1.3, label='centroid')
+ax[0].plot(Dfr[::2], simc[::2], 'o', color='#0072B2', ms=4, mfc='none',
            label='_nolegend_')
-ax[0].plot(Dfr, thl, '-', color='#c0392b', lw=1.3, label='Gaussian fit')
-ax[0].plot(Dfr[::2], siml[::2], 's', color='#c0392b', ms=4, mfc='none',
+ax[0].plot(Dfr, thl, '-', color='#D55E00', lw=1.3, label='Gaussian fit')
+ax[0].plot(Dfr[::2], siml[::2], 's', color='#D55E00', ms=4, mfc='none',
            label='_nolegend_')
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
@@ -191,11 +191,11 @@ ax[0].grid(True, alpha=0.25)
 # positions plotted in pm, the unit the narrative uses (+/-200 pm window)
 ax[1].plot(pos * PM, err, '.', ms=2, color='0.75', alpha=0.5,
            label='_nolegend_')
-ax[1].plot(cent * PM, binned, 'o', color='#2980b9', ms=5,
+ax[1].plot(cent * PM, binned, 'o', color='#0072B2', ms=5,
            label='mean, no refs')
-ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#c0392b', lw=1.4,
+ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#D55E00', lw=1.4,
            label='Law B')
-ax[1].plot(cent * PM, binned_r, 's-', color='#28b463', ms=3.6, lw=1.0,
+ax[1].plot(cent * PM, binned_r, 's-', color='#009E73', ms=3.6, lw=1.0,
            mfc='none', label='mean, 2 refs')
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('multiple-access bias [pm]')
@@ -205,9 +205,9 @@ ax[1].legend(fontsize=5.7, loc='upper left', ncol=1, frameon=False,
 ax[1].grid(True, alpha=0.25)
 
 Ns = sorted(products)
-ax[2].plot(Ns, [products[N] / 1e3 for N in Ns], 'o-', color='#2980b9',
+ax[2].plot(Ns, [products[N] / 1e3 for N in Ns], 'o-', color='#0072B2',
            label=r'simulated  $K_{\max} \cdot f_r$')
-ax[2].axhline(bound / 1e3, color='#c0392b', ls='--', lw=1.2,
+ax[2].axhline(bound / 1e3, color='#D55E00', ls='--', lw=1.2,
               label=r'bound  $\epsilon f_s / (c_L n_s M)$')
 ax[2].set_xscale('log')
 ax[2].set_xticks(Ns)
