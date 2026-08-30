@@ -1,7 +1,10 @@
 """figstyle.py - one visual language for every figure in the paper.
 
 Figures are drawn at their final printed width (7.1 in for a full-width IEEE
-figure), so a 7 pt label on screen is a 7 pt label on paper. Palette is
+figure), so a 7 pt label on screen is a 7 pt label on paper. That holds only
+while the PDF width matches the width main.tex includes it at, which is worth
+checking after any layout change: pdfinfo gives the file width, and the ratio
+against the includegraphics width multiplies every font size on the figure. Palette is
 Okabe-Ito, colour-blind safe. Spines are thin and open (top and right off),
 legends frameless, panels lettered in bold lowercase.
 """
