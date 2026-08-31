@@ -181,7 +181,7 @@ ax[0].plot(Dfr[::2], siml[::2], 's', color='#D55E00', ms=4, mfc='none',
            label='_nolegend_')
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
-ax[0].set_ylabel('pairwise shadowing bias [pm]')
+ax[0].set_ylabel('$\\delta\\lambda_{k\\leftarrow j}$ [pm]')
 ax[0].set_title(r'(a) Law A, $R = 1\%$', fontsize=8.3)
 ax[0].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.4, labelspacing=0.18,
@@ -198,7 +198,7 @@ ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#D55E00', lw=1.4,
 ax[1].plot(cent * PM, binned_r, 's-', color='#009E73', ms=3.6, lw=1.0,
            mfc='none', label='mean, 2 refs')
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
-ax[1].set_ylabel('multiple-access bias [pm]')
+ax[1].set_ylabel('mean bias $\\overline{\\delta\\lambda}(\\nu_k)$ [pm]')
 ax[1].set_title('(b) Law B and two references', fontsize=8.3)
 ax[1].legend(fontsize=5.7, loc='upper left', ncol=1, frameon=False,
              handlelength=1.4, labelspacing=0.2)

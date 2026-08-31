@@ -252,23 +252,23 @@ FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
 fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.45))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#CC79A7', lw=1.2,
-               label='shadowing')
+               label='shadowing $A_k$')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#D55E00', lw=1.2,
-               label='ghosts, uniform')
+               label='ghosts $\\tau_g$, uniform')
 ax[0].semilogy(Ks, cl(only_ghost), 'X:', color='#009E73', lw=1.2,
-               label='ghosts, randomized')
+               label='ghosts $\\tau_g$, randomized')
 ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.2,
-               label='leakage + noise')
+               label='leakage $L_k$ + noise')
 ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#0072B2', lw=1.8, label='full, randomized')
 ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#E69F00', lw=1.8,
-               label='full + deshadowing')
+               label='full + deshadowing $\\widehat S_k$')
 ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0,
               label='%.0f pm target' % TARGET_PM)
 # os schodzi ponizej podlogi, zeby znaczniki punktow docietych byly cale
 ax[0].axhline(FLOOR, color='0.75', lw=0.6)
 ax[0].set_ylim(0.125, 400)
 ax[0].set_xlabel('gratings on the fiber, $K$')
-ax[0].set_ylabel('RMS Bragg error [pm]')
+ax[0].set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 ax[0].set_title(r'(a) Error mechanisms vs array size, $R = %.0f\%%$'
                 % (R_A * 100))
 handles0, labels0 = ax[0].get_legend_handles_labels()
@@ -281,7 +281,7 @@ ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
               label='gratings of the bench, $R = 10\\%$')
 ax[1].set_ylim(0, 58)
 ax[1].set_xlabel('grating reflectivity $R$ [%]')
-ax[1].set_ylabel('gratings meeting the %.0f pm target' % TARGET_PM)
+ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
 ax[1].grid(True, which='both', alpha=0.25)
 ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,

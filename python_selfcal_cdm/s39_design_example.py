@@ -231,7 +231,9 @@ ax.grid(True, axis='y', alpha=0.22)
 ax.set_axisbelow(True)
 ax.text(0.5, 1.10, '1 K', fontsize=5.6, color='0.25', va='bottom')
 
-handles = [Patch(color=COLS[n], label=n) for n in ORDER]
+LEG = {'shadowing': 'shadowing $A_k$', 'ghosts': 'ghosts $\\tau_g$', 'leakage': 'leakage $L_k$',
+       'axis': 'axis $\\Delta\\lambda_{\\mathrm{ch}}$', 'delay': 'delay $\\delta z$'}
+handles = [Patch(color=COLS[n], label=LEG[n]) for n in ORDER]
 handles += [Patch(facecolor='0.7', hatch='/////', edgecolor='white',
                   label='hatched: from the rules'),
             Patch(facecolor='0.4', label='solid: from the datasheet'),

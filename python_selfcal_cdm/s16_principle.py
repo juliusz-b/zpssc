@@ -195,7 +195,7 @@ draw_row(4.35, RND, '#0072B2', 'randomized spacing: almost none does')
 
 axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
-axb.text(50, 0.02, 'delay bin (grating position)', ha='center',
+axb.text(50, 0.02, 'delay bin $\\tau$ (grating position)', ha='center',
          fontsize=6.8, color='0.4')
 axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
 
@@ -208,11 +208,11 @@ nubs = rng3.uniform(-25, 25, Kc)
 Ac = 0.05 * np.exp(-0.5 * ((nuc[None, :] - nubs[:, None]) / SIG) ** 2)
 wanted = Ac[0]
 leak = (-1.0 / NCH) * (Ac[1:].sum(axis=0))
-ax[1].plot(nuc * PM / 1000.0, wanted, color='#0072B2', lw=1.4, label='wanted grating')
+ax[1].plot(nuc * PM / 1000.0, wanted, color='#0072B2', lw=1.4, label='wanted $A_k(\\lambda)$')
 ax[1].plot(nuc * PM / 1000.0, np.abs(leak), color='0.45', lw=1.2,
-           label=r'|leakage|, side lobe $1/N$')
+           label=r'$|L_k|$, m-sequence side lobe $1/N$')
 ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
-           color='#D55E00', lw=1.2, ls='--', label=r'|leakage|, Gold $17/N$')
+           color='#D55E00', lw=1.2, ls='--', label=r'$|L_k|$, Gold side lobe $17/N$')
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
 ax[1].set_title('(b) Side-lobe leakage, $K = %d$' % Kc, fontsize=8.1)

@@ -110,12 +110,12 @@ for a, (det, label) in zip(axa, DETS):
     a.plot(nu, two_pass, color=FS.BLUE, lw=0.8,
            label='two-pass transmission $(1-R_j)^2$')
     a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)),
-           label='undistorted line $k$')
+           label='undistorted $R_k(\\lambda)$')
     a.fill_between(nu, received, wanted, where=wanted >= received,
                    color=FS.ORANGE, alpha=0.28, lw=0)
-    a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='at the detector')
+    a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='at the detector, $A_k$')
     a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)),
-           label='Gaussian fit')
+           label='Gaussian fit $\\to\\hat\\lambda_{B,k}$')
     a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
     a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
     lab = ('%.1f' % mu).replace('-0.0', '0.0')
@@ -164,9 +164,9 @@ hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35, label='pairwise bias, Law A')
+b.plot(D, bias, color=FS.VERM, lw=1.35, label='Law A, $|\\delta\\lambda_{k\\leftarrow j}|$')
 b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
-          label='1 pm tolerance')
+          label='tolerance $\\epsilon=1$ pm')
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.plot(DSTAR, bias.max(), 'o', color=FS.VERM, ms=3.5)

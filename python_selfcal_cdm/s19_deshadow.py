@@ -116,11 +116,11 @@ fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.02))
 axb = ax[0]
 lam = nu * PM / 1000.0
 axb.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#0072B2', lw=2.2,
-         label='true')
+         label='true $R_4(\\lambda)$')
 axb.plot(lam, shad_b[kk] / shad_b[kk].max(), color='#D55E00', lw=1.4,
-         label='shadowed')
+         label='shadowed $S_4$')
 axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#009E73', lw=1.4,
-         ls='--', label='corrected')
+         ls='--', label='corrected $\\widehat S_4$')
 axb.axvline(p_true / 1000.0, color='#0072B2', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#D55E00', ls=':', lw=0.8)
 # 21 pm na osi szerokiej na 560 pm: groty na zewnatrz, liczba obok
@@ -138,11 +138,11 @@ axb.legend(fontsize=5.5, loc='upper left',
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
-axc.semilogy(Ks, raw, 'o-', color='#D55E00', label='uncorrected')
-axc.semilogy(Ks, fixed, 's-', color='#009E73', label='corrected')
+axc.semilogy(Ks, raw, 'o-', color='#D55E00', label='uncorrected $S_k$')
+axc.semilogy(Ks, fixed, 's-', color='#009E73', label='corrected $\\widehat S_k$')
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, $K$')
-axc.set_ylabel('RMS Bragg error [pm]')
+axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 axc.set_title(r'(b) Gain and its limit, $R = 10\%$', fontsize=7)
 axc.legend(fontsize=5.5, loc='lower right',
            ncol=3, frameon=False, handlelength=1.4, columnspacing=0.65)

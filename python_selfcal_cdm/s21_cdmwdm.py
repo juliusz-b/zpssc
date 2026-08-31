@@ -135,7 +135,7 @@ axa.annotate('one bin, four bands', xy=(SHARED, 3.92), xytext=(SHARED - 6, 4.16)
              arrowprops=dict(arrowstyle='-', color='0.3', lw=0.5))
 axa.set_xlim(0, NCH); axa.set_ylim(0, Wb + 0.30)
 axa.set_yticks([])
-axa.set_xlabel('delay bin (grating position)')
+axa.set_xlabel('delay bin $\\tau$ (grating position)')
 axa.set_ylabel('wavelength band')
 axa.set_title('(a) CDM-WDM addressing', fontsize=9)
 
@@ -150,7 +150,7 @@ bars = axc.bar(np.arange(3), vals, 0.6, color=cols)
 for i, v in enumerate(vals):
     axc.text(i, v * 1.04, '%.1f pm' % v, ha='center', fontsize=7.5)
 axc.set_xticks(np.arange(3)); axc.set_xticklabels(labels, fontsize=7)
-axc.set_ylabel('RMS Bragg error [pm]')
+axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 axc.set_ylim(0, max(vals) * 1.22)
 axc.set_title('(b) Banding resets the error chain', fontsize=9)
 axc.set_axisbelow(True)      # siatka pod slupkami, nie na nich

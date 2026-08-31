@@ -159,11 +159,11 @@ def quant_jitter(bits, headroom=0.5, ntrials=300, seed=7):
 # single panel: the resolution criterion (jitter is one sentence in the text)
 fig, ax0 = plt.subplots(figsize=(3.45, 2.30))
 ax0.loglog(Bs / 1e6, np.maximum(e_05, 0.05), 'o-', color='#D55E00',
-           label='0.5 m')
+           label='closest spacing 0.5 m')
 ax0.loglog(Bs / 1e6, np.maximum(e_2, 0.05), 's-', color='#0072B2',
-           label='2 m')
+           label='closest spacing 2 m')
 ax0.loglog(Bs / 1e6, np.maximum(e_4, 0.05), '^-', color='#009E73',
-           label='4 m (bench)')
+           label='closest spacing 4 m (bench)')
 for d, col in [(0.5, '#D55E00'), (2.0, '#0072B2'), (4.0, '#009E73')]:
     B_req = C_LIGHT / (2.0 * N_GROUP * d) / 1e6
     ax0.axvline(B_req, color=col, ls=':', lw=0.9)
@@ -172,7 +172,7 @@ ax0.axhline(10.0, color='0.3', ls='--', lw=0.8)
 ax0.set_xlim(0.85 * Bs.min() / 1e6, 300.0)
 ax0.set_ylim(1.45, 220.0)
 ax0.set_xlabel('chip rate $B$ [Mchip/s]')
-ax0.set_ylabel('RMS Bragg error [pm]')
+ax0.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 ax0.legend(fontsize=5.8, loc='lower left',
            ncol=3, frameon=False, handlelength=1.4, columnspacing=0.8)
 ax0.grid(True, which='both', alpha=0.25)

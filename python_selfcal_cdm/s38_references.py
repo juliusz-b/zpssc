@@ -171,7 +171,7 @@ for r, v in zip(REFS, read10):
                                      shrinkB=1.5))
 axb.text(-172, -6.6, '1st: nothing in front,\nreads the true error',
          fontsize=5.2, color='0.25', ha='left', va='top')
-axb.text(14, 6.6, '2nd: shadowed by the 1st,\nreads 7.5 pm too high',
+axb.text(14, 6.6, '2nd: shadowed by the 1st,\nreads $\\delta\\lambda_{k\\leftarrow j}=7.5$ pm too high',
          fontsize=5.2, color='0.25', ha='left', va='top')
 axb.text(168, 11.6, '3rd: shadowed by two,\nreads 8.4 pm too high',
          fontsize=5.2, color='0.25', ha='right', va='top')

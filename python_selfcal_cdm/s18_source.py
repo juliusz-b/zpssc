@@ -139,9 +139,9 @@ ax[0].text(1.72, 0.5, r'$\Delta\lambda_{\mathrm{ch}}$', color='#0072B2', fontsiz
 ax[0].grid(True, alpha=0.2)
 
 # --- (b) -------------------------------------------------------------------
-ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='no chirp')
+ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='$R_k(\\lambda)$, no chirp')
 ax[1].plot(g * PM / 1000.0, chirped, color='#D55E00', lw=1.4,
-           label='chirped source')
+           label='$S_k^{\\mathrm{ch}}$, chirped source')
 nu_op = -0.62 * F
 kern = np.exp(-0.5 * ((g - nu_op) / (0.5 * DELTA_DEMO)) ** 2)
 ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#CC79A7', alpha=0.32,
@@ -161,8 +161,8 @@ ax[1].set_ylim(0, 1.28)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
-ax[1].set_title('(b) FM-to-AM on the flank', fontsize=9)
-ax[1].legend(fontsize=5.8, loc='upper right',
+ax[1].set_title('(b) FM-to-AM through the kernel $p(\\xi)$', fontsize=9)
+ax[1].legend(fontsize=5.8, loc='lower right',
              ncol=1, frameon=False, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.18, borderaxespad=0.25)
 
@@ -175,7 +175,7 @@ for n in (0, 1, 2, 3):
 ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[2].set_yscale('log')
 ax[2].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
-ax[2].set_ylabel('residual Bragg error [pm]')
+ax[2].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 ax[2].set_title('(c) What the references remove', fontsize=9)
 ax[2].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.5, columnspacing=0.8,

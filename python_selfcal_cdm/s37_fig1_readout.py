@@ -118,7 +118,7 @@ for lbl, col in zip(axc.get_xticklabels(), COLS):
     lbl.set_color(col)
 axc.set_yticks([0.0, 0.05, 0.10])
 axc.set_xlabel(r'delay $\tau$ [chips]', labelpad=1.2)
-axc.set_ylabel('reflectance', labelpad=1.2)
+axc.set_ylabel('$X_m(\\tau)$ [refl.]', labelpad=1.2)
 axc.tick_params(length=2.0, pad=1.4)
 axc.text(0, 1.28 * row.max(), r'one step, $\lambda_m$', fontsize=6.0,
          color='0.35', ha='left', va='top')

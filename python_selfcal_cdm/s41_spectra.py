@@ -95,10 +95,10 @@ fig, ax = plt.subplots(1, 4, figsize=(7.16, 1.95))
 for col, k in enumerate(SHOW):
     a = ax[col]
     true = R * line(nu, NU0[k])
-    a.plot(lam, true, color='0.55', lw=2.6, alpha=0.55, label='true line')
-    a.plot(lam, meas[k], color=VERM, lw=1.2, label='measured')
+    a.plot(lam, true, color='0.55', lw=2.6, alpha=0.55, label='true $R_k(\\lambda)$')
+    a.plot(lam, meas[k], color=VERM, lw=1.2, label='measured $S_k$')
     a.plot(lam, corr[k], color=GREE, lw=1.1, ls=(0, (3.5, 2)),
-           label='deshadowed')
+           label='deshadowed $\\widehat S_k$')
     a.axvline(NU0[k] / 1000.0, color='0.3', lw=0.6, ls=(0, (1.5, 2.5)))
     loss = 100.0 * (1.0 - meas[k].max() / true.max())
     a.text(-0.5, 0.1255, 'grating %d' % (k + 1), fontsize=6.2, color='0.2',
@@ -121,11 +121,11 @@ ax[1].legend(fontsize=5.5, loc='upper right', frameon=False,
 a = ax[3]
 true8 = R * line(nu, NU0[7])
 a.plot(lam, true8, color='0.55', lw=2.6, alpha=0.55,
-       label='line of grating 8')
+       label='the line $A_8(\\lambda)$')
 a.plot(lam, ghost_u[7], color=VERM, lw=1.2,
-       label='$+$ ghost power, uniform')
+       label='$+$ summed $P_g$, uniform')
 a.plot(lam, ghost_r[7], color=BLUE, lw=1.2,
-       label='$+$ ghost power, randomized')
+       label='$+$ summed $P_g$, randomized')
 a.set_yscale('log')
 a.set_ylim(3e-7, 0.6)
 a.set_xlim(-0.52, 0.52)

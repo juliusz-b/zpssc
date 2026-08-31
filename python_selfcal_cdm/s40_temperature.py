@@ -104,8 +104,8 @@ ax.annotate('up to %.1f K\noff the diagonal' % abs(dep[ks, i]),
 ax.set_xlim(-21, 21)
 ax.set_ylim(-21, 21)
 ax.set_aspect('equal')
-ax.set_xlabel('true change [K]', labelpad=1.5)
-ax.set_ylabel('recovered change [K]', labelpad=1.5)
+ax.set_xlabel('true change $\\Delta T$ [K]', labelpad=1.5)
+ax.set_ylabel('recovered change $\\Delta\\hat T$ [K]', labelpad=1.5)
 ax.grid(True, alpha=0.22)
 ax.set_axisbelow(True)
 
