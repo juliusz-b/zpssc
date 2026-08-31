@@ -5,8 +5,9 @@ figure), so a 7 pt label on screen is a 7 pt label on paper. That holds only
 while the PDF width matches the width main.tex includes it at, which is worth
 checking after any layout change: pdfinfo gives the file width, and the ratio
 against the includegraphics width multiplies every font size on the figure. Palette is
-Okabe-Ito, colour-blind safe. Spines are thin and open (top and right off),
-legends frameless, panels lettered in bold lowercase.
+Okabe-Ito, colour-blind safe. Since 31.08.2026 the look follows Origin: boxed
+axes, ticks inside, sans-serif labels, framed legend. Panels lettered in bold
+lowercase.
 """
 import matplotlib.pyplot as plt
 
@@ -22,13 +23,55 @@ GREY = '#4D4D4D'
 LGREY = '#AAAAAA'
 
 
-def apply(base=7.0):
+def apply(base=8.0):
+    """Styl jak z Origina (decyzja kierownika, 31.08.2026): ramka osi z
+    czterech stron, znaczniki glowne i pomocnicze do wewnatrz, krój
+    bezszeryfowy, pogrubione opisy osi, grubsze linie, legenda w ramce.
+    Poprzedni styl (Times, otwarte osie) zostal w apply_open()."""
     plt.rcParams.update({
         'font.size': base,
-        # Times, jak tekst artykulu skladany IEEEtranem. Figury przestaja
-        # wygladac jak wklejone z innego dokumentu, a wzory w podpisach osi
-        # maja ten sam krój co wzory w tekscie. STIX to wolny odpowiednik
-        # Timesa z pelnym zestawem matematycznym.
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Arial', 'Liberation Sans', 'DejaVu Sans'],
+        'mathtext.fontset': 'dejavusans',
+        'axes.titlesize': base + 1,
+        'axes.labelsize': base + 1,
+        'axes.labelweight': 'bold',
+        'xtick.labelsize': base,
+        'ytick.labelsize': base,
+        'legend.fontsize': base - 0.5,
+        'axes.linewidth': 1.0,
+        'xtick.direction': 'in',
+        'ytick.direction': 'in',
+        'xtick.top': True,
+        'ytick.right': True,
+        'xtick.minor.visible': True,
+        'ytick.minor.visible': True,
+        'xtick.major.size': 4,
+        'ytick.major.size': 4,
+        'xtick.minor.size': 2,
+        'ytick.minor.size': 2,
+        'xtick.major.width': 1.0,
+        'ytick.major.width': 1.0,
+        'xtick.minor.width': 0.7,
+        'ytick.minor.width': 0.7,
+        'lines.linewidth': 1.6,
+        'lines.markersize': 4.0,
+        'axes.spines.top': True,
+        'axes.spines.right': True,
+        'legend.frameon': True,
+        'legend.fancybox': False,
+        'legend.edgecolor': 'black',
+        'legend.framealpha': 1.0,
+        'figure.dpi': 200,
+        'savefig.dpi': 300,
+    })
+
+
+def apply_open(base=7.0):
+    """Poprzedni styl: Times jak tekst IEEEtran, cienkie otwarte osie,
+    legenda bez ramki. Dla figur, ktorych jeszcze nie przerobiono."""
+    plt.rcParams.update({
+        'font.size': base,
         'font.family': 'serif',
         'font.serif': ['Times New Roman', 'STIXGeneral', 'DejaVu Serif'],
         'mathtext.fontset': 'stix',
