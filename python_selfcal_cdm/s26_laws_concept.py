@@ -1,10 +1,15 @@
 """s26_laws_concept.py - physical meaning of Law A and Law B.
 
-Row (a) shows Law A on the spectrum itself, in its three regimes: the
-upstream neighbour co-tuned, at the worst detuning sigma*sqrt(3/2), and far
-away. Each panel has the undistorted line, the two-pass transmission of the
-upstream grating, the line that reaches the detector, and the Gaussian
-fitted to it, so the bias is the visible distance between two centres.
+Row (a) starts with a sketch of the light path: the launched light crosses
+the upstream grating j twice, once toward grating k and once back, so the
+line of k reaches the detector multiplied by the two-pass transmission
+(1-R_j)^2. The three panels then show that notch in its three regimes:
+co-tuned, at the worst detuning sigma*sqrt(3/2), and far away. Each panel
+has the undistorted line, the two-pass transmission, the line at the
+detector, and the Gaussian fitted to it, so the bias is the visible
+distance between two centres, and the worst panel marks the direction:
+away from the neighbour, sign opposite to the detuning.
+
 Panel (b) turns the same pairwise bias into a placement rule over the
 complete sensor operating range. Panel (c) shows why the mean code-leakage
 bias behaves like a wavelength-axis stretch and why two stabilized references
@@ -43,16 +48,52 @@ def gaussian(x, amp, centre, width, baseline):
     return baseline + amp * np.exp(-0.5 * ((x - centre) / width) ** 2)
 
 
-fig = plt.figure(figsize=(7.1, 4.05))
-gs = fig.add_gridspec(2, 6, height_ratios=[1.0, 1.15], hspace=0.62,
-                      wspace=1.15, left=0.075, right=0.995, bottom=0.10,
-                      top=0.93)
-axa = [fig.add_subplot(gs[0, 2 * i:2 * i + 2]) for i in range(3)]
-b = fig.add_subplot(gs[1, 0:3])
-c = fig.add_subplot(gs[1, 3:6])
+fig = plt.figure(figsize=(7.1, 4.15))
+gs0 = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.12], hspace=0.55,
+                       left=0.052, right=0.995, bottom=0.095, top=0.92)
+top = gs0[0].subgridspec(1, 4, width_ratios=[0.68, 1.0, 1.0, 1.0],
+                         wspace=0.24)
+bot = gs0[1].subgridspec(1, 2, width_ratios=[1.0, 1.12], wspace=0.30)
+sk = fig.add_subplot(top[0, 0])
+axa = [fig.add_subplot(top[0, i]) for i in (1, 2, 3)]
+b = fig.add_subplot(bot[0, 0])
+c = fig.add_subplot(bot[0, 1])
 
 # ---------------------------------------------------------------------------
-# (a) the three regimes, on the spectrum itself
+# (a0) the light path: two passes through j, one reflection at k
+# ---------------------------------------------------------------------------
+sk.set_xlim(0, 10)
+sk.set_ylim(0, 10)
+sk.axis('off')
+panel_title(sk, 'a', 'Law A on the spectrum')
+
+sk.plot([0.4, 9.6], [5.3, 5.3], color='0.55', lw=1.6)
+for dx in (-0.22, 0.0, 0.22):
+    sk.plot([3.3 + dx, 3.3 + dx], [4.5, 6.1], color=FS.BLUE, lw=1.3)
+    sk.plot([7.3 + dx, 7.3 + dx], [4.5, 6.1], color=FS.ORANGE, lw=1.3)
+sk.text(3.3, 6.6, '$j$, upstream', ha='center', fontsize=5.8, color=FS.BLUE)
+sk.text(7.62, 6.6, '$k$, read', ha='left', fontsize=5.8, color=FS.ORANGE)
+
+# launch lane, reflection hook at k, return lane
+sk.annotate('', xy=(7.15, 7.8), xytext=(0.5, 7.8),
+            arrowprops=dict(arrowstyle='-|>', color='0.35', lw=0.9,
+                            mutation_scale=7))
+sk.plot([7.3, 7.3], [7.8, 3.0], color='0.35', lw=0.8)
+sk.annotate('', xy=(0.5, 3.0), xytext=(7.3, 3.0),
+            arrowprops=dict(arrowstyle='-|>', color='0.35', lw=0.9,
+                            mutation_scale=7))
+sk.text(3.3, 8.3, r'$\times(1{-}R_j)$', ha='center', fontsize=5.6,
+        color=FS.BLUE)
+sk.text(3.3, 2.0, r'$\times(1{-}R_j)$', ha='center', fontsize=5.6,
+        color=FS.BLUE)
+sk.text(7.75, 4.0, r'$\times R_k$', ha='left', fontsize=5.6,
+        color=FS.ORANGE)
+
+sk.text(5.0, 0.6, r'$A_k=R_k\,(1-R_j)^2$', ha='center', fontsize=6.6,
+        color='0.15')
+
+# ---------------------------------------------------------------------------
+# (a1-a3) the three regimes, on the spectrum itself
 # ---------------------------------------------------------------------------
 nu = np.linspace(-5.0 * SIG, 5.0 * SIG, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
@@ -67,7 +108,7 @@ for a, (det, label) in zip(axa, DETS):
     shifts.append(mu)
 
     a.plot(nu, two_pass, color=FS.BLUE, lw=0.8,
-           label='two-pass transmission of $j$')
+           label='two-pass transmission $(1-R_j)^2$')
     a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)),
            label='undistorted line $k$')
     a.fill_between(nu, received, wanted, where=wanted >= received,
@@ -82,9 +123,16 @@ for a, (det, label) in zip(axa, DETS):
         FS.dim_gap(a, 0.0, mu, 1.13,
                    r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
                    color=FS.VERM, tail=55.0, side='right', fontsize=6.0)
+        a.annotate('away from $j$', xy=(mu - 14, 0.90),
+                   xytext=(-320, 0.66), fontsize=5.6, color=FS.VERM,
+                   va='center',
+                   arrowprops=dict(arrowstyle='-|>', color=FS.VERM, lw=0.6,
+                                   mutation_scale=6))
     else:
         a.text(8.0, 1.13, r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
                fontsize=6.0, color=FS.VERM, va='center')
+    if det > 1.0:
+        a.text(det, 0.71, '$j$', ha='center', fontsize=6.2, color=FS.BLUE)
     a.text(0.975, 0.05, label, transform=a.transAxes, ha='right',
            va='bottom', fontsize=5.9, color='0.25')
     a.set_xlim(-330, 500)
@@ -95,7 +143,6 @@ for a, (det, label) in zip(axa, DETS):
 axa[0].set_ylabel('normalized reflectance')
 for a in axa[1:]:
     a.set_yticklabels([])
-panel_title(axa[0], 'a', 'Law A on the spectrum')
 handles, labels = axa[0].get_legend_handles_labels()
 fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.995, 1.005),
            ncol=4, fontsize=5.6, frameon=False, handlelength=1.4,

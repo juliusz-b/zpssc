@@ -150,26 +150,38 @@ axa.text(5.3, 5.28, '(a) two places the references can sit',
 # (b) what the three references report when they sit inline
 # ==========================================================================
 grid = np.linspace(-210, 210, 300)
-axb.plot(grid, axis_error(grid), color='0.35', lw=1.1,
-         label='axis error to remove')
+axb.plot(grid, axis_error(grid), color='0.35', lw=1.2,
+         label='true axis error')
 read10 = np.array([axis_error(r) + sum(law_a(REFS[j] - r, 0.10)
                                        for j in range(i))
                    for i, r in enumerate(REFS)])
-axb.plot(REFS, read10, 'o', color=VERM, ms=4.2, label='what they report')
 fit = np.polyfit(REFS, read10, 2)
+axb.fill_between(grid, axis_error(grid), np.polyval(fit, grid),
+                 color=VERM, alpha=0.13, lw=0,
+                 label='gap: added to every sensor')
 axb.plot(grid, np.polyval(fit, grid), color=VERM, lw=1.0, ls=(0, (3, 2)),
-         label='the fit it produces')
+         label='fit through the readings')
+axb.plot(REFS, read10, 'o', color=VERM, ms=4.2,
+         label='what each reference reads')
 for r, v in zip(REFS, read10):
-    axb.plot([r, r], [axis_error(r), v], color=VERM, lw=0.6, alpha=0.6)
-axb.text(-205, 15.5, 'each reference is shadowed\nby the ones before it',
-         fontsize=5.6, color='0.3', va='top')
+    if abs(v - axis_error(r)) > 0.3:
+        axb.annotate('', xy=(r, v), xytext=(r, axis_error(r)),
+                     arrowprops=dict(arrowstyle='-|>', color=VERM, lw=0.7,
+                                     mutation_scale=6, shrinkA=0,
+                                     shrinkB=1.5))
+axb.text(-172, -6.6, '1st: nothing in front,\nreads the true error',
+         fontsize=5.2, color='0.25', ha='left', va='top')
+axb.text(14, 6.6, '2nd: shadowed by the 1st,\nreads 7.5 pm too high',
+         fontsize=5.2, color='0.25', ha='left', va='top')
+axb.text(168, 11.6, '3rd: shadowed by two,\nreads 8.4 pm too high',
+         fontsize=5.2, color='0.25', ha='right', va='top')
 axb.set_xlim(-215, 215)
 axb.set_ylim(-9, 17.5)
 axb.set_xticks([-180, 0, 180])
 axb.set_xlabel('band position [pm]', labelpad=1.5)
-axb.set_ylabel('reported shift [pm]', labelpad=1.5)
-axb.set_title('(b) inline, $R=10\\%$', fontsize=7.0)
-axb.legend(fontsize=5.2, loc='lower right', frameon=False, handlelength=1.5,
+axb.set_ylabel('reported axis error [pm]', labelpad=1.5)
+axb.set_title('(b) inline references misread the axis', fontsize=7.0)
+axb.legend(fontsize=5.2, loc='upper left', frameon=False, handlelength=1.5,
            labelspacing=0.18, borderaxespad=0.2)
 
 # ==========================================================================

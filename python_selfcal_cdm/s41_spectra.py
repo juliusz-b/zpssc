@@ -120,18 +120,28 @@ ax[1].legend(fontsize=5.5, loc='upper right', frameon=False,
 # --- the ghost term on its own, at the scale it actually has --------------
 a = ax[3]
 true8 = R * line(nu, NU0[7])
-a.plot(lam, true8, color='0.55', lw=2.6, alpha=0.55, label='the line itself')
-a.plot(lam, ghost_u[7], color=VERM, lw=1.2, label='ghosts, uniform')
-a.plot(lam, ghost_r[7], color=BLUE, lw=1.2, label='ghosts, randomized')
+a.plot(lam, true8, color='0.55', lw=2.6, alpha=0.55,
+       label='line of grating 8')
+a.plot(lam, ghost_u[7], color=VERM, lw=1.2,
+       label='$+$ ghost power, uniform')
+a.plot(lam, ghost_r[7], color=BLUE, lw=1.2,
+       label='$+$ ghost power, randomized')
 a.set_yscale('log')
 a.set_ylim(3e-7, 0.6)
 a.set_xlim(-0.52, 0.52)
 a.set_xlabel('wavelength offset [nm]', labelpad=1.5)
 a.set_ylabel('reflectance', labelpad=1.5)
-a.text(-0.5, 0.30, 'grating 8, ghost term alone', fontsize=6.2, color='0.2',
-       va='top')
-a.legend(fontsize=5.4, loc='lower center', frameon=False, handlelength=1.5,
-         labelspacing=0.18, borderaxespad=0.25)
+a.text(-0.5, 0.30, 'grating 8: what ghosts add on top', fontsize=6.2,
+       color='0.2', va='top',
+       bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.8))
+a.text(-0.5, 0.105, 'drawn alone, log scale: added to'
+       '\n' 'the line they would vanish under it', fontsize=5.2,
+       color='0.4', va='top',
+       bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.8))
+leg = a.legend(fontsize=5.2, loc='lower left', frameon=True,
+               framealpha=0.85, edgecolor='none', handlelength=1.3,
+               labelspacing=0.18, borderaxespad=0.2)
+leg.set_zorder(7)
 a.grid(True, which='both', alpha=0.2)
 a.set_axisbelow(True)
 
