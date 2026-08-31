@@ -11,16 +11,20 @@ distance between two centres, and the worst panel marks the direction:
 away from the neighbour, sign opposite to the detuning.
 
 Panel (b) turns the same pairwise bias into a placement rule over the
-complete sensor operating range. Panel (c) shows why the mean code-leakage
-bias behaves like a wavelength-axis stretch and why two stabilized references
-remove its offset and scale.
+complete sensor operating range. Panel (c) paints that rule on the address
+plane of one grating, in the style of the CDM-WDM addressing figure: the
+danger zone is a spectral band, it covers every upstream grating that falls
+inside it whatever its distance along the fiber, and nothing downstream of k
+shadows k. Panel (d) shows why the mean code-leakage bias behaves like a
+wavelength-axis stretch and why two stabilized references remove its offset
+and scale.
 """
 import warnings
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import FancyArrowPatch, Rectangle
 import numpy as np
 from scipy.optimize import brentq, curve_fit
 
@@ -53,11 +57,12 @@ gs0 = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.12], hspace=0.55,
                        left=0.052, right=0.995, bottom=0.095, top=0.92)
 top = gs0[0].subgridspec(1, 4, width_ratios=[0.68, 1.0, 1.0, 1.0],
                          wspace=0.24)
-bot = gs0[1].subgridspec(1, 2, width_ratios=[1.0, 1.12], wspace=0.30)
+bot = gs0[1].subgridspec(1, 3, width_ratios=[0.98, 0.92, 1.10], wspace=0.36)
 sk = fig.add_subplot(top[0, 0])
 axa = [fig.add_subplot(top[0, i]) for i in (1, 2, 3)]
 b = fig.add_subplot(bot[0, 0])
-c = fig.add_subplot(bot[0, 1])
+m = fig.add_subplot(bot[0, 1])
+c = fig.add_subplot(bot[0, 2])
 
 # ---------------------------------------------------------------------------
 # (a0) the light path: two passes through j, one reflection at k
@@ -195,7 +200,50 @@ b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
          labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
-# (c) Law B is an axis stretch, removed by two reference anchors
+# (c) who is priced by Law A: the address plane of one grating
+# ---------------------------------------------------------------------------
+XK = 80.0                       # delay bin of the grating being read
+YLIM = 430.0
+m.set_xlim(0, 127)
+m.set_ylim(-YLIM, YLIM)
+m.set_xticks([0, 40, 80, 120])
+m.set_yticks([-400, -200, 0, 200, 400])
+m.set_xlabel(r'delay bin $\tau$ (position along fiber)')
+m.set_ylabel(r'detuning $\Delta\lambda_{jk}$ [pm]')
+panel_title(m, 'c', 'the pairs Law A prices')
+
+m.axvline(XK, color='0.45', lw=0.7, ls=(0, (2, 2)))
+for y0 in (dlo, -dhi):
+    m.add_patch(Rectangle((0.0, y0), XK, dhi - dlo,
+                          color=FS.VERM, alpha=0.13, lw=0))
+    m.plot([0.0, XK], [y0, y0], color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
+    m.plot([0.0, XK], [y0 + dhi - dlo, y0 + dhi - dlo],
+           color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
+
+m.plot(XK, 0.0, 'v', ms=6.0, color=FS.ORANGE, zorder=5)
+m.text(XK, -95.0, '$k$, read', ha='center', fontsize=5.8, color=FS.ORANGE)
+
+up_hit = [(10.0, 150.0), (33.0, -230.0), (58.0, 305.0)]
+up_safe = [(20.0, 0.0), (44.0, -395.0)]
+down = [(97.0, 140.0), (108.0, -260.0), (120.0, 30.0)]
+for x0, y0 in up_hit:
+    m.plot(x0, y0, 'v', ms=5.0, color=FS.VERM)
+for x0, y0 in up_safe + down:
+    m.plot(x0, y0, 'v', ms=5.0, color=FS.GREEN)
+
+m.text(40.0, YLIM * 0.86, 'upstream of $k$', ha='center', fontsize=5.8,
+       color='0.30')
+m.text(104.0, YLIM * 0.86, 'downstream,\nnever shadows $k$', ha='center',
+       fontsize=5.8, color=FS.GREEN)
+m.text(34.0, 232.0, 'biased pairs,\nany distance', ha='center', fontsize=5.6,
+       color=FS.VERM)
+m.text(20.0, -78.0, 'co-tuned, safe', ha='center', fontsize=5.4,
+       color=FS.GREEN, bbox=dict(fc='white', ec='none', pad=0.5, alpha=0.85))
+m.text(49.0, -400.0, 'far, safe', ha='left', va='center', fontsize=5.4,
+       color=FS.GREEN)
+
+# ---------------------------------------------------------------------------
+# (d) Law B is an axis stretch, removed by two reference anchors
 # ---------------------------------------------------------------------------
 for sp in ('top', 'right', 'left'):
     c.spines[sp].set_visible(False)
@@ -205,7 +253,7 @@ c.tick_params(axis='x', labelsize=6.0, length=2.2, width=0.6)
 c.set_xlabel(r'position in the band $\nu_k=\lambda_{B,k}-\lambda_0$ [pm]')
 c.set_xlim(-300, 275)
 c.set_ylim(-0.32, 3.08)
-panel_title(c, 'c', 'Law B: an axis stretch, two references remove it')
+panel_title(c, 'd', 'Law B: an axis stretch, two references remove it')
 
 W = 180.0
 K, N = 32, 127
