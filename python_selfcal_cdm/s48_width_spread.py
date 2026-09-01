@@ -1,10 +1,10 @@
-"""s48_width_spread.py - what happens to Law A and to the array budget when
+"""s48_width_spread.py - what happens to Rule A and to the array budget when
 the gratings do not share one linewidth.
 
 Fabricated gratings never have exactly equal FWHM, so this script answers the
-reviewer question the equal-width Law A leaves open. Three results.
+reviewer question the equal-width Rule A leaves open. Three results.
 
-  (a) The width-aware generalization of Law A. Repeating the first-order
+  (a) The width-aware generalization of Rule A. Repeating the first-order
       projection with unequal widths sigma_j (neighbor) and sigma_k (read
       grating) gives
 
@@ -97,7 +97,7 @@ for r_ in ratios:
                                  for d in DLS])))
 ax[1].plot(ratios, mx_win, 'o-', color=FS.PURPLE, ms=2.8, label='windowed peak fit')
 ax[1].plot(ratios, mx_unr, 's-', color=FS.BLUE, ms=2.8, label='full model, unrestricted fit')
-ax[1].plot(ratios, mx_law, '--', color=FS.VERM, label='first-order law')
+ax[1].plot(ratios, mx_law, '--', color=FS.VERM, label='first-order rule')
 ax[1].set_xlabel(r'width ratio $\sigma_j/\sigma_k$')
 ax[1].set_ylabel(r'worst-case $|\delta\lambda_{k\leftarrow j}|$ (pm)')
 ax[1].legend(fontsize=6.2, handlelength=1.6)

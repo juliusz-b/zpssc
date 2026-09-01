@@ -1,4 +1,4 @@
-"""s23_theory.py - closed-form first-order laws for the coded readout, verified.
+"""s23_theory.py - closed-form first-order rules for the coded readout, verified.
 
 The simulations so far produced scaling laws numerically. This script derives
 them, and then checks the derivations against the model to the percent level.
@@ -12,7 +12,7 @@ functional of p. For the two standard estimators the functional is explicit:
              (unweighted least squares, free amplitude/centre/width/baseline;
               on a symmetric window the centre couples only to the odd part)
 
-LAW A, pairwise shadowing. A downstream grating read through one upstream
+RULE A, pairwise shadowing. A downstream grating read through one upstream
 grating of reflectance R detuned by D has p = -2 R A g(nu) g(nu - D), and the
 integrals close:
 
@@ -24,7 +24,7 @@ D* = s sqrt(2) (centroid) or s sqrt(3/2) (LSQ), with peak magnitude 0.607 R s
 and 0.809 R s. The dangerous neighbour is the one detuned by about one line
 sigma; a co-tuned neighbour biases nothing.
 
-LAW B, mean multiple-access bias. An m-sequence correlator leaks every other
+RULE B, mean multiple-access bias. An m-sequence correlator leaks every other
 grating into the wanted bin with weight -1/N. Averaging the leaked background
 over detunings uniform on (-W, W) and applying the LSQ functional gives
 
@@ -84,7 +84,7 @@ def lsq_full(x, y, mu0):
 
 
 # ---------------------------------------------------------------------------
-# LAW A verification
+# RULE A verification
 # ---------------------------------------------------------------------------
 g = np.linspace(-5 * F, 5 * F, 3000)
 R_A = 0.01
@@ -104,7 +104,7 @@ err_c = float(np.max(np.abs(simc / thc - 1)))
 err_l = float(np.max(np.abs(siml / thl - 1)))
 
 # ---------------------------------------------------------------------------
-# LAW B verification and the reference corollary
+# RULE B verification and the reference corollary
 # ---------------------------------------------------------------------------
 K = 32
 R_B = 0.10
@@ -182,7 +182,7 @@ ax[0].plot(Dfr[::2], siml[::2], 's', color='#D55E00', ms=4, mfc='none',
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('$\\delta\\lambda_{k\\leftarrow j}$ [pm]')
-ax[0].set_title(r'(a) Law A, $R = 1\%$', fontsize=8.3)
+ax[0].set_title(r'(a) Rule A, $R = 1\%$', fontsize=8.3)
 ax[0].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.4, labelspacing=0.18,
              columnspacing=0.8)
@@ -194,12 +194,12 @@ ax[1].plot(pos * PM, err, '.', ms=2, color='0.75', alpha=0.5,
 ax[1].plot(cent * PM, binned, 'o', color='#0072B2', ms=5,
            label='mean, no refs')
 ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#D55E00', lw=1.4,
-           label='Law B')
+           label='Rule B')
 ax[1].plot(cent * PM, binned_r, 's-', color='#009E73', ms=3.6, lw=1.0,
            mfc='none', label='mean, 2 refs')
 ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
 ax[1].set_ylabel('mean bias $\\overline{\\delta\\lambda}(\\nu_k)$ [pm]')
-ax[1].set_title('(b) Law B and two references', fontsize=8.3)
+ax[1].set_title('(b) Rule B and two references', fontsize=8.3)
 ax[1].legend(fontsize=5.7, loc='upper left', ncol=1, frameon=False,
              handlelength=1.4, labelspacing=0.2)
 ax[1].grid(True, alpha=0.25)
@@ -229,14 +229,14 @@ fig.savefig('figs/fig_s23_theory.pdf', bbox_inches='tight')
 # ---------------------------------------------------------------------------
 # printed verification
 # ---------------------------------------------------------------------------
-print('=== LAW A: pairwise shadowing bias, R = %.0f%% ===' % (R_A * 100))
+print('=== RULE A: pairwise shadowing bias, R = %.0f%% ===' % (R_A * 100))
 print('  centroid: worst deviation from closed form %.1f%%' % (100 * err_c))
 print('  LSQ fit : worst deviation from closed form %.1f%%' % (100 * err_l))
 print('  worst-case bias: 0.607 R sigma (centroid), 0.809 R sigma (LSQ)')
 print('  at R = 10%%, FWHM = 250 pm: %.1f pm at a neighbour detuning of %.0f pm'
       % (0.809 * 0.10 * SIG * PM, np.sqrt(1.5) * SIG * PM))
 print()
-print('=== LAW B: mean multiple-access bias, K = %d, N = %d ===' % (K, NCH))
+print('=== RULE B: mean multiple-access bias, K = %d, N = %d ===' % (K, NCH))
 print('   bin centre [GHz]   simulated [pm]   closed form [pm]')
 for c_, b_, t_ in zip(cent, binned, lawB):
     print('   %14.1f   %14.2f   %16.2f' % (c_, b_, t_))

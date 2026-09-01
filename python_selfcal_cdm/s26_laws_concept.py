@@ -1,4 +1,4 @@
-"""s26_laws_concept.py - physical meaning of Law A and Law B.
+"""s26_laws_concept.py - physical meaning of Rule A and Rule B.
 
 Row (a) starts with a sketch of the light path: the launched light crosses
 the upstream grating j twice, once toward grating k and once back, so the
@@ -70,7 +70,7 @@ c = fig.add_subplot(bot[0, 2])
 sk.set_xlim(0, 10)
 sk.set_ylim(0, 10)
 sk.axis('off')
-panel_title(sk, 'a', 'Law A on the spectrum')
+panel_title(sk, 'a', 'Rule A on the spectrum')
 
 sk.plot([0.4, 9.6], [5.3, 5.3], color='0.55', lw=1.6)
 for dx in (-0.22, 0.0, 0.22):
@@ -169,7 +169,7 @@ hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35, label='Law A, $|\\delta\\lambda_{k\\leftarrow j}|$')
+b.plot(D, bias, color=FS.VERM, lw=1.35, label='Rule A, $|\\delta\\lambda_{k\\leftarrow j}|$')
 b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
           label='tolerance $\\epsilon=1$ pm')
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
@@ -195,12 +195,12 @@ b.set_ylim(-1.15, 9.55)
 b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
-panel_title(b, 'b', 'Law A as a placement rule')
+panel_title(b, 'b', 'Rule A as a placement rule')
 b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
          labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
-# (c) who is priced by Law A: the address plane of one grating
+# (c) who is priced by Rule A: the address plane of one grating
 # ---------------------------------------------------------------------------
 XK = 80.0                       # delay bin of the grating being read
 YLIM = 430.0
@@ -210,7 +210,7 @@ m.set_xticks([0, 40, 80, 120])
 m.set_yticks([-400, -200, 0, 200, 400])
 m.set_xlabel(r'delay bin $\tau$ (position along fiber)')
 m.set_ylabel(r'detuning $\Delta\lambda_{jk}$ [pm]')
-panel_title(m, 'c', 'the pairs Law A prices')
+panel_title(m, 'c', 'the pairs Rule A prices')
 
 m.axvline(XK, color='0.45', lw=0.7, ls=(0, (2, 2)))
 for y0 in (dlo, -dhi):
@@ -243,7 +243,7 @@ m.text(49.0, -400.0, 'far, safe', ha='left', va='center', fontsize=5.4,
        color=FS.GREEN)
 
 # ---------------------------------------------------------------------------
-# (d) Law B is an axis stretch, removed by two reference anchors
+# (d) Rule B is an axis stretch, removed by two reference anchors
 # ---------------------------------------------------------------------------
 for sp in ('top', 'right', 'left'):
     c.spines[sp].set_visible(False)
@@ -253,7 +253,7 @@ c.tick_params(axis='x', labelsize=6.0, length=2.2, width=0.6)
 c.set_xlabel(r'position in the band $\nu_k=\lambda_{B,k}-\lambda_0$ [pm]')
 c.set_xlim(-300, 275)
 c.set_ylim(-0.32, 3.08)
-panel_title(c, 'd', 'Law B: an axis stretch, two references remove it')
+panel_title(c, 'd', 'Rule B: an axis stretch, two references remove it')
 
 W = 180.0
 K, N = 32, 127
@@ -261,7 +261,7 @@ stretch = 1.0 + (K - 1) / N
 true = np.linspace(-W, W, 7)
 read = true * stretch
 rows = [(2.38, true, 'true', '0.35'),
-        (1.43, read, 'read, Law B', FS.VERM),
+        (1.43, read, 'read, Rule B', FS.VERM),
         (0.48, true, 'calibrated', FS.BLUE)]
 
 for y0, values, label, col in rows:
@@ -294,7 +294,7 @@ fig.savefig('figs/fig_s26_laws_concept.png', dpi=300, bbox_inches='tight',
             pad_inches=0.025)
 plt.close(fig)
 
-print('Law A roots at 1 pm: Delta_lo=%.1f pm, Delta_hi=%.1f pm' % (dlo, dhi))
-print('Law A at least half its maximum between %.0f and %.0f pm '
+print('Rule A roots at 1 pm: Delta_lo=%.1f pm, Delta_hi=%.1f pm' % (dlo, dhi))
+print('Rule A at least half its maximum between %.0f and %.0f pm '
       '(%.2f and %.2f sigma)' % (hlo, hhi, hlo / SIG, hhi / SIG))
 print('saved figs/fig_s26_laws_concept.pdf and .png')
