@@ -57,46 +57,18 @@ def gaussian(x, amp, centre, width, baseline):
 fig = plt.figure(figsize=(7.1, 4.15))
 gs0 = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.12], hspace=0.55,
                        left=0.052, right=0.995, bottom=0.095, top=0.955)
-top = gs0[0].subgridspec(1, 2, width_ratios=[0.40, 0.60], wspace=0.16)
+top = gs0[0].subgridspec(1, 1)
 bot = gs0[1].subgridspec(1, 3, width_ratios=[0.98, 0.92, 1.10], wspace=0.36)
-sk = fig.add_subplot(top[0, 0])
-pa = fig.add_subplot(top[0, 1])
+pa = fig.add_subplot(top[0, 0])
 b = fig.add_subplot(bot[0, 0])
 m = fig.add_subplot(bot[0, 1])
 c = fig.add_subplot(bot[0, 2])
 
 # ---------------------------------------------------------------------------
-# (a0) the light path, drawn in the visual language of Fig. 2: FBG blocks
-# on a thick fiber, two passes through j, one reflection at k
+# (a) the three regimes merged on one axis, the light-path sketch as an
+# inset in the empty left part (x extended to -730 pm to make that room)
 # ---------------------------------------------------------------------------
-sk.set_xlim(0, 10)
-sk.set_ylim(0, 5)
-sk.axis('off')
-panel_title(sk, 'a', 'Rule A on the spectrum')
-
-sk.plot([0.3, 9.7], [2.6, 2.6], color='black', lw=4.5, solid_capstyle='butt',
-        zorder=1)
-for x0, colr, lab in ((3.6, FS.BLUE, 'FBG$_j$'), (7.0, FS.ORANGE, 'FBG$_k$')):
-    sk.add_patch(Rectangle((x0, 1.7), 1.3, 1.8, facecolor=colr,
-                           edgecolor='none', zorder=2))
-    sk.text(x0 + 0.65, 1.95, lab, ha='center', va='center', fontsize=6.2,
-            color='white', zorder=3)
-sk.text(4.25, 4.05, 'upstream, shadows', ha='center', fontsize=5.8,
-        color=FS.BLUE)
-sk.text(7.65, 4.05, 'read', ha='center', fontsize=5.8, color='#B87F00')
-sk.annotate('', xy=(6.9, 3.05), xytext=(0.9, 3.05),
-            arrowprops=dict(arrowstyle='-|>', lw=1.0, color='0.25'))
-sk.text(0.95, 3.32, r'$\times(1{-}R_j)$', fontsize=5.6, color=FS.BLUE)
-sk.annotate('', xy=(0.9, 2.15), xytext=(6.9, 2.15),
-            arrowprops=dict(arrowstyle='-|>', lw=1.0, color='0.25'))
-sk.text(0.95, 1.32, r'$\times(1{-}R_j)$', fontsize=5.6, color=FS.BLUE)
-sk.text(7.15, 1.32, r'$\times R_k$', fontsize=5.6, color='#B87F00')
-sk.text(5.0, 0.32, r'$A_k=R_k\,(1-R_j)^2$', ha='center', fontsize=6.6,
-        color='0.15')
-
-# ---------------------------------------------------------------------------
-# (a1) the three regimes merged on one axis: color = case, style = role
-# ---------------------------------------------------------------------------
+panel_title(pa, 'a', 'Rule A on the spectrum')
 nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
 CASES = ((0.0, FS.BLUE, 'co-tuned'), (DSTAR, FS.VERM, 'worst'),
@@ -118,10 +90,10 @@ for (det, colr, name), (tx, ty) in zip(CASES, ANN):
     pa.text(tx, ty, name + '\n' + r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
             fontsize=5.5, color=colr, ha='center', va='center')
 pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.3, zorder=6)
-pa.set_xlim(-330, 560)
+pa.set_xlim(-730, 560)
 pa.set_ylim(0.0, 1.12)
 pa.set_yticks([0, 0.5, 1.0])
-pa.set_xticks([-200, 0, 200, 400])
+pa.set_xticks([-600, -400, -200, 0, 200, 400])
 pa.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
 pa.set_ylabel('normalized reflectance')
 roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
@@ -131,6 +103,30 @@ pa.legend(roles, [r'two-pass transmission $(1-R_j)^2$',
                   r'undistorted $R_k(\lambda)$',
                   r'at the detector, $A_k$'],
           fontsize=5.2, loc='lower right', handlelength=1.5, borderaxespad=0.3)
+
+sk = pa.inset_axes([0.012, 0.06, 0.285, 0.64])
+sk.set_xlim(0, 10)
+sk.set_ylim(0, 5)
+sk.axis('off')
+sk.plot([0.3, 9.7], [2.6, 2.6], color='black', lw=4.0, solid_capstyle='butt',
+        zorder=1)
+for x0, colr, lab in ((3.6, FS.BLUE, 'FBG$_j$'), (7.0, FS.ORANGE, 'FBG$_k$')):
+    sk.add_patch(Rectangle((x0, 1.7), 1.3, 1.8, facecolor=colr,
+                           edgecolor='none', zorder=2))
+    sk.text(x0 + 0.65, 1.95, lab, ha='center', va='center', fontsize=5.8,
+            color='white', zorder=3)
+sk.text(4.25, 4.05, 'upstream, shadows', ha='center', fontsize=5.4,
+        color=FS.BLUE)
+sk.text(7.65, 4.05, 'read', ha='center', fontsize=5.4, color='#B87F00')
+sk.annotate('', xy=(6.9, 3.05), xytext=(0.9, 3.05),
+            arrowprops=dict(arrowstyle='-|>', lw=0.9, color='0.25'))
+sk.text(0.95, 3.34, r'$\times(1{-}R_j)$', fontsize=5.2, color=FS.BLUE)
+sk.annotate('', xy=(0.9, 2.15), xytext=(6.9, 2.15),
+            arrowprops=dict(arrowstyle='-|>', lw=0.9, color='0.25'))
+sk.text(0.95, 1.34, r'$\times(1{-}R_j)$', fontsize=5.2, color=FS.BLUE)
+sk.text(7.15, 1.34, r'$\times R_k$', fontsize=5.2, color='#B87F00')
+sk.text(5.0, 0.34, r'$A_k=R_k\,(1-R_j)^2$', ha='center', fontsize=6.0,
+        color='0.15')
 print('Fig. 3(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
       '400 pm' % (shifts[0], shifts[1], shifts[2], DSTAR))
 
@@ -154,9 +150,9 @@ b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.plot(DSTAR, bias.max(), 'o', color=FS.VERM, ms=3.5)
-b.text(DSTAR + 14, bias.max() + 0.05,
+b.text(250, 8.75,
        'maximum $0.81R\\sigma$\nat $\\sigma\\sqrt{3/2}$',
-       fontsize=5.6, color=FS.VERM, va='center', ha='left')
+       fontsize=5.6, color=FS.VERM, va='top', ha='left')
 
 forb = (dlo, dhi)
 safe = (dhi + 18.0, 690.0)
@@ -175,7 +171,8 @@ b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
 panel_title(b, 'b', 'Rule A as a placement criterion')
-b.legend(loc='upper right', fontsize=5.7, handlelength=1.5,
+b.legend(loc='center right', bbox_to_anchor=(0.985, 0.40),
+         fontsize=5.7, handlelength=1.5,
          labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
@@ -203,23 +200,23 @@ m.plot(XK, 0.0, 'v', ms=6.0, color=FS.ORANGE, zorder=5)
 m.text(XK, -95.0, '$k$, read', ha='center', fontsize=5.8, color=FS.ORANGE)
 
 up_hit = [(10.0, 150.0), (33.0, -230.0), (58.0, 305.0)]
-up_safe = [(20.0, 0.0), (44.0, -395.0)]
+up_safe = [(20.0, 4.0), (44.0, -380.0)]
 down = [(97.0, 140.0), (108.0, -260.0), (120.0, 30.0)]
-for x0, y0 in up_hit:
-    m.plot(x0, y0, 'v', ms=5.0, color=FS.VERM)
-for x0, y0 in up_safe + down:
-    m.plot(x0, y0, 'v', ms=5.0, color=FS.GREEN)
-
+hb = m.plot([x for x, _ in up_hit], [y for _, y in up_hit], 'v', ms=5.6,
+            color=FS.VERM, ls='none', label='biases $k$')[0]
+hs = m.plot([x for x, _ in up_safe + down], [y for _, y in up_safe + down],
+            'v', ms=5.6, color=FS.GREEN, ls='none', label='safe')[0]
+m.legend(handles=[hb, hs], fontsize=5.4, loc='lower left', handlelength=0.9,
+         borderaxespad=0.25, labelspacing=0.2)
 m.text(40.0, YLIM * 0.86, 'upstream of $k$', ha='center', fontsize=5.8,
-       color='0.30')
-m.text(104.0, YLIM * 0.86, 'downstream,\nnever shadows $k$', ha='center',
-       fontsize=5.8, color=FS.GREEN)
-m.text(34.0, 232.0, 'biased pairs,\nany distance', ha='center', fontsize=5.6,
-       color=FS.VERM)
-m.text(20.0, -78.0, 'co-tuned, safe', ha='center', fontsize=5.4,
-       color=FS.GREEN, bbox=dict(fc='white', ec='none', pad=0.5, alpha=0.85))
-m.text(49.0, -400.0, 'far, safe', ha='left', va='center', fontsize=5.4,
-       color=FS.GREEN)
+       color='0.30',
+       bbox=dict(fc='white', ec='none', pad=0.5, alpha=0.85))
+m.text(106.0, 225.0, 'downstream:\nnever\nshadows $k$', ha='center',
+       fontsize=5.6, color=FS.GREEN)
+m.text(40.0, (dlo + dhi) / 2.0,
+       r'detuned $\Delta\lambda_{\mathrm{lo}}$ to $\Delta\lambda_{\mathrm{hi}}$',
+       ha='center', va='center', fontsize=5.4, color=FS.VERM,
+       bbox=dict(fc='white', ec='none', pad=0.5, alpha=0.85))
 
 # ---------------------------------------------------------------------------
 # (d) Rule B is an axis stretch, removed by two reference anchors
@@ -239,33 +236,33 @@ K, N = 32, 127
 stretch = 1.0 + (K - 1) / N
 true = np.linspace(-W, W, 7)
 read = true * stretch
-rows = [(2.38, true, 'true', '0.35'),
-        (1.43, read, 'read, Rule B', FS.VERM),
-        (0.48, true, 'calibrated', FS.BLUE)]
+rows = [(2.30, true, 'true', '0.35'),
+        (0.86, read, 'read, Rule B', FS.VERM)]
 
 for y0, values, label, col in rows:
-    c.plot([-205, 205], [y0, y0], color='0.78', lw=0.75)
+    c.plot([-235, 235], [y0, y0], color='0.78', lw=0.75)
     for q, x0 in enumerate(values):
         is_ref = q in (0, len(values) - 1)
         tick_col = FS.BLUE if is_ref else col
-        c.plot([x0, x0], [y0 - 0.13, y0 + 0.13], color=tick_col,
+        c.plot([x0, x0], [y0 - 0.16, y0 + 0.16], color=tick_col,
                lw=2.1 if is_ref else 1.15)
-    c.text(-265, y0, label, ha='right', va='center', fontsize=6.2,
+    c.text(-262, y0, label, ha='right', va='center', fontsize=6.2,
            color=col)
 
 for x0, xr in zip(true, read):
-    c.add_patch(FancyArrowPatch((x0, 2.22), (xr, 1.59),
-                                arrowstyle='-', color=FS.VERM,
-                                lw=0.55, alpha=0.55))
-    c.add_patch(FancyArrowPatch((xr, 1.27), (x0, 0.64),
-                                arrowstyle='-', color=FS.BLUE,
-                                lw=0.55, alpha=0.55))
-
-c.text(-W, 2.70, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
-c.text(W, 2.70, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
-c.text(0.0, 1.90, 'every grating pulled outward by $1+(K-1)/N$',
-       ha='center', fontsize=5.6, color=FS.VERM,
-       bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.85))
+    if abs(x0) < 1.0:
+        continue
+    c.add_patch(FancyArrowPatch((x0, 2.10), (xr, 1.06),
+                                arrowstyle='-|>', mutation_scale=5,
+                                color=FS.VERM, lw=0.6, alpha=0.75))
+c.text(-W, 2.72, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
+c.text(W, 2.72, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
+c.text(0.0, 1.56, 'every grating pulled outward by $1+(K-1)/N$',
+       ha='center', fontsize=5.7, color=FS.VERM,
+       bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.9))
+c.text(0.0, 0.26,
+       'two anchored references (blue) measure the stretch and take it out',
+       ha='center', fontsize=5.4, color=FS.BLUE)
 
 fig.savefig('figs/fig_s26_laws_concept.pdf', bbox_inches='tight',
             pad_inches=0.025)
