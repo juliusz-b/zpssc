@@ -195,7 +195,7 @@ b.set_ylim(-1.15, 9.55)
 b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
-panel_title(b, 'b', 'Rule A as a placement rule')
+panel_title(b, 'b', 'Rule A as a placement criterion')
 b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
          labelspacing=0.18, borderaxespad=0.25)
 
