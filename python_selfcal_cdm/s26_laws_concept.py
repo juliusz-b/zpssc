@@ -140,9 +140,7 @@ hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35, label='Gaussian fit')
-bias_cen = (R / np.sqrt(2.0)) * D * np.exp(-D ** 2 / (4.0 * SIG ** 2))
-b.plot(D, bias_cen, color=FS.BLUE, lw=1.1, ls=(0, (5, 2)), label='centroid')
+b.plot(D, bias, color=FS.VERM, lw=1.35, label='Rule A, $\\delta\\lambda_{k\\leftarrow j}$')
 b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
           label='tolerance $\\epsilon=1$ pm')
 b.legend(loc='upper right', bbox_to_anchor=(0.985, 0.295), fontsize=5.4,
