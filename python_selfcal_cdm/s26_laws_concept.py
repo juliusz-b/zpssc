@@ -181,9 +181,9 @@ m.set_xlim(0, 127)
 m.set_ylim(-YLIM, YLIM)
 m.set_xticks([0, 80])
 m.set_yticks([-400, 0, 400])
-m.tick_params(labelsize=4.4, length=1.8, width=0.6, pad=1.5)
-m.set_xlabel(r'delay bin $\tau$', fontsize=4.8, labelpad=1.0)
-m.set_ylabel(r'$\Delta\lambda_{jk}$ [pm]', fontsize=4.8, labelpad=0.5)
+m.tick_params(labelsize=5.0, length=2.6, width=1.0, pad=1.5)
+m.set_xlabel(r'delay bin $\tau$', fontsize=5.2, labelpad=1.0)
+m.set_ylabel(r'$\Delta\lambda_{jk}$ [pm]', fontsize=5.2, labelpad=0.5)
 
 m.axvline(XK, color='0.45', lw=0.6, ls=(0, (2, 2)))
 for y0 in (dlo, -dhi):
