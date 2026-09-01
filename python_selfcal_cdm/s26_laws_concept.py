@@ -29,6 +29,8 @@ import numpy as np
 from scipy.optimize import brentq, curve_fit
 
 import figstyle as FS
+from matplotlib.patches import Rectangle
+from matplotlib.lines import Line2D
 
 warnings.filterwarnings('ignore')
 FS.apply(base=7.1)
@@ -54,105 +56,82 @@ def gaussian(x, amp, centre, width, baseline):
 
 fig = plt.figure(figsize=(7.1, 4.15))
 gs0 = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.12], hspace=0.55,
-                       left=0.052, right=0.995, bottom=0.095, top=0.92)
-top = gs0[0].subgridspec(1, 4, width_ratios=[0.68, 1.0, 1.0, 1.0],
-                         wspace=0.24)
+                       left=0.052, right=0.995, bottom=0.095, top=0.955)
+top = gs0[0].subgridspec(1, 2, width_ratios=[0.40, 0.60], wspace=0.16)
 bot = gs0[1].subgridspec(1, 3, width_ratios=[0.98, 0.92, 1.10], wspace=0.36)
 sk = fig.add_subplot(top[0, 0])
-axa = [fig.add_subplot(top[0, i]) for i in (1, 2, 3)]
+pa = fig.add_subplot(top[0, 1])
 b = fig.add_subplot(bot[0, 0])
 m = fig.add_subplot(bot[0, 1])
 c = fig.add_subplot(bot[0, 2])
 
 # ---------------------------------------------------------------------------
-# (a0) the light path: two passes through j, one reflection at k
+# (a0) the light path, drawn in the visual language of Fig. 2: FBG blocks
+# on a thick fiber, two passes through j, one reflection at k
 # ---------------------------------------------------------------------------
 sk.set_xlim(0, 10)
-sk.set_ylim(0, 10)
+sk.set_ylim(0, 5)
 sk.axis('off')
 panel_title(sk, 'a', 'Rule A on the spectrum')
 
-sk.plot([0.4, 9.6], [5.3, 5.3], color='0.55', lw=1.6)
-for dx in (-0.22, 0.0, 0.22):
-    sk.plot([3.3 + dx, 3.3 + dx], [4.5, 6.1], color=FS.BLUE, lw=1.3)
-    sk.plot([7.3 + dx, 7.3 + dx], [4.5, 6.1], color=FS.ORANGE, lw=1.3)
-sk.text(3.3, 6.6, '$j$, upstream', ha='center', fontsize=5.8, color=FS.BLUE)
-sk.text(7.62, 6.6, '$k$, read', ha='left', fontsize=5.8, color=FS.ORANGE)
-
-# launch lane, reflection hook at k, return lane
-sk.annotate('', xy=(7.15, 7.8), xytext=(0.5, 7.8),
-            arrowprops=dict(arrowstyle='-|>', color='0.35', lw=0.9,
-                            mutation_scale=7))
-sk.plot([7.3, 7.3], [7.8, 3.0], color='0.35', lw=0.8)
-sk.annotate('', xy=(0.5, 3.0), xytext=(7.3, 3.0),
-            arrowprops=dict(arrowstyle='-|>', color='0.35', lw=0.9,
-                            mutation_scale=7))
-sk.text(3.3, 8.3, r'$\times(1{-}R_j)$', ha='center', fontsize=5.6,
+sk.plot([0.3, 9.7], [2.6, 2.6], color='black', lw=4.5, solid_capstyle='butt',
+        zorder=1)
+for x0, colr, lab in ((3.6, FS.BLUE, 'FBG$_j$'), (7.0, FS.ORANGE, 'FBG$_k$')):
+    sk.add_patch(Rectangle((x0, 1.7), 1.3, 1.8, facecolor=colr,
+                           edgecolor='none', zorder=2))
+    sk.text(x0 + 0.65, 1.95, lab, ha='center', va='center', fontsize=6.2,
+            color='white', zorder=3)
+sk.text(4.25, 4.05, 'upstream, shadows', ha='center', fontsize=5.8,
         color=FS.BLUE)
-sk.text(3.3, 2.0, r'$\times(1{-}R_j)$', ha='center', fontsize=5.6,
-        color=FS.BLUE)
-sk.text(7.75, 4.0, r'$\times R_k$', ha='left', fontsize=5.6,
-        color=FS.ORANGE)
-
-sk.text(5.0, 0.6, r'$A_k=R_k\,(1-R_j)^2$', ha='center', fontsize=6.6,
+sk.text(7.65, 4.05, 'read', ha='center', fontsize=5.8, color='#B87F00')
+sk.annotate('', xy=(6.9, 3.05), xytext=(0.9, 3.05),
+            arrowprops=dict(arrowstyle='-|>', lw=1.0, color='0.25'))
+sk.text(0.95, 3.32, r'$\times(1{-}R_j)$', fontsize=5.6, color=FS.BLUE)
+sk.annotate('', xy=(0.9, 2.15), xytext=(6.9, 2.15),
+            arrowprops=dict(arrowstyle='-|>', lw=1.0, color='0.25'))
+sk.text(0.95, 1.32, r'$\times(1{-}R_j)$', fontsize=5.6, color=FS.BLUE)
+sk.text(7.15, 1.32, r'$\times R_k$', fontsize=5.6, color='#B87F00')
+sk.text(5.0, 0.32, r'$A_k=R_k\,(1-R_j)^2$', ha='center', fontsize=6.6,
         color='0.15')
 
 # ---------------------------------------------------------------------------
-# (a1-a3) the three regimes, on the spectrum itself
+# (a1) the three regimes merged on one axis: color = case, style = role
 # ---------------------------------------------------------------------------
-nu = np.linspace(-5.0 * SIG, 5.0 * SIG, 1800)
+nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
+CASES = ((0.0, FS.BLUE, 'co-tuned'), (DSTAR, FS.VERM, 'worst'),
+         (400.0, FS.GREEN, 'far'))
+ANN = ((-262, 0.86), (235, 0.66), (455, 0.70))
 shifts = []
-for a, (det, label) in zip(axa, DETS):
-    upstream = R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)
-    two_pass = (1.0 - upstream) ** 2
+for (det, colr, name), (tx, ty) in zip(CASES, ANN):
+    two_pass = (1.0 - R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)) ** 2
     received = wanted * two_pass
-    (amp, mu, sig, base), _ = curve_fit(
+    (amp, mu, sig_, base), _ = curve_fit(
         gaussian, nu, received, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
-    fit = gaussian(nu, amp, mu, sig, base)
     shifts.append(mu)
-
-    a.plot(nu, two_pass, color=FS.BLUE, lw=0.8,
-           label='two-pass transmission $(1-R_j)^2$')
-    a.plot(nu, wanted, color='0.50', lw=1.0, ls=(0, (3, 2)),
-           label='undistorted $R_k(\\lambda)$')
-    a.fill_between(nu, received, wanted, where=wanted >= received,
-                   color=FS.ORANGE, alpha=0.28, lw=0)
-    a.plot(nu, received, color=FS.ORANGE, lw=1.25, label='at the detector, $A_k$')
-    a.plot(nu, fit, color=FS.VERM, lw=0.9, ls=(0, (3, 1.7)),
-           label='Gaussian fit $\\to\\hat\\lambda_{B,k}$')
-    a.axvline(0.0, color='0.45', lw=0.65, ls=(0, (2, 2)))
-    a.axvline(mu, color=FS.VERM, lw=0.75, ls=(0, (2, 2)))
+    pa.plot(nu, two_pass, color=colr, lw=0.85, alpha=0.85, zorder=2)
+    pa.fill_between(nu, received, wanted, where=wanted >= received,
+                    color=colr, alpha=0.16, lw=0, zorder=1)
+    pa.plot(nu, received, color=colr, lw=1.45, zorder=4)
+    pa.axvline(mu, color=colr, lw=0.7, ls=(0, (1.5, 2)), zorder=1)
     lab = ('%.1f' % mu).replace('-0.0', '0.0')
-    if abs(mu) > 1.0:
-        FS.dim_gap(a, 0.0, mu, 1.13,
-                   r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
-                   color=FS.VERM, tail=55.0, side='right', fontsize=6.0)
-        a.annotate('away from $j$', xy=(mu - 14, 0.90),
-                   xytext=(-320, 0.66), fontsize=5.6, color=FS.VERM,
-                   va='center',
-                   arrowprops=dict(arrowstyle='-|>', color=FS.VERM, lw=0.6,
-                                   mutation_scale=6))
-    else:
-        a.text(8.0, 1.13, r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
-               fontsize=6.0, color=FS.VERM, va='center')
-    if det > 1.0:
-        a.text(det, 0.71, '$j$', ha='center', fontsize=6.2, color=FS.BLUE)
-    a.text(0.975, 0.05, label, transform=a.transAxes, ha='right',
-           va='bottom', fontsize=5.9, color='0.25')
-    a.set_xlim(-330, 500)
-    a.set_ylim(0.0, 1.30)
-    a.set_yticks([0, 0.5, 1.0])
-    a.set_xticks([-200, 0, 200, 400])
-    a.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
-axa[0].set_ylabel('normalized reflectance')
-for a in axa[1:]:
-    a.set_yticklabels([])
-handles, labels = axa[0].get_legend_handles_labels()
-fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.995, 1.005),
-           ncol=4, fontsize=5.6, handlelength=1.4,
-           columnspacing=0.9, borderaxespad=0.1)
-print('Fig. 2(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
+    pa.text(tx, ty, name + '\n' + r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
+            fontsize=5.5, color=colr, ha='center', va='center')
+pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.3, zorder=6)
+pa.set_xlim(-330, 560)
+pa.set_ylim(0.0, 1.12)
+pa.set_yticks([0, 0.5, 1.0])
+pa.set_xticks([-200, 0, 200, 400])
+pa.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
+pa.set_ylabel('normalized reflectance')
+roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
+         Line2D([], [], color='0.12', ls=(0, (4, 2.5)), lw=1.3),
+         Line2D([], [], color='0.3', lw=1.45)]
+pa.legend(roles, [r'two-pass transmission $(1-R_j)^2$',
+                  r'undistorted $R_k(\lambda)$',
+                  r'at the detector, $A_k$'],
+          fontsize=5.2, loc='lower right', handlelength=1.5, borderaxespad=0.3)
+print('Fig. 3(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
       '400 pm' % (shifts[0], shifts[1], shifts[2], DSTAR))
 
 # ---------------------------------------------------------------------------
@@ -210,7 +189,7 @@ m.set_xticks([0, 40, 80, 120])
 m.set_yticks([-400, -200, 0, 200, 400])
 m.set_xlabel(r'delay bin $\tau$ (position along fiber)')
 m.set_ylabel(r'detuning $\Delta\lambda_{jk}$ [pm]')
-panel_title(m, 'c', 'the pairs Rule A prices')
+panel_title(m, 'c', 'which pairs Rule A affects')
 
 m.axvline(XK, color='0.45', lw=0.7, ls=(0, (2, 2)))
 for y0 in (dlo, -dhi):
