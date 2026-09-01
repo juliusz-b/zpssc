@@ -150,7 +150,7 @@ for a in axa[1:]:
     a.set_yticklabels([])
 handles, labels = axa[0].get_legend_handles_labels()
 fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(0.995, 1.005),
-           ncol=4, fontsize=5.6, frameon=False, handlelength=1.4,
+           ncol=4, fontsize=5.6, handlelength=1.4,
            columnspacing=0.9, borderaxespad=0.1)
 print('Fig. 2(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
       '400 pm' % (shifts[0], shifts[1], shifts[2], DSTAR))
@@ -196,7 +196,7 @@ b.set_yticks([0, 4, 8])
 b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
 b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
 panel_title(b, 'b', 'Rule A as a placement criterion')
-b.legend(loc='upper right', fontsize=5.7, frameon=False, handlelength=1.5,
+b.legend(loc='upper right', fontsize=5.7, handlelength=1.5,
          labelspacing=0.18, borderaxespad=0.25)
 
 # ---------------------------------------------------------------------------
