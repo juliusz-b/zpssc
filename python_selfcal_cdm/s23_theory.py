@@ -171,7 +171,9 @@ products = {N: k * f for N, (k, f) in table.items()}
 # ---------------------------------------------------------------------------
 # The manuscript places this figure at 0.85 text width, about 6.0 in. Drawing
 # at the final physical width preserves the intended label size in print.
-fig, ax = plt.subplots(1, 3, figsize=(6.0, 1.95))
+fig, axab = plt.subplots(1, 2, figsize=(4.6, 1.95))
+fig2, axc = plt.subplots(figsize=(3.3, 2.3))
+ax = [axab[0], axab[1], axc]
 
 ax[0].plot(Dfr, thc, '-', color='#0072B2', lw=1.3, label='centroid')
 ax[0].plot(Dfr[::2], simc[::2], 'o', color='#0072B2', ms=4, mfc='none',
@@ -197,7 +199,7 @@ ax[1].plot(nu_fine * PM, lawB_fine, '-', color='#D55E00', lw=1.4,
            label='Rule B')
 ax[1].plot(cent * PM, binned_r, 's-', color='#009E73', ms=3.6, lw=1.0,
            mfc='none', label='mean, 2 refs')
-ax[1].set_xlabel(r'grating position in the band  $\nu_k$ [pm]')
+ax[1].set_xlabel(r'position in the band $\nu_k$ [pm]')
 ax[1].set_ylabel('mean bias $\\overline{\\delta\\lambda}(\\nu_k)$ [pm]')
 ax[1].set_title('(b) Rule B and two references', fontsize=8.3)
 ax[1].legend(fontsize=5.7, loc='upper left', ncol=1, frameon=False,
@@ -215,16 +217,19 @@ ax[2].set_xticklabels([str(N) for N in Ns], fontsize=5.8)
 ax[2].minorticks_off()
 ax[2].set_ylim(0, bound / 1e3 * 1.25)
 ax[2].set_xlabel('code length $N$')
-ax[2].set_ylabel(r'capacity-refresh product [10$^3$ sensor$\cdot$Hz]')
-ax[2].set_title(r'(c) Invariant: $N$ cancels', fontsize=8.3)
+ax[2].set_ylabel(r'$K_{\max}\,f_r$ [10$^3$ sensor$\cdot$Hz]')
+ax[2].set_title(r'Invariant: $N$ cancels', fontsize=8.3)
 ax[2].legend(fontsize=5.7, loc='lower left',
              ncol=1, frameon=False, handlelength=1.5, labelspacing=0.16)
 ax[2].grid(True, which='both', alpha=0.25)
 
 fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.17,
                     wspace=0.36)
-fig.savefig('figs/fig_s23_theory.png', dpi=150, bbox_inches='tight')
-fig.savefig('figs/fig_s23_theory.pdf', bbox_inches='tight')
+fig.savefig('figs/fig_s23_rules.png', dpi=300, bbox_inches='tight', pad_inches=0.02)
+fig.savefig('figs/fig_s23_rules.pdf', bbox_inches='tight', pad_inches=0.02)
+fig2.tight_layout(pad=0.3)
+fig2.savefig('figs/fig_s23_bound.png', dpi=300, bbox_inches='tight', pad_inches=0.02)
+fig2.savefig('figs/fig_s23_bound.pdf', bbox_inches='tight', pad_inches=0.02)
 
 # ---------------------------------------------------------------------------
 # printed verification
