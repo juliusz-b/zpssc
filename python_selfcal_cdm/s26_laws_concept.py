@@ -163,14 +163,14 @@ ins.set_ylim(0, 5)
 ins.axis('off')
 ins.plot([0.2, 9.8], [2.5, 2.5], color='black', lw=3.0, solid_capstyle='butt',
          zorder=1)
-EX = [(1.0, FS.VERM, '$k{-}2$', '+150 pm', 'forbidden'),
-      (4.0, FS.GREEN, '$k{-}1$', '0', 'allowed'),
+EX = [(1.0, FS.VERM, '$j{=}k{-}2$', '+150 pm', 'forbidden'),
+      (4.0, FS.GREEN, '$j{=}k{-}1$', '0', 'allowed'),
       (6.1, FS.ORANGE, '$k$', 'read', ''),
       (8.5, FS.GREEN, '$k{+}1$', 'behind', 'allowed')]
 for x0, colr, lab, det, verdict in EX:
     ins.add_patch(Rectangle((x0 - 0.42, 1.75), 0.84, 1.5, facecolor=colr,
                             edgecolor='none', zorder=2))
-    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=4.6,
+    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=4.3,
              color='white', zorder=3, rotation=90)
     ins.text(x0, 1.35, det, ha='center', va='top', fontsize=4.6,
              color=('#B87F00' if colr == FS.ORANGE else colr))
