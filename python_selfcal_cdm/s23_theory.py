@@ -253,4 +253,4 @@ print('  bound: eps*fs/(c_L*n_s*M) = %.0f sensor*Hz per band' % bound)
 for N in Ns:
     print('   N = %4d: K_max * f_r = %.0f  (%.0f%% of the bound)'
           % (N, products[N], 100 * products[N] / bound))
-print('saved figs/fig_s23_theory.png')
+print('saved figs/fig_s23_rules.pdf and figs/fig_s23_bound.pdf')
