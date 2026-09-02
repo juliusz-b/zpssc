@@ -97,7 +97,7 @@ roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
          Line2D([], [], color='0.12', ls=(0, (4, 2.5)), lw=1.3),
          Line2D([], [], color='0.3', lw=1.45)]
 pa.legend(roles, [r'$(1-R_j)^2$', r'$R_k(\lambda)$', r'$A_k$'],
-          fontsize=4.7, loc='upper left', handlelength=1.2, borderaxespad=0.25,
+          fontsize=4.7, loc='lower right', handlelength=1.2, borderaxespad=0.25,
           handletextpad=0.5)
 
 
@@ -170,8 +170,8 @@ EX = [(1.0, FS.VERM, '$k{-}2$', '+150 pm', 'forbidden'),
 for x0, colr, lab, det, verdict in EX:
     ins.add_patch(Rectangle((x0 - 0.42, 1.75), 0.84, 1.5, facecolor=colr,
                             edgecolor='none', zorder=2))
-    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=4.4,
-             color='white', zorder=3)
+    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=4.6,
+             color='white', zorder=3, rotation=90)
     ins.text(x0, 1.35, det, ha='center', va='top', fontsize=4.6,
              color=('#B87F00' if colr == FS.ORANGE else colr))
     if verdict:
