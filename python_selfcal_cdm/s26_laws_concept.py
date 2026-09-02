@@ -54,11 +54,12 @@ def gaussian(x, amp, centre, width, baseline):
     return baseline + amp * np.exp(-0.5 * ((x - centre) / width) ** 2)
 
 
-fig = plt.figure(figsize=(7.1, 2.55))
-gs0 = fig.add_gridspec(1, 2, width_ratios=[1.55, 1.0], wspace=0.30,
-                       left=0.052, right=0.995, bottom=0.17, top=0.90)
+fig = plt.figure(figsize=(7.1, 2.4))
+gs0 = fig.add_gridspec(1, 3, width_ratios=[1.45, 1.0, 1.0], wspace=0.36,
+                       left=0.05, right=0.995, bottom=0.18, top=0.90)
 pa = fig.add_subplot(gs0[0, 0])
 b = fig.add_subplot(gs0[0, 1])
+c = fig.add_subplot(gs0[0, 2])
 
 # ---------------------------------------------------------------------------
 # (a) the three regimes merged on one axis, the light-path sketch as an
@@ -69,7 +70,7 @@ nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
 CASES = ((0.0, FS.BLUE, 'co-tuned'), (DSTAR, FS.VERM, 'worst'),
          (400.0, FS.GREEN, 'far'))
-ANN = ((-250, 0.62), (235, 0.66), (455, 0.70))
+ANN = ((-215, 0.60), (235, 0.66), (470, 0.50))
 shifts = []
 for (det, colr, name), (tx, ty) in zip(CASES, ANN):
     two_pass = (1.0 - R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)) ** 2
@@ -86,10 +87,10 @@ for (det, colr, name), (tx, ty) in zip(CASES, ANN):
     pa.text(tx, ty, name + '\n' + r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
             fontsize=5.5, color=colr, ha='center', va='center')
 pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.3, zorder=6)
-pa.set_xlim(-580, 560)
+pa.set_xlim(-330, 560)
 pa.set_ylim(0.0, 1.12)
 pa.set_yticks([0, 0.5, 1.0])
-pa.set_xticks([-400, -200, 0, 200, 400])
+pa.set_xticks([-200, 0, 200, 400])
 pa.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
 pa.set_ylabel('normalized reflectance')
 roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
@@ -98,29 +99,10 @@ roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
 pa.legend(roles, [r'two-pass transmission $(1-R_j)^2$',
                   r'undistorted $R_k(\lambda)$',
                   r'at the detector, $A_k$'],
-          fontsize=5.0, loc='upper left', bbox_to_anchor=(0.005, 0.985),
-          handlelength=1.5, borderaxespad=0.0)
+          fontsize=4.7, loc='upper left', handlelength=1.2, borderaxespad=0.25,
+          handletextpad=0.5)
 
-sk = pa.inset_axes([0.015, 0.06, 0.27, 0.52])
-sk.set_xlim(0, 10)
-sk.set_ylim(0, 5)
-sk.axis('off')
-sk.plot([0.3, 9.7], [2.6, 2.6], color='black', lw=4.0, solid_capstyle='butt',
-        zorder=1)
-for x0, colr, lab in ((3.6, FS.BLUE, 'FBG$_j$'), (7.0, FS.ORANGE, 'FBG$_k$')):
-    sk.add_patch(Rectangle((x0, 1.7), 1.3, 1.8, facecolor=colr,
-                           edgecolor='none', zorder=2))
-    sk.text(x0 + 0.65, 2.62, lab, ha='center', va='center', fontsize=5.6,
-            color='white', zorder=3)
-sk.annotate('', xy=(6.9, 3.05), xytext=(0.9, 3.05),
-            arrowprops=dict(arrowstyle='-|>', lw=0.9, color='0.25'))
-sk.text(0.95, 3.34, r'$\times(1{-}R_j)$', fontsize=5.2, color=FS.BLUE)
-sk.annotate('', xy=(0.9, 2.15), xytext=(6.9, 2.15),
-            arrowprops=dict(arrowstyle='-|>', lw=0.9, color='0.25'))
-sk.text(0.95, 1.34, r'$\times(1{-}R_j)$', fontsize=5.2, color=FS.BLUE)
-sk.text(7.15, 1.34, r'$\times R_k$', fontsize=5.2, color='#B87F00')
-sk.text(5.0, 0.34, r'$A_k=R_k\,(1-R_j)^2$', ha='center', fontsize=5.6,
-        color='0.15')
+
 print('Fig. 3(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
       '400 pm' % (shifts[0], shifts[1], shifts[2], DSTAR))
 
@@ -128,61 +110,65 @@ print('Fig. 3(a): fitted shifts %.2f, %.2f, %.2f pm at detunings 0, %.0f, '
 # (b) Pairwise bias as a placement rule over the full sensor range
 # ---------------------------------------------------------------------------
 D = np.linspace(0, 700, 1000)
-bias = C_A * R * D * np.exp(-D ** 2 / (3.0 * SIG ** 2))
+bias = -C_A * R * D * np.exp(-D ** 2 / (3.0 * SIG ** 2))      # signed, (8)
 root_fn = lambda x: C_A * R * x * np.exp(-x ** 2 / (3.0 * SIG ** 2)) - EPS
 dlo = brentq(root_fn, 1.0, DSTAR)
 dhi = brentq(root_fn, DSTAR, 700.0)
 half_fn = (lambda x: C_A * R * x * np.exp(-x ** 2 / (3.0 * SIG ** 2))
-           - 0.5 * bias.max())
+           + 0.5 * bias.min())
 hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35, label='Rule A, $\\delta\\lambda_{k\\leftarrow j}$')
-b.axhline(EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
+b.plot(D, bias, color=FS.VERM, lw=1.35, label='Rule A, (8)')
+# the full two-pass model with an unrestricted Gaussian fit, as markers
+Dm = np.linspace(25.0, 625.0, 13)
+mod = []
+for d in Dm:
+    rec = wanted * (1.0 - R * np.exp(-0.5 * ((nu - d) / SIG) ** 2)) ** 2
+    (amp, mu, sg_, base), _ = curve_fit(
+        gaussian, nu, rec, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
+    mod.append(mu)
+b.plot(Dm, mod, 's', ms=3.6, mfc='none', mec=FS.VERM, mew=0.9, ls='none',
+       label='full model')
+b.axhline(-EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
           label='tolerance $\\epsilon=1$ pm')
-b.legend(loc='upper right', bbox_to_anchor=(0.985, 0.295), fontsize=5.4,
-         handlelength=1.6, labelspacing=0.2, borderaxespad=0.0)
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
-b.plot(DSTAR, bias.max(), 'o', color=FS.VERM, ms=3.5)
-b.text(150, 9.48,
-       'maximum $0.81R\\sigma$\nat $\\sigma\\sqrt{3/2}$',
-       fontsize=5.4, color=FS.VERM, va='top', ha='left')
+b.plot(DSTAR, bias.min(), 'o', color=FS.VERM, ms=3.5)
+b.text(150, -9.45, 'min. $-0.81R\\sigma$',
+       fontsize=5.0, color=FS.VERM, va='bottom', ha='left')
 
 forb = (dlo, dhi)
 safe = (dhi + 18.0, 690.0)
-b.plot(forb, [-0.62, -0.62], color=FS.VERM, lw=8.0,
+b.plot(forb, [0.62, 0.62], color=FS.VERM, lw=8.0,
        solid_capstyle='butt', clip_on=False)
-b.text(np.mean(forb), -0.62, 'forbidden', ha='center', va='center',
+b.text(np.mean(forb), 0.62, 'forbidden', ha='center', va='center',
        fontsize=5.8, color='white', clip_on=False)
-b.plot(safe, [-0.62, -0.62], color=FS.GREEN, lw=8.0,
+b.plot(safe, [0.62, 0.62], color=FS.GREEN, lw=8.0,
        solid_capstyle='butt', clip_on=False)
-b.text(np.mean(safe), -0.62, 'allowed', ha='center', va='center',
+b.text(np.mean(safe), 0.62, 'allowed', ha='center', va='center',
        fontsize=5.8, color='white', clip_on=False)
 
 b.set_xlim(0, 700)
-b.set_ylim(-1.15, 9.55)
-b.set_yticks([0, 4, 8])
-b.set_xlabel(r'pair detuning $|\Delta\lambda_{jk}|$ [pm]')
-b.set_ylabel(r'pairwise bias $|\delta\lambda_{k\leftarrow j}|$ [pm]')
+b.set_ylim(-9.55, 1.15)
+b.set_yticks([-8, -4, 0])
+b.set_xlabel(r'pair detuning $\Delta\lambda_{jk}$ [pm]')
+b.set_ylabel(r'pairwise bias $\delta\lambda_{k\leftarrow j}$ [pm]')
 panel_title(b, 'b', 'Rule A as a placement criterion')
+b.legend(loc='upper right', bbox_to_anchor=(0.99, 0.58), fontsize=5.0,
+         handlelength=1.6, labelspacing=0.18, borderaxespad=0.0)
 
-
-# ---------------------------------------------------------------------------
-# (c) who is priced by Rule A: the address plane of one grating
-# ---------------------------------------------------------------------------
-ins = b.inset_axes([0.40, 0.44, 0.58, 0.50])
+ins = b.inset_axes([0.46, 0.05, 0.52, 0.46])
 ins.set_xlim(0, 10)
 ins.set_ylim(0, 5)
 ins.axis('off')
 ins.plot([0.2, 9.8], [2.5, 2.5], color='black', lw=3.0, solid_capstyle='butt',
          zorder=1)
-EX = [(1.0, FS.VERM, '$j_1$', '+150 pm', 'biases $k$'),
-      (3.0, FS.GREEN, '$j_2$', '0 pm', 'safe'),
-      (5.0, FS.GREEN, '$j_3$', '+400 pm', 'safe'),
-      (7.0, FS.ORANGE, '$k$', 'read', ''),
-      (9.0, FS.GREEN, '$d$', 'behind $k$', 'safe')]
+EX = [(1.3, FS.VERM, '$j_1$', '+150 pm', 'biases $k$'),
+      (3.7, FS.GREEN, '$j_2$', '0', 'safe'),
+      (6.1, FS.ORANGE, '$k$', 'read', ''),
+      (8.5, FS.GREEN, '$d$', 'behind', 'safe')]
 for x0, colr, lab, det, verdict in EX:
     ins.add_patch(Rectangle((x0 - 0.42, 1.75), 0.84, 1.5, facecolor=colr,
                             edgecolor='none', zorder=2))
@@ -198,8 +184,26 @@ ins.annotate('', xy=(9.6, 0.5), xytext=(0.4, 0.5),
                              mutation_scale=6))
 ins.text(5.0, 0.1, 'from the laser', ha='center', va='top', fontsize=4.6,
          color='0.4')
-ins.text(5.0, 4.9, r'example: detuning of each grating from $k$',
+ins.text(5.0, 4.9, r'example: detuning from $k$',
          ha='center', va='top', fontsize=4.8, color='0.25')
+
+# ---------------------------------------------------------------------------
+# (c) Rule B against the model: layouts, their mean, the closed form, and the
+# mean after two references. Data computed by s23_theory.py (s23_ruleB.npz).
+# ---------------------------------------------------------------------------
+dat = np.load('figs/s23_ruleB.npz')
+c.plot(dat['pos'], dat['err'], '.', ms=2, color='0.75', alpha=0.5)
+c.plot(dat['cent'], dat['binned'], 'o', color=FS.BLUE, ms=4.5,
+       label='mean, no refs')
+c.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.VERM, lw=1.4,
+       label='Rule B')
+c.plot(dat['cent'], dat['binned_r'], 's-', color=FS.GREEN, ms=3.4, lw=1.0,
+       mfc='none', label='mean, 2 refs')
+c.set_xlabel(r'position in the band $\nu_k$ [pm]')
+c.set_ylabel(r'mean bias $\overline{\delta\lambda}(\nu_k)$ [pm]')
+panel_title(c, 'c', 'Rule B and two references')
+c.legend(fontsize=5.2, loc='upper left', handlelength=1.6, labelspacing=0.18,
+         borderaxespad=0.3)
 
 fig.savefig('figs/fig_s26_laws_concept.pdf', bbox_inches='tight',
             pad_inches=0.025)

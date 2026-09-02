@@ -154,6 +154,10 @@ lawB = pref * (np.exp(-(W - cent) ** 2 / (4 * SIG ** 2)) -
 nu_fine = np.linspace(-W, W, 300)
 lawB_fine = pref * (np.exp(-(W - nu_fine) ** 2 / (4 * SIG ** 2)) -
                     np.exp(-(W + nu_fine) ** 2 / (4 * SIG ** 2))) * PM
+# Rule B panel data, consumed by s26_laws_concept.py (Fig. 3c of the paper)
+np.savez('figs/s23_ruleB.npz', pos=pos * PM, err=err, cent=cent * PM,
+         binned=binned, binned_r=binned_r, nu_fine=nu_fine * PM,
+         lawB_fine=lawB_fine, rms_raw=rms_raw, rms_ref=rms_ref)
 
 # ---------------------------------------------------------------------------
 # INEQUALITY C check against the design table
@@ -225,8 +229,6 @@ ax[2].grid(True, which='both', alpha=0.25)
 
 fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.17,
                     wspace=0.36)
-fig.savefig('figs/fig_s23_rules.png', dpi=300, bbox_inches='tight', pad_inches=0.02)
-fig.savefig('figs/fig_s23_rules.pdf', bbox_inches='tight', pad_inches=0.02)
 fig2.tight_layout(pad=0.3)
 fig2.savefig('figs/fig_s23_bound.png', dpi=300, bbox_inches='tight', pad_inches=0.02)
 fig2.savefig('figs/fig_s23_bound.pdf', bbox_inches='tight', pad_inches=0.02)
@@ -253,4 +255,4 @@ print('  bound: eps*fs/(c_L*n_s*M) = %.0f sensor*Hz per band' % bound)
 for N in Ns:
     print('   N = %4d: K_max * f_r = %.0f  (%.0f%% of the bound)'
           % (N, products[N], 100 * products[N] / bound))
-print('saved figs/fig_s23_rules.pdf and figs/fig_s23_bound.pdf')
+print('saved figs/fig_s23_bound.pdf and figs/s23_ruleB.npz')
