@@ -54,14 +54,11 @@ def gaussian(x, amp, centre, width, baseline):
     return baseline + amp * np.exp(-0.5 * ((x - centre) / width) ** 2)
 
 
-fig = plt.figure(figsize=(7.1, 4.15))
-gs0 = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.12], hspace=0.55,
-                       left=0.052, right=0.995, bottom=0.095, top=0.955)
-top = gs0[0].subgridspec(1, 1)
-bot = gs0[1].subgridspec(1, 2, width_ratios=[1.0, 1.0], wspace=0.28)
-pa = fig.add_subplot(top[0, 0])
-b = fig.add_subplot(bot[0, 0])
-c = fig.add_subplot(bot[0, 1])
+fig = plt.figure(figsize=(7.1, 2.55))
+gs0 = fig.add_gridspec(1, 2, width_ratios=[1.55, 1.0], wspace=0.30,
+                       left=0.052, right=0.995, bottom=0.17, top=0.90)
+pa = fig.add_subplot(gs0[0, 0])
+b = fig.add_subplot(gs0[0, 1])
 
 # ---------------------------------------------------------------------------
 # (a) the three regimes merged on one axis, the light-path sketch as an
@@ -72,7 +69,7 @@ nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
 CASES = ((0.0, FS.BLUE, 'co-tuned'), (DSTAR, FS.VERM, 'worst'),
          (400.0, FS.GREEN, 'far'))
-ANN = ((-262, 0.86), (235, 0.66), (455, 0.70))
+ANN = ((-250, 0.62), (235, 0.66), (455, 0.70))
 shifts = []
 for (det, colr, name), (tx, ty) in zip(CASES, ANN):
     two_pass = (1.0 - R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)) ** 2
@@ -101,9 +98,10 @@ roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
 pa.legend(roles, [r'two-pass transmission $(1-R_j)^2$',
                   r'undistorted $R_k(\lambda)$',
                   r'at the detector, $A_k$'],
-          fontsize=5.2, loc='lower right', handlelength=1.5, borderaxespad=0.3)
+          fontsize=5.0, loc='upper left', bbox_to_anchor=(0.005, 0.985),
+          handlelength=1.5, borderaxespad=0.0)
 
-sk = pa.inset_axes([0.015, 0.06, 0.235, 0.50])
+sk = pa.inset_axes([0.015, 0.06, 0.27, 0.52])
 sk.set_xlim(0, 10)
 sk.set_ylim(0, 5)
 sk.axis('off')
@@ -174,81 +172,34 @@ panel_title(b, 'b', 'Rule A as a placement criterion')
 # ---------------------------------------------------------------------------
 # (c) who is priced by Rule A: the address plane of one grating
 # ---------------------------------------------------------------------------
-XK = 80.0
-YLIM = 430.0
-m = b.inset_axes([0.50, 0.42, 0.48, 0.52])
-m.set_xlim(0, 127)
-m.set_ylim(-YLIM, YLIM)
-m.set_xticks([0, 80])
-m.set_yticks([-400, 0, 400])
-m.tick_params(labelsize=5.0, length=2.6, width=1.0, pad=1.5)
-m.set_xlabel(r'delay bin $\tau$', fontsize=5.2, labelpad=1.0)
-m.set_ylabel(r'$\Delta\lambda_{jk}$ [pm]', fontsize=5.2, labelpad=0.5)
-
-m.axvline(XK, color='0.45', lw=0.6, ls=(0, (2, 2)))
-for y0 in (dlo, -dhi):
-    m.add_patch(Rectangle((0.0, y0), XK, dhi - dlo,
-                          color=FS.VERM, alpha=0.13, lw=0))
-m.plot(XK, 0.0, 'v', ms=4.0, color=FS.ORANGE)
-m.text(XK + 4, -150.0, '$k$, read', ha='left', fontsize=4.6, color='#B87F00')
-
-up_hit = [(10.0, 150.0), (33.0, -230.0), (58.0, 305.0)]
-up_safe = [(20.0, 4.0), (44.0, -380.0)]
-down = [(97.0, 140.0), (108.0, -260.0), (120.0, 30.0)]
-m.plot([x for x, _ in up_hit], [y for _, y in up_hit], 'v', ms=3.4,
-       color=FS.VERM, ls='none')
-m.plot([x for x, _ in up_safe + down], [y for _, y in up_safe + down],
-       'v', ms=3.4, color=FS.GREEN, ls='none')
-m.text(38.0, 358.0, 'shadows $k$', ha='center', fontsize=4.6, color=FS.VERM,
-       bbox=dict(fc='white', ec='none', pad=0.4, alpha=0.85))
-m.text(100.0, -365.0, 'downstream: safe', ha='center', va='center',
-       fontsize=4.6, color=FS.GREEN)
-
-# ---------------------------------------------------------------------------
-# (d) Rule B is an axis stretch, removed by two reference anchors
-# ---------------------------------------------------------------------------
-for sp in ('top', 'right', 'left'):
-    c.spines[sp].set_visible(False)
-c.set_yticks([])
-c.set_xticks([-180, -90, 0, 90, 180])
-c.tick_params(axis='x', labelsize=6.0, length=2.2, width=0.6)
-c.set_xlabel(r'position in the band $\nu_k=\lambda_{B,k}-\lambda_0$ [pm]')
-c.set_xlim(-300, 275)
-c.set_ylim(-0.32, 3.08)
-panel_title(c, 'c', 'Rule B: an axis stretch, two references remove it')
-
-W = 180.0
-K, N = 32, 127
-stretch = 1.0 + (K - 1) / N
-true = np.linspace(-W, W, 7)
-read = true * stretch
-rows = [(2.30, true, 'true', '0.35'),
-        (0.86, read, 'read, Rule B', FS.VERM)]
-
-for y0, values, label, col in rows:
-    c.plot([-235, 235], [y0, y0], color='0.78', lw=0.75)
-    for q, x0 in enumerate(values):
-        is_ref = q in (0, len(values) - 1)
-        tick_col = FS.BLUE if is_ref else col
-        c.plot([x0, x0], [y0 - 0.16, y0 + 0.16], color=tick_col,
-               lw=2.1 if is_ref else 1.15)
-    c.text(-262, y0, label, ha='right', va='center', fontsize=6.2,
-           color=col)
-
-for x0, xr in zip(true, read):
-    if abs(x0) < 1.0:
-        continue
-    c.add_patch(FancyArrowPatch((x0, 2.10), (xr, 1.06),
-                                arrowstyle='-|>', mutation_scale=5,
-                                color=FS.VERM, lw=0.6, alpha=0.75))
-c.text(-W, 2.72, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
-c.text(W, 2.72, 'ref.', ha='center', fontsize=5.8, color=FS.BLUE)
-c.text(0.0, 1.56, 'every grating pulled outward by $1+(K-1)/N$',
-       ha='center', fontsize=5.7, color=FS.VERM,
-       bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.9))
-c.text(0.0, 0.26,
-       'two anchored references (blue) measure the stretch and take it out',
-       ha='center', fontsize=5.4, color=FS.BLUE)
+ins = b.inset_axes([0.40, 0.44, 0.58, 0.50])
+ins.set_xlim(0, 10)
+ins.set_ylim(0, 5)
+ins.axis('off')
+ins.plot([0.2, 9.8], [2.5, 2.5], color='black', lw=3.0, solid_capstyle='butt',
+         zorder=1)
+EX = [(1.0, FS.VERM, '$j_1$', '+150 pm', 'biases $k$'),
+      (3.0, FS.GREEN, '$j_2$', '0 pm', 'safe'),
+      (5.0, FS.GREEN, '$j_3$', '+400 pm', 'safe'),
+      (7.0, FS.ORANGE, '$k$', 'read', ''),
+      (9.0, FS.GREEN, '$d$', 'behind $k$', 'safe')]
+for x0, colr, lab, det, verdict in EX:
+    ins.add_patch(Rectangle((x0 - 0.42, 1.75), 0.84, 1.5, facecolor=colr,
+                            edgecolor='none', zorder=2))
+    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=5.2,
+             color='white', zorder=3)
+    ins.text(x0, 1.35, det, ha='center', va='top', fontsize=4.6,
+             color=('#B87F00' if colr == FS.ORANGE else colr))
+    if verdict:
+        ins.text(x0, 3.55, verdict, ha='center', va='bottom', fontsize=4.6,
+                 color=colr)
+ins.annotate('', xy=(9.6, 0.5), xytext=(0.4, 0.5),
+             arrowprops=dict(arrowstyle='-|>', lw=0.7, color='0.4',
+                             mutation_scale=6))
+ins.text(5.0, 0.1, 'from the laser', ha='center', va='top', fontsize=4.6,
+         color='0.4')
+ins.text(5.0, 4.9, r'example: detuning of each grating from $k$',
+         ha='center', va='top', fontsize=4.8, color='0.25')
 
 fig.savefig('figs/fig_s26_laws_concept.pdf', bbox_inches='tight',
             pad_inches=0.025)
