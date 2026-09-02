@@ -170,12 +170,12 @@ for d, col in [(0.5, '#D55E00'), (2.0, '#0072B2'), (4.0, '#009E73')]:
 ax0.axhline(10.0, color='0.3', ls='--', lw=0.8)
 # zapas, zeby kreska kryterium dla 0,5 m nie siadala na ramce
 ax0.set_xlim(0.85 * Bs.min() / 1e6, 300.0)
-ax0.set_ylim(1.45, 220.0)
+ax0.set_ylim(1.45, 700.0)
 ax0.set_xlabel('chip rate $B$ [Mchip/s]')
 ax0.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
-ax0.legend(fontsize=5.8, loc='lower left',
-           ncol=3, frameon=False, handlelength=1.4, columnspacing=0.8)
-ax0.grid(True, which='both', alpha=0.25)
+ax0.legend(fontsize=5.8, loc='upper right',
+           ncol=1, frameon=True, handlelength=1.4, columnspacing=0.8)
+ax0.grid(False, which='both', alpha=0.25)
 fig.subplots_adjust(left=0.18, right=0.99, top=0.97, bottom=0.16)
 plt.savefig('figs/fig_s13_chiprate.png', dpi=140)
 plt.savefig('figs/fig_s13_chiprate.pdf')

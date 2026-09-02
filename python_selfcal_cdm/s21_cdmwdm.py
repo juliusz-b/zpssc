@@ -154,7 +154,7 @@ axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 axc.set_ylim(0, max(vals) * 1.22)
 axc.set_title('(b) Banding resets the error chain', fontsize=9)
 axc.set_axisbelow(True)      # siatka pod slupkami, nie na nich
-axc.grid(True, axis='y', alpha=0.25)
+axc.grid(False, axis='y', alpha=0.25)
 
 fig.tight_layout()
 fig.savefig('figs/fig_s21_cdmwdm.png', dpi=150, bbox_inches='tight')

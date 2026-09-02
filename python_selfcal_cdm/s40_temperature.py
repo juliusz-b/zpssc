@@ -106,7 +106,7 @@ ax.set_ylim(-21, 21)
 ax.set_aspect('equal')
 ax.set_xlabel('true change $\\Delta T$ [K]', labelpad=1.5)
 ax.set_ylabel('recovered change $\\Delta\\hat T$ [K]', labelpad=1.5)
-ax.grid(True, alpha=0.22)
+ax.grid(False, alpha=0.22)
 ax.set_axisbelow(True)
 
 handles = [
@@ -118,7 +118,7 @@ handles = [
     Line2D([], [], color='0.25', lw=0.8, ls=(0, (4, 2)),
            label='recovered $=$ true'),
 ]
-ax.legend(handles=handles, fontsize=5.3, loc='upper left', frameon=False,
+ax.legend(handles=handles, fontsize=5.3, loc='upper left', frameon=True,
           handlelength=1.5, labelspacing=0.22, borderaxespad=0.25)
 
 fig.subplots_adjust(left=0.135, right=0.99, top=0.99, bottom=0.115)

@@ -136,7 +136,7 @@ ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
                arrowprops=dict(arrowstyle='<->', lw=0.9, color='#0072B2'))
 ax[0].text(1.72, 0.5, r'$\Delta\lambda_{\mathrm{ch}}$', color='#0072B2', fontsize=8.0, ha='left',
            va='center')
-ax[0].grid(True, alpha=0.2)
+ax[0].grid(False, alpha=0.2)
 
 # --- (b) -------------------------------------------------------------------
 ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='$R_k(\\lambda)$, no chirp')
@@ -157,13 +157,13 @@ ax[1].axvline(p_chirp / 1000.0, color='#D55E00', ls=':', lw=0.9)
 FS.dim_gap(ax[1], p_true / 1000.0, p_chirp / 1000.0, 1.10,
            '%.0f pm' % abs(p_chirp - p_true), color='0.2',
            tail=0.13, side='left')
-ax[1].set_ylim(0, 1.28)
+ax[1].set_ylim(0, 1.62)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 ax[1].set_title('(b) FM-to-AM through the kernel $p(\\xi)$', fontsize=9)
-ax[1].legend(fontsize=5.8, loc='lower right',
-             ncol=1, frameon=False, handlelength=1.5, columnspacing=0.8,
+ax[1].legend(fontsize=5.8, loc='upper right',
+             ncol=1, frameon=True, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.18, borderaxespad=0.25)
 
 # --- (c) -------------------------------------------------------------------
@@ -177,10 +177,11 @@ ax[2].set_yscale('log')
 ax[2].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[2].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 ax[2].set_title('(c) What the references remove', fontsize=9)
-ax[2].legend(fontsize=5.8, loc='lower right',
-             ncol=2, frameon=False, handlelength=1.5, columnspacing=0.8,
+ax[2].set_ylim(0.5, 3000)
+ax[2].legend(fontsize=5.8, loc='upper left',
+             ncol=2, frameon=True, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.15)
-ax[2].grid(True, which='both', alpha=0.25)
+ax[2].grid(False, which='both', alpha=0.25)
 
 fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.17,
                     wspace=0.34)

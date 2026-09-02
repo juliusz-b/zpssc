@@ -109,12 +109,12 @@ for col, k in enumerate(SHOW):
     a.set_ylim(0, 0.132)
     a.set_yticks([0, 0.05, 0.10])
     a.set_xlabel('wavelength offset [nm]', labelpad=1.5)
-    a.grid(True, alpha=0.2)
+    a.grid(False, alpha=0.2)
     a.set_axisbelow(True)
     if col:
         a.set_yticklabels([])
 ax[0].set_ylabel('reflectance', labelpad=1.5)
-ax[1].legend(fontsize=5.5, loc='upper right', frameon=False,
+ax[0].legend(fontsize=5.5, loc='center right', frameon=True,
              handlelength=1.5, labelspacing=0.18, borderaxespad=0.22)
 
 # --- the ghost term on its own, at the scale it actually has --------------
@@ -127,22 +127,22 @@ a.plot(lam, ghost_u[7], color=VERM, lw=1.2,
 a.plot(lam, ghost_r[7], color=BLUE, lw=1.2,
        label='$+$ summed $P_g$, randomized')
 a.set_yscale('log')
-a.set_ylim(3e-7, 0.6)
+a.set_ylim(1e-8, 0.6)
 a.set_xlim(-0.52, 0.52)
 a.set_xlabel('wavelength offset [nm]', labelpad=1.5)
 a.set_ylabel('reflectance', labelpad=1.5)
 a.text(-0.5, 0.30, 'grating 8: what ghosts add on top', fontsize=6.2,
        color='0.2', va='top',
        bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.8))
-a.text(-0.5, 0.105, 'drawn alone, log scale: added to'
-       '\n' 'the line they would vanish under it', fontsize=5.2,
+a.text(-0.5, 0.105, 'drawn alone, log scale',
+       fontsize=5.2,
        color='0.4', va='top',
        bbox=dict(fc='white', ec='none', pad=0.6, alpha=0.8))
-leg = a.legend(fontsize=5.2, loc='lower left', frameon=True,
+leg = a.legend(fontsize=5.2, loc='lower center', frameon=True,
                framealpha=0.85, edgecolor='none', handlelength=1.3,
                labelspacing=0.18, borderaxespad=0.2)
 leg.set_zorder(7)
-a.grid(True, which='both', alpha=0.2)
+a.grid(False, which='both', alpha=0.2)
 a.set_axisbelow(True)
 
 fig.subplots_adjust(left=0.062, right=0.995, top=0.975, bottom=0.205,

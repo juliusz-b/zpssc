@@ -272,7 +272,7 @@ ax[0].set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 ax[0].set_title(r'(a) Error mechanisms vs array size, $R = %.0f\%%$'
                 % (R_A * 100))
 handles0, labels0 = ax[0].get_legend_handles_labels()
-ax[0].grid(True, which='both', alpha=0.25)
+ax[0].grid(False, which='both', alpha=0.25)
 
 ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#D55E00', label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#0072B2', label='randomized')
@@ -283,11 +283,11 @@ ax[1].set_ylim(0, 58)
 ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 ax[1].set_title('(b) Capacity vs reflectivity')
-ax[1].grid(True, which='both', alpha=0.25)
+ax[1].grid(False, which='both', alpha=0.25)
 ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
-             frameon=False, handlelength=1.5, columnspacing=0.7,
+             frameon=True, handlelength=1.5, columnspacing=0.7,
              labelspacing=0.16, borderaxespad=0.25)
-ax[1].legend(fontsize=5.8, loc='lower left', frameon=False,
+ax[1].legend(fontsize=5.8, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
 fig.subplots_adjust(left=0.075, right=0.99, top=0.88, bottom=0.17, wspace=0.30)
 plt.savefig('figs/fig_s12_capacity.png', dpi=140)

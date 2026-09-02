@@ -181,7 +181,7 @@ axb.set_xticks([-180, 0, 180])
 axb.set_xlabel('band position [pm]', labelpad=1.5)
 axb.set_ylabel('reported axis error [pm]', labelpad=1.5)
 axb.set_title('(b) inline references misread the axis', fontsize=7.0)
-axb.legend(fontsize=5.2, loc='upper left', frameon=False, handlelength=1.5,
+axb.legend(fontsize=5.2, loc='upper left', frameon=True, handlelength=1.5,
            labelspacing=0.18, borderaxespad=0.2)
 
 # ==========================================================================
@@ -199,9 +199,9 @@ axc.set_ylim(0, 7.5)
 axc.set_xlabel('reference reflectivity [%]', labelpad=1.5)
 axc.set_ylabel('RMS sensor error [pm]', labelpad=1.5)
 axc.set_title('(c) what the fit leaves', fontsize=7.0)
-axc.legend(fontsize=5.2, loc='upper left', frameon=False, handlelength=1.6,
+axc.legend(fontsize=5.2, loc='upper left', frameon=True, handlelength=1.6,
            labelspacing=0.2, borderaxespad=0.25)
-axc.grid(True, which='both', alpha=0.22)
+axc.grid(False, which='both', alpha=0.22)
 
 os.makedirs('figs', exist_ok=True)
 fig.savefig('figs/fig_s38_references.pdf', bbox_inches='tight',

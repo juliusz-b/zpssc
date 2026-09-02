@@ -226,8 +226,8 @@ ax.set_xticks(x)
 ax.set_xlabel('sensor, in fiber order', labelpad=1.5)
 ax.set_ylabel('temperature error [K]', labelpad=1.5)
 ax.set_xlim(0.4, K + 0.6)
-ax.set_ylim(-2.55, 5.0)
-ax.grid(True, axis='y', alpha=0.22)
+ax.set_ylim(-2.55, 5.6)
+ax.grid(False, axis='y', alpha=0.22)
 ax.set_axisbelow(True)
 ax.text(0.5, 1.10, '1 K', fontsize=5.6, color='0.25', va='bottom')
 
@@ -240,7 +240,7 @@ handles += [Patch(facecolor='0.7', hatch='/////', edgecolor='white',
             Line2D([], [], ls='none', marker='x', color='0.10', ms=4.6,
                    mew=1.1, label='net error')]
 ax.legend(handles=handles, fontsize=5.2, loc='upper left', ncol=2,
-          frameon=False, handlelength=1.2, columnspacing=0.8,
+          frameon=True, handlelength=1.2, columnspacing=0.8,
           labelspacing=0.2, borderaxespad=0.25, handleheight=0.9)
 
 fig.subplots_adjust(left=0.13, right=0.99, top=0.985, bottom=0.14)

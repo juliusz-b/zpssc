@@ -213,15 +213,15 @@ ax[1].plot(nuc * PM / 1000.0, np.abs(leak), color='0.45', lw=1.2,
            label=r'$|L_k|$, m-sequence side lobe $1/N$')
 ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
            color='#D55E00', lw=1.2, ls='--', label=r'$|L_k|$, Gold side lobe $17/N$')
-ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 0.2)
+ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 3.0)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
 ax[1].set_title('(b) Side-lobe leakage, $K = %d$' % Kc, fontsize=8.1)
-ax[1].grid(True, which='both', alpha=0.2)
+ax[1].grid(False, which='both', alpha=0.2)
 # legenda w pustym lewym gornym rogu, a nie pod osiami: pod osiami
 # zabierala ponad jedna trzecia wysokosci calej figury
 # dol posrodku: trzy kolumny mieszcza sie pod dzwonami, a gorny rog
 # zostaje wolny dla samych krzywych
-ax[1].legend(fontsize=5.2, loc='lower center', ncol=1, frameon=False,
+ax[1].legend(fontsize=5.2, loc='upper left', ncol=1, frameon=True,
              handlelength=1.4, labelspacing=0.2, borderaxespad=0.3)
 
 fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
