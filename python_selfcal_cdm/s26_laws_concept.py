@@ -96,9 +96,7 @@ pa.set_ylabel('normalized reflectance')
 roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
          Line2D([], [], color='0.12', ls=(0, (4, 2.5)), lw=1.3),
          Line2D([], [], color='0.3', lw=1.45)]
-pa.legend(roles, [r'two-pass transmission $(1-R_j)^2$',
-                  r'undistorted $R_k(\lambda)$',
-                  r'at the detector, $A_k$'],
+pa.legend(roles, [r'$(1-R_j)^2$', r'$R_k(\lambda)$', r'$A_k$'],
           fontsize=4.7, loc='upper left', handlelength=1.2, borderaxespad=0.25,
           handletextpad=0.5)
 
@@ -154,7 +152,7 @@ b.set_xlim(0, 700)
 b.set_ylim(-9.55, 1.15)
 b.set_yticks([-8, -4, 0])
 b.set_xlabel(r'pair detuning $\Delta\lambda_{jk}$ [pm]')
-b.set_ylabel(r'pairwise bias $\delta\lambda_{k\leftarrow j}$ [pm]')
+b.set_ylabel(r'$\delta\lambda_{k\leftarrow j}$ [pm]')
 panel_title(b, 'b', 'Rule A as a placement criterion')
 b.legend(loc='upper right', bbox_to_anchor=(0.99, 0.58), fontsize=5.0,
          handlelength=1.6, labelspacing=0.18, borderaxespad=0.0)
@@ -165,19 +163,19 @@ ins.set_ylim(0, 5)
 ins.axis('off')
 ins.plot([0.2, 9.8], [2.5, 2.5], color='black', lw=3.0, solid_capstyle='butt',
          zorder=1)
-EX = [(1.3, FS.VERM, '$j_1$', '+150 pm', 'biases $k$'),
-      (3.7, FS.GREEN, '$j_2$', '0', 'safe'),
+EX = [(1.0, FS.VERM, '$k{-}2$', '+150 pm', 'forbidden'),
+      (4.0, FS.GREEN, '$k{-}1$', '0', 'allowed'),
       (6.1, FS.ORANGE, '$k$', 'read', ''),
-      (8.5, FS.GREEN, '$d$', 'behind', 'safe')]
+      (8.5, FS.GREEN, '$k{+}1$', 'behind', 'allowed')]
 for x0, colr, lab, det, verdict in EX:
     ins.add_patch(Rectangle((x0 - 0.42, 1.75), 0.84, 1.5, facecolor=colr,
                             edgecolor='none', zorder=2))
-    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=5.2,
+    ins.text(x0, 2.5, lab, ha='center', va='center', fontsize=4.4,
              color='white', zorder=3)
     ins.text(x0, 1.35, det, ha='center', va='top', fontsize=4.6,
              color=('#B87F00' if colr == FS.ORANGE else colr))
     if verdict:
-        ins.text(x0, 3.55, verdict, ha='center', va='bottom', fontsize=4.6,
+        ins.text(x0, 3.55, verdict, ha='center', va='bottom', fontsize=4.2,
                  color=colr)
 ins.annotate('', xy=(9.6, 0.5), xytext=(0.4, 0.5),
              arrowprops=dict(arrowstyle='-|>', lw=0.7, color='0.4',
