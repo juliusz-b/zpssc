@@ -12,16 +12,16 @@ figures of the paper.
       returns and the third-order path (a,b,c) are drawn in full, the other
       four third-order paths as thin lines. Every ghost carries the colour of
       the grating of its first reflection, greyed.
-  (b) The same delays as bars: three direct returns of power ~ R and five
-      third-order paths of power ~ R^3. The spacing is non-uniform on purpose
-      so that the ghosts do not collide, except the pair (a,b,c)/(c,b,a),
-      which share one delay for any spacing.
-  (c) The delay profile of the same three gratings in the time-domain model:
+  (b) The delay profile of the same three gratings in the time-domain model:
       z = 8, 19.2, 40 m (the ratios of (a)), R = 10 %, unipolar m-sequence
-      N = 127 at 25 Mchip/s (Table III), every path up to the third order, record mean
-      removed, correlation with the bipolar replica, constant offset of the
-      periodic correlation subtracted. Linear scale, so that the ghosts
-      show how low they sit under the direct returns.
+      N = 127 at 25 Mchip/s (Table III), every path up to the third order,
+      record mean removed, correlation with the bipolar replica, constant
+      offset of the periodic correlation subtracted, linear scale. Behind the
+      curve, a coloured bar marks every arrival with its delay: three direct
+      returns of power ~ R and five third-order paths of power ~ R^3, bar
+      heights not to scale. The spacing is non-uniform on purpose so that the
+      ghosts do not collide, except the pair (a,b,c)/(c,b,a), which share one
+      delay for any spacing.
 """
 import os
 import numpy as np
@@ -82,12 +82,11 @@ GHOST_LABELS = {2 * TC - TB: r'$2\tau_c{-}\tau_b$',
                 2 * TA - TC: r'$2\tau_a{-}\tau_c$',
                 2 * TA - TB: r'$2\tau_a{-}\tau_b$'}
 
-fig = plt.figure(figsize=(3.45, 3.75))
-gs = fig.add_gridspec(2, 2, height_ratios=[1.5, 1.0], width_ratios=[1.0, 1.0],
-                      hspace=0.22, wspace=0.32, left=0.075, right=0.985, bottom=0.115, top=0.95)
-ax = fig.add_subplot(gs[0, :])
-bx = fig.add_subplot(gs[1, 0])
-cx = fig.add_subplot(gs[1, 1])
+fig = plt.figure(figsize=(3.45, 3.6))
+gs = fig.add_gridspec(2, 1, height_ratios=[1.5, 1.0],
+                      hspace=0.2, left=0.075, right=0.985, bottom=0.11, top=0.95)
+ax = fig.add_subplot(gs[0, 0])
+cx = fig.add_subplot(gs[1, 0])
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
@@ -166,34 +165,7 @@ ax.spines['bottom'].set_color('0.3')
 ax.spines['bottom'].set_position(('data', 0))
 ax.spines['bottom'].set_bounds(0, TMAX)
 
-# ---------------- (b) arrivals as bars ---------------------------------------
-H_DIR, H_GH = 1.0, 0.33
-for g in 'bca':
-    bx.plot([T[g], T[g]], [0, H_DIR], color=COL[g], lw=2.6, solid_capstyle='butt', zorder=3)
-    bx.text(T[g], -0.1, r'$\tau_%s$' % g, color=COL[g], ha='center', va='top', fontsize=6.6)
-ROW = {2 * TC - TB: 1, TA - TB + TC: 2, 2 * TA - TC: 1, 2 * TA - TB: 0}      # label rows below the axis
-for tg, lab_t in GHOST_LABELS.items():
-    seqs_at = [q for q in GHOST_SEQS if abs(path_points(q)[-1, 0] - tg) < 1e-9]
-    double = len(seqs_at) > 1
-    xs = (tg - 0.11, tg + 0.11) if double else (tg,)
-    for x_, q in zip(xs, seqs_at):
-        bx.plot([x_, x_], [0, H_GH], color=GH[q[0]], lw=1.8, solid_capstyle='butt', zorder=3)
-    ct = '0.4' if double else GHT[seqs_at[0][0]]
-    bx.text(tg, -0.1 - 0.27 * ROW[tg], lab_t, color=ct, ha='center', va='top', fontsize=5.8)
-bx.text(TMAX - 0.05, 0.05, r'$\tau$', color='0.25', ha='right', va='bottom', fontsize=7)
-bx.add_patch(FancyArrowPatch((TMAX - 0.6, 0), (TMAX, 0), arrowstyle='-|>', mutation_scale=7, color='0.3',
-                             lw=0.9, shrinkA=0, shrinkB=0, zorder=4, clip_on=False))
-bx.text(TMAX - 0.9, 1.25, 'heights not to scale', color=GREY, ha='right', va='top', fontsize=5.8)
-bx.set_xlim(0, TMAX)
-bx.set_ylim(-0.9, 1.3)
-bx.set_yticks([]); bx.set_xticks([])
-for s in ('top', 'right', 'left'):
-    bx.spines[s].set_visible(False)
-bx.spines['bottom'].set_color('0.3')
-bx.spines['bottom'].set_position(('data', 0))
-bx.spines['bottom'].set_bounds(0, TMAX)
-
-# ---------------- (c) delay profile of the time-domain model -----------------
+# ---------------- (b) delay profile with the arrivals as bars ---------------
 # Receiver chain as in Section IV: launched power P0 into a link of loss ALPHA,
 # every path up to the third order, photodiode of responsivity RESP with the
 # NEP of the link budget, shot noise of the photocurrent, laser RIN, a 4th-order
@@ -278,37 +250,33 @@ ref_meas = corr[(zaxis > 6.0) & (zaxis < 10.0)].max()   # its peak after the rec
 print('first direct return after the receiver chain: %.3f of ideal' % (ref_meas / ref))
 XMAX = 80.0
 m = zaxis <= XMAX
-cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.7, zorder=3)
+# every arrival as a bar, heights schematic (direct returns 1, ghosts 0.33)
+H_DIR, H_GH = 1.0, 0.33
+LABEL = {('c', 'b', 'c'): (r'$2\tau_c{-}\tau_b$', 0), ('a', 'b', 'c'): (r'$\tau_a{-}\tau_b{+}\tau_c$', 1),
+         ('a', 'c', 'a'): (r'$2\tau_a{-}\tau_c$', 0), ('a', 'b', 'a'): (r'$2\tau_a{-}\tau_b$', 1)}
 for seq, amp, zpos in P:
     if len(seq) == 1:
-        cx.text(zpos, 1.07, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.2)
-# the arrivals of (b) as bars at their true height, then a marker above every ghost
-for seq, amp, zpos in P:
-    col = COL[seq[0]] if len(seq) == 1 else GH[seq[0]]
-    off = 0.0 if len(seq) == 1 else (0.35 if seq in (('a', 'b', 'c'),) else (-0.35 if seq == ('c', 'b', 'a') else 0.0))
-    cx.plot([zpos + off, zpos + off], [0, amp / ref], color=col, lw=1.6 if len(seq) == 1 else 1.2,
-            solid_capstyle='butt', zorder=2)
-pos = {}
-for seq, amp, zpos in P:
-    if len(seq) == 3:
-        pos.setdefault(round(zpos, 3), []).append((seq, amp))
-for zpos, lst in pos.items():
-    tot = sum(a for _, a in lst) / ref
-    cx.plot(zpos, tot + 0.05, 'v', color=GH[lst[0][0][0]], ms=3.2, mec='white', mew=0.4, zorder=5)
-cx.text(0.5 * (min(pos) + max(pos)), 0.13, 'ghosts', color='0.45', ha='center', va='bottom', fontsize=5.8)
+        cx.plot([zpos, zpos], [0, H_DIR], color=COL[seq[0]], lw=2.4, solid_capstyle='butt', zorder=2)
+        cx.text(zpos, H_DIR + 0.05, r'$\tau_%s$' % seq[0], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.4)
+    else:
+        off = 0.45 if seq == ('a', 'b', 'c') else (-0.45 if seq == ('c', 'b', 'a') else 0.0)
+        cx.plot([zpos + off, zpos + off], [0, H_GH], color=GH[seq[0]], lw=1.8, solid_capstyle='butt', zorder=2)
+        if seq in LABEL:
+            lab, row = LABEL[seq]
+            col = '0.4' if seq == ('a', 'b', 'c') else GHT[seq[0]]
+            cx.text(zpos, H_GH + 0.06 + 0.17 * row, lab, color=col, ha='center', va='bottom', fontsize=5.8)
+cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.8, zorder=3)
 cx.set_xlim(0, XMAX)
 cx.set_ylim(0, 1.2)
 cx.set_xticks([0, 20, 40, 60, 80])
 cx.set_yticks([0, 0.5, 1.0])
-cx.tick_params(labelsize=5.8, length=2.2)
-cx.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
-cx.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
-cx.text(0.97, 0.80, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
-_, corr0, _ = delay_profile(Z, noise=False)
-print('noise rms (with minus without): %.1e of the first direct return' % (np.std(corr - corr0) / ref_meas))
-
-for a_, let in ((ax, 'a'), (bx, 'b'), (cx, 'c')):
-    a_.text(-0.02 if a_ is ax else -0.04, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
+cx.tick_params(labelsize=6.2, length=2.4)
+cx.set_xlabel('position (m)', fontsize=6.8, labelpad=1.5)
+cx.set_ylabel('correlation, norm.', fontsize=6.8, labelpad=1.5)
+cx.text(0.985, 0.95, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=6.0)
+cx.text(0.985, 0.83, 'bar heights not to scale', transform=cx.transAxes, ha='right', va='top', fontsize=5.8, color=GREY)
+for a_, let in ((ax, 'a'), (cx, 'b')):
+    a_.text(-0.02, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
             ha='right', va='bottom')
 
 os.makedirs('figs', exist_ok=True)
