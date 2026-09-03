@@ -10,7 +10,8 @@ figures of the paper.
       launched code climbs the diagonal; every reflection descends back to
       z = 0 and lands on the time axis at its delay. The three direct returns
       and the third-order path (a,b,c) are drawn in full, the other four
-      third-order paths as thin lines.
+      third-order paths as thin lines. Every ghost carries the colour of the
+      grating of its first reflection, greyed.
   (b) The same time axis with every arrival: three direct returns of power
       ~ R and five third-order paths of power ~ R^3, labelled with delay and
       reflectivity product. The spacing is non-uniform on purpose so that the
@@ -33,7 +34,18 @@ FS.apply()
 TB, TC, TA = 1.0, 2.4, 5.0
 T = {'a': TA, 'b': TB, 'c': TC}
 COL = {'a': FS.VERM, 'b': FS.ORANGE, 'c': FS.GREEN}
-PUR = FS.PURPLE
+from matplotlib.colors import to_rgb
+
+
+def tint(col, w):
+    """Blend a colour with light grey: w = 1 keeps the colour, w = 0 is grey."""
+    c = np.array(to_rgb(col)); g = np.array([0.78, 0.78, 0.78])
+    return tuple(w * c + (1 - w) * g)
+
+
+# ghosts take the colour of the grating of their first reflection, greyed
+GH = {g: tint(COL[g], 0.45) for g in COL}    # lines, bars, dots
+GHT = {g: tint(COL[g], 0.7) for g in COL}    # text
 GREY = '0.45'
 TMAX = 11.3
 TMIN = -1.9      # room on the left for the fiber with the gratings
@@ -118,23 +130,23 @@ for seq in GHOST_SEQS:
     if seq == ('a', 'b', 'c'):
         continue
     p = path_points(seq)
-    ax.plot(p[1:, 0], p[1:, 1], color=PUR, lw=LW_GHF, alpha=0.5, zorder=2)
+    ax.plot(p[1:, 0], p[1:, 1], color=GH[seq[0]], lw=LW_GHF + 0.2, zorder=2)
 
 # the path (a,b,c) in full
 p = path_points(('a', 'b', 'c'))
-seg_arrow(ax, tuple(p[1]), tuple(p[2]), PUR, LW_GH, ms=6, frac=0.55)
-seg_arrow(ax, tuple(p[2]), tuple(p[3]), PUR, LW_GH, ms=6, frac=0.55)
-seg_arrow(ax, tuple(p[3]), tuple(p[4]), PUR, LW_GH, ms=6, frac=0.55)
+seg_arrow(ax, tuple(p[1]), tuple(p[2]), GH['a'], LW_GH, ms=6, frac=0.55)
+seg_arrow(ax, tuple(p[2]), tuple(p[3]), GH['a'], LW_GH, ms=6, frac=0.55)
+seg_arrow(ax, tuple(p[3]), tuple(p[4]), GH['a'], LW_GH, ms=6, frac=0.55)
 ax.text(p[2][0] + 0.1, p[2][1] + 0.05, r'$\times R_b$', color=COL['b'], ha='left', va='bottom', fontsize=6.6)
 ax.text(p[3][0] + 0.12, p[3][1] - 0.02, r'$\times R_c$', color=COL['c'], ha='left', va='top', fontsize=6.6)
-ax.text(TMAX - 0.1, 2.05, r'path $(a,b,c)$: $\tau_a{-}\tau_b{+}\tau_c$', color=PUR, ha='right', va='bottom', fontsize=6.4)
-ax.text(TMAX - 0.1, 1.82, r'power $\propto R_aR_bR_c$', color=PUR, ha='right', va='bottom', fontsize=6.4)
+ax.text(TMAX - 0.1, 2.05, r'path $(a,b,c)$: $\tau_a{-}\tau_b{+}\tau_c$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
+ax.text(TMAX - 0.1, 1.82, r'power $\propto R_aR_bR_c$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
 
 # arrivals at the photodiode: dots on the time axis
 for g in 'bca':
     ax.plot(T[g], 0, 'o', color=COL[g], ms=3.6, mec='white', mew=0.5, zorder=5)
 for seq in GHOST_SEQS:
-    ax.plot(path_points(seq)[-1, 0], 0, 'o', color=PUR, ms=3.0, mec='white', mew=0.5, zorder=5)
+    ax.plot(path_points(seq)[-1, 0], 0, 'o', color=GH[seq[0]], ms=3.0, mec='white', mew=0.5, zorder=5)
 
 ax.set_xlim(TMIN, TMAX)
 ax.set_ylim(-0.14, ZMAX)
@@ -154,17 +166,21 @@ for g in 'bca':
 for tg, (lab_t, lab_r) in GHOST_LABELS.items():
     double = abs(tg - (TA - TB + TC)) < 1e-9
     low = double or abs(tg - (2 * TA - TB)) < 1e-9
+    seqs_at = [q for q in GHOST_SEQS if abs(path_points(q)[-1, 0] - tg) < 1e-9]
     xs = (tg - 0.09, tg + 0.09) if double else (tg,)
-    for x_ in xs:
-        bx.plot([x_, x_], [0, H_GH], color=PUR, lw=2.2, solid_capstyle='butt', zorder=3)
-    bx.text(tg, H_GH + 0.06 + (0.22 if double else 0), lab_r, color=PUR, ha='center', va='bottom', fontsize=6.6)
-    bx.text(tg, -0.1 - (0.24 if low else 0), lab_t, color=PUR, ha='center', va='top', fontsize=6.4)
+    for x_, q in zip(xs, seqs_at):
+        bx.plot([x_, x_], [0, H_GH], color=GH[q[0]], lw=2.2, solid_capstyle='butt', zorder=3)
+    ct = '0.4' if double else GHT[seqs_at[0][0]]
+    bx.text(tg, H_GH + 0.06 + (0.22 if double else 0), lab_r, color=ct, ha='center', va='bottom', fontsize=6.6)
+    bx.text(tg, -0.1 - (0.24 if low else 0), lab_t, color=ct, ha='center', va='top', fontsize=6.4)
 # leaders from the arrival dots to the bars
 for g in 'bca':
     bx.plot([T[g], T[g]], [H_DIR + 0.02, 1.62], color=COL[g], lw=0.7, ls=(0, (1, 1.6)), alpha=0.8, zorder=0)
 for tg in GHOST_LABELS:
-    bx.plot([tg, tg], [H_GH + (0.36 if abs(tg - (TA - TB + TC)) < 1e-9 else 0.3), 1.62],
-            color=PUR, lw=0.7, ls=(0, (1, 1.6)), alpha=0.6, zorder=0)
+    double = abs(tg - (TA - TB + TC)) < 1e-9
+    q0 = [q for q in GHOST_SEQS if abs(path_points(q)[-1, 0] - tg) < 1e-9][0]
+    bx.plot([tg, tg], [H_GH + (0.36 if double else 0.3), 1.62],
+            color='0.6' if double else GH[q0[0]], lw=0.7, ls=(0, (1, 1.6)), alpha=0.8, zorder=0)
 bx.text(TMAX - 0.05, 0.12, r'time $\tau$', color='0.25', ha='right', va='bottom', fontsize=7)
 for a_ in (ax, bx):
     a_.add_patch(FancyArrowPatch((TMAX - 0.6, 0), (TMAX, 0), arrowstyle='-|>', mutation_scale=7, color='0.3', lw=0.9, shrinkA=0, shrinkB=0, zorder=4, clip_on=False))
