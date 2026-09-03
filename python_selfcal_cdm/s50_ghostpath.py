@@ -133,7 +133,7 @@ for x, g, col in GR:
     # leaders: a stub under the grating and a line from below the lanes to the bar,
     # so that they do not run along the vertical part of the hooks
     ax.plot([x, x], [Y_FIB - 0.22, Y_IN + 0.12], color=col, lw=0.7, ls=(0, (1, 1.6)), alpha=0.8, zorder=0)
-    ax.plot([x, x], [Y_G2 - 0.3, Y_AX + H_DIR + 0.02], color=col, lw=0.7, ls=(0, (1, 1.6)), alpha=0.8, zorder=0)
+    ax.plot([x, x], [Y_G2 - 0.3, Y_AX + H_DIR + 0.42], color=col, lw=0.7, ls=(0, (1, 1.6)), alpha=0.8, zorder=0)
 arrow(X0 + 0.15, 10.35, Y_AX, '0.3', 0.9, ms=7)
 ax.text(10.42, Y_AX, r'$\tau$', color='0.25', ha='left', va='center', fontsize=7)
 ax.text(X0 + 0.15, Y_AX + H_DIR + 0.55, 'arrivals at the PD, heights not to scale',
