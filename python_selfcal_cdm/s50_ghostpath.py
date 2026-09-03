@@ -194,10 +194,22 @@ bx.spines['bottom'].set_position(('data', 0))
 bx.spines['bottom'].set_bounds(0, TMAX)
 
 # ---------------- (c) delay profile of the time-domain model -----------------
+# Receiver chain as in Section IV: launched power P0 into a link of loss ALPHA,
+# every path up to the third order, photodiode of responsivity RESP with the
+# NEP of the link budget, shot noise of the photocurrent, laser RIN, a 4th-order
+# Bessel low-pass at 0.75 B, a 12-bit ADC at NS samples per chip, record mean
+# removed, periodic correlation with the bipolar replica, constant offset of
+# the periodic correlation (-1/N per return) subtracted.
+from scipy.signal import bessel, filtfilt
 C_LIGHT, NG = 2.998e8, 1.468
-CHIP_RATE, SPC, NBITS, R = 100e6, 16, 9, 0.10
-Z = {'b': 4.0, 'c': 9.6, 'a': 20.0}                 # metres, the ratios of (a)
+CHIP_RATE, NBITS, R = 100e6, 9, 0.10
+SPC_FINE, NS = 32, 8                                 # fine grid and ADC samples per chip
+Z = {'b': 4.0, 'c': 9.6, 'a': 20.0}                  # metres, the ratios of (a)
 M_PER_CHIP = C_LIGHT / NG / CHIP_RATE / 2.0
+P0, ALPHA, NEP, RESP = 1e-3, 10 ** (-4.0 / 10), 0.5e-12, 0.9   # W, link loss, W/sqrt(Hz), A/W
+RIN_DB, ADC_BITS = -130.0, 12
+Q_E = 1.602e-19
+RNG = np.random.default_rng(3)
 
 
 def paths(Zd):
@@ -232,27 +244,42 @@ def paths(Zd):
 def delay_profile(Zd):
     code01 = C._mls01(NBITS)
     n = code01.size
-    tx = np.repeat(code01.astype(float), SPC)
-    rx = np.zeros_like(tx)
+    fs = CHIP_RATE * SPC_FINE
+    tx = np.repeat(code01.astype(float), SPC_FINE)
+    # optical power at the photodiode, one code period, every path
+    popt = np.zeros_like(tx)
     for seq, amp, zpos in paths(Zd):
-        rx += amp * np.roll(tx, int(round(zpos / M_PER_CHIP * SPC)))
-    replica = np.repeat(C._to_pm1(code01).astype(float), SPC)
-    rx = rx - rx.mean()
-    corr = np.fft.ifft(np.fft.fft(rx) * np.conj(np.fft.fft(replica))).real
-    corr /= -(n * SPC / 2.0)                     # a unit return gives a peak of +1
-    corr -= np.median(corr)                      # constant offset of the periodic correlation
-    return np.arange(tx.size) / SPC * M_PER_CHIP, corr, n
+        popt += amp * np.roll(tx, int(round(zpos / M_PER_CHIP * SPC_FINE)))
+    popt *= P0 * ALPHA
+    popt *= 1.0 + RNG.normal(0.0, np.sqrt(10 ** (RIN_DB / 10) * fs / 2), popt.size)   # laser RIN
+    i_pd = RESP * popt
+    i_pd += RNG.normal(0.0, np.sqrt(2 * Q_E * RESP * popt.mean() * fs / 2), i_pd.size)   # shot noise
+    i_pd += RNG.normal(0.0, RESP * NEP * np.sqrt(fs / 2), i_pd.size)                     # receiver NEP
+    b_, a_ = bessel(4, 0.75 * CHIP_RATE / (fs / 2), norm='mag')
+    i_pd = filtfilt(b_, a_, i_pd)                    # receiver low-pass, zero phase
+    dec = SPC_FINE // NS
+    rec = i_pd[dec // 2::dec]                        # ADC samples, NS per chip
+    fsr = 1.2 * rec.max()
+    rec = np.round(rec / fsr * 2 ** (ADC_BITS - 1)) / 2 ** (ADC_BITS - 1) * fsr   # quantization
+    replica = np.repeat(C._to_pm1(code01).astype(float), NS)
+    rec = rec - rec.mean()
+    corr = np.fft.ifft(np.fft.fft(rec) * np.conj(np.fft.fft(replica))).real
+    corr /= -(n * NS / 2.0) * RESP * P0 * ALPHA     # a unit return gives a peak of +1
+    corr -= np.median(corr)                          # constant offset of the periodic correlation
+    return np.arange(rec.size) / NS * M_PER_CHIP, corr, n
 
 
 zaxis, corr, n = delay_profile(Z)
 P = paths(Z)
-ref = P[0][1]
+ref = P[0][1]                                      # ideal amplitude of the first direct return
+ref_meas = corr[(zaxis > 3.0) & (zaxis < 5.0)].max()   # its peak after the receiver chain
+print('first direct return after the receiver chain: %.3f of ideal' % (ref_meas / ref))
 YC = 0.022
 m = zaxis <= 40.0
-cx.plot(zaxis[m], corr[m] / ref, color='0.25', lw=0.8, zorder=3)
+cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.7, zorder=3)
 for seq, amp, zpos in P:
     if len(seq) == 1:
-        cx.text(zpos, YC * 0.98, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='top', fontsize=6.6,
+        cx.text(zpos, YC * 0.98, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='top', fontsize=6.2,
                 bbox=dict(facecolor='white', edgecolor='none', pad=0.6))
 pos = {}
 for seq, amp, zpos in P:
@@ -260,15 +287,18 @@ for seq, amp, zpos in P:
         pos.setdefault(round(zpos, 3), []).append((seq, amp))
 for zpos, lst in pos.items():
     tot = sum(a for _, a in lst) / ref
-    cx.plot(zpos, tot + 0.0016, 'v', color=GH[lst[0][0][0]], ms=3.4, mec='white', mew=0.4, zorder=5)
+    cx.plot(zpos, tot + 0.0016, 'v', color=GH[lst[0][0][0]], ms=3.2, mec='white', mew=0.4, zorder=5)
 cx.set_xlim(0, 40)
 cx.set_ylim(0, YC)
 cx.set_xticks([0, 10, 20, 30, 40])
 cx.set_yticks([0, 0.01, 0.02])
-cx.set_xlabel('position (m)', labelpad=1.5)
-cx.set_ylabel('correlation, norm.', labelpad=1.5)
-cx.text(0.97, 0.80, r'$R=10\%$', transform=cx.transAxes, ha='right', va='top', fontsize=6.2)
-cx.text(0.97, 0.68, r'$N=511$', transform=cx.transAxes, ha='right', va='top', fontsize=6.2)
+cx.tick_params(labelsize=5.8, length=2.2)
+cx.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
+cx.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
+cx.text(0.97, 0.80, r'$R=10\%$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
+cx.text(0.97, 0.68, r'$N=511$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
+quiet = (zaxis > 1.5) & (zaxis < 2.5)
+print('noise rms in the quiet stretch: %.1e of the first direct return' % (np.std(corr[quiet]) / ref_meas))
 
 for a_, let in ((ax, 'a'), (bx, 'b'), (cx, 'c')):
     a_.text(-0.02 if a_ is ax else -0.04, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
