@@ -282,7 +282,12 @@ cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.7, zorder=3)
 for seq, amp, zpos in P:
     if len(seq) == 1:
         cx.text(zpos, 1.07, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.2)
-# the ghosts: a marker above every expected position, at the expected height
+# the arrivals of (b) as bars at their true height, then a marker above every ghost
+for seq, amp, zpos in P:
+    col = COL[seq[0]] if len(seq) == 1 else GH[seq[0]]
+    off = 0.0 if len(seq) == 1 else (0.35 if seq in (('a', 'b', 'c'),) else (-0.35 if seq == ('c', 'b', 'a') else 0.0))
+    cx.plot([zpos + off, zpos + off], [0, amp / ref], color=col, lw=1.6 if len(seq) == 1 else 1.2,
+            solid_capstyle='butt', zorder=2)
 pos = {}
 for seq, amp, zpos in P:
     if len(seq) == 3:
