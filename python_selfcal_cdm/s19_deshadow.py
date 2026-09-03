@@ -40,9 +40,11 @@ nu = np.linspace(-2.6 * F, 2.6 * F, M)
 SIGMA_N = 1.1e-6
 
 
-def shadowed_array(K, R, rng):
+def shadowed_array(K, R, rng, nub=None):
     """Per-grating readout with cumulative upstream transmission."""
-    nub = rng.uniform(-DETUNE, DETUNE, size=K)
+    if nub is None:
+        nub = rng.uniform(-DETUNE, DETUNE, size=K)
+    nub = np.asarray(nub, float)
     shapes = np.exp(-0.5 * ((nu[None, :] - nub[:, None]) / SIG) ** 2)
     tcum = np.ones((K, M))
     for k in range(1, K):
@@ -94,9 +96,28 @@ def rms_error(K, R, seed, corrected=False, ntrials=6):
 # --- data for panel (b): the fourth grating behind three strong ones ---------
 rng_b = np.random.default_rng(12)
 K_B, R_B = 4, 0.20
-nub_b, clean_b, shad_b = shadowed_array(K_B, R_B, rng_b)
+# panel (a): odstrojenia na sztywno (GHz), tak zeby kazda z trzech siatek z przodu
+# widocznie zacieniala czwarta i kazdy krok korekcji byl widoczny
+nub_b, clean_b, shad_b = shadowed_array(K_B, R_B, rng_b, nub=[-7.0, 8.0, 4.0, 0.0])
 _, corrected_b = peel(shad_b)
 kk = K_B - 1
+
+
+def peel_steps(S, kk, floor=0.05):
+    """Czesciowe korekcje siatki kk: S_kk / (T1), / (T1 T2), ... jak w peel()."""
+    tcorr = np.ones(M)
+    steps = []
+    for k in range(kk):
+        Sk = S[k] / np.maximum(tcorr, floor)
+        a, mu, sg, _ = C.gauss_fit_full(nu, Sk)
+        line = np.clip(a, 0.0, 0.99) * np.exp(-0.5 * ((nu - mu) / max(sg, 1e-3)) ** 2)
+        tcorr = tcorr * (1.0 - line) ** 2
+        steps.append(S[kk] / np.maximum(tcorr, floor))
+    return steps
+
+
+steps_b = peel_steps(shad_b, kk)
+p_steps = [C.gauss_fit_peak(nu, st) * PM for st in steps_b]
 p_true = C.gauss_fit_peak(nu, clean_b[kk]) * PM
 p_shad = C.gauss_fit_peak(nu, shad_b[kk]) * PM
 p_corr = C.gauss_fit_peak(nu, corrected_b[kk]) * PM
@@ -112,29 +133,27 @@ fixed = np.array([rms_error(K, 0.10, 200 + K, corrected=True) for K in Ks])
 # two panels: the recursion itself lives in eqs. (19)-(20) of the paper
 fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.02))
 
-# --- (a) one grating, before and after --------------------------------------
+# --- (a) one grating, the correction step by step ---------------------------
 axb = ax[0]
 lam = nu * PM / 1000.0
-axb.plot(lam, clean_b[kk] / clean_b[kk].max(), color='#0072B2', lw=2.2,
-         label='true $R_4(\\lambda)$')
-axb.plot(lam, shad_b[kk] / shad_b[kk].max(), color='#D55E00', lw=1.4,
-         label='shadowed $S_4$')
-axb.plot(lam, corrected_b[kk] / corrected_b[kk].max(), color='#009E73', lw=1.4,
-         ls='--', label='corrected $\\widehat S_4$')
-axb.axvline(p_true / 1000.0, color='#0072B2', ls=':', lw=0.8)
+nrm = clean_b[kk].max()
+axb.plot(lam, clean_b[kk] / nrm, color='0.55', lw=2.6, alpha=0.6, label='$R_4$')
+axb.plot(lam, shad_b[kk] / nrm, color='#D55E00', lw=1.4, label='$S_4$')
+step_cols = ['#E69F00', '#56B4E9']
+step_lab = ['$S_4/\\widehat T_1$', '$S_4/\\widehat T_1\\widehat T_2$']
+for st, col, lab in zip(steps_b[:-1], step_cols, step_lab):
+    axb.plot(lam, st / nrm, color=col, lw=1.0, label=lab)
+axb.plot(lam, corrected_b[kk] / nrm, color='#009E73', lw=1.4, ls='--', label='$\\widehat S_4$')
+axb.axvline(p_true / 1000.0, color='0.3', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color='#D55E00', ls=':', lw=0.8)
-# 21 pm na osi szerokiej na 560 pm: groty na zewnatrz, liczba obok
 FS.dim_gap(axb, p_true / 1000.0, p_shad / 1000.0, 1.13,
            '%.0f pm' % abs(p_shad - p_true), color='#D55E00',
            tail=0.055, side='right')
-axb.text(p_true / 1000.0 + 0.006, 0.06, 'true $\\lambda_{B,4}$',
-         fontsize=6.0, color='#0072B2', rotation=90, va='bottom', ha='left')
-axb.set_xlim(-0.42, 0.14); axb.set_ylim(0, 1.62)
-axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('normalized readout')
-axb.set_title(r'(a) 4th grating behind three, $R = 20\%$', fontsize=7)
-axb.legend(fontsize=5.5, loc='upper left',
-           ncol=2, frameon=True, handlelength=1.4, columnspacing=0.65,
-           labelspacing=0.2)
+axb.set_xlim(-0.45, 0.45); axb.set_ylim(0, 1.62)
+axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('readout / peak of $R_4$')
+axb.set_title(r'(a) grating 4 behind three, $R = 20\%$', fontsize=7)
+axb.legend(fontsize=5.5, loc='upper left', ncol=2, frameon=True,
+           handlelength=1.4, columnspacing=0.7, labelspacing=0.2)
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
@@ -156,6 +175,8 @@ print('panel (b): K=%d, R=%.2f, grating %d' % (K_B, R_B, kk + 1))
 print('  true %.1f pm, shadowed %.1f pm, deshadowed %.1f pm'
       % (p_true, p_shad, p_corr))
 print('--- (c) shadowing with code leakage and noise, R = 10% ---')
+print('grating 4 behind three at R=20%%: true %.1f, shadowed %.1f, after T1 %.1f, after T1T2 %.1f, corrected %.1f pm'
+      % (p_true, p_shad, p_steps[0], p_steps[1], p_corr))
 print('     K   uncorrected [pm]   deshadowed [pm]   gain')
 for K, a, b in zip(Ks, raw, fixed):
     print('  %4d   %16.2f   %15.2f   %5.1fx' % (K, a, b, a / max(b, 1e-9)))

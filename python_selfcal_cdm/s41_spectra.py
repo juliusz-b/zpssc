@@ -91,57 +91,21 @@ nu, meas, corr, ghost_u = build(LAYOUT['uniform, 4 m'])
 _, _, _, ghost_r = build(LAYOUT['randomized'])
 lam = nu / 1000.0
 
-fig = plt.figure(figsize=(3.45, 2.75))
-gs = fig.add_gridspec(1, 2, width_ratios=[1.25, 1.0], wspace=0.34,
-                      left=0.135, right=0.99, bottom=0.165, top=0.93)
-ax = [fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1])]
+fig, a = plt.subplots(figsize=(3.45, 2.0))
+fig.subplots_adjust(left=0.16, right=0.985, bottom=0.2, top=0.97)
 
-# --- (a) gratings 1, 4, 8 stacked on one axis, each on its own baseline ----
-a = ax[0]
-STEP = 0.125
-for row, k in enumerate(SHOW):
-    off = STEP * (len(SHOW) - 1 - row)
-    true = R * line(nu, NU0[k])
-    a.plot(lam, true + off, color='0.55', lw=2.4, alpha=0.55,
-           label='true $R_k(\\lambda)$' if row == 0 else None)
-    a.plot(lam, meas[k] + off, color=VERM, lw=1.1,
-           label='measured $S_k$' if row == 0 else None)
-    a.plot(lam, corr[k] + off, color=GREE, lw=1.0, ls=(0, (3.5, 2)),
-           label='deshadowed $\\widehat S_k$' if row == 0 else None)
-    a.axhline(off, color='0.8', lw=0.5)
-    a.axvline(NU0[k] / 1000.0, ymin=off / (STEP * 3), ymax=(off + 0.115) / (STEP * 3),
-              color='0.3', lw=0.6, ls=(0, (1.5, 2.5)))
-    loss = 100.0 * (1.0 - meas[k].max() / true.max())
-    a.text(0.5, off + 0.108, 'grating %d, $-$%.0f%%' % (k + 1, loss), fontsize=5.4,
-           color='0.25', ha='right', va='top')
-a.set_xlim(-0.52, 0.52)
-a.set_ylim(0, STEP * 3)
-a.set_yticks([0, 0.1, STEP, STEP + 0.1, 2 * STEP, 2 * STEP + 0.1])
-a.set_yticklabels(['0', '0.1', '0', '0.1', '0', '0.1'])
-a.set_xlabel('wavelength offset [nm]', labelpad=1.5)
-a.set_ylabel('reflectance', labelpad=1.5)
-a.set_title('(a) three depths, before and after', fontsize=7)
-a.legend(fontsize=5.0, loc='upper left', frameon=True,
-         handlelength=1.5, labelspacing=0.18, borderaxespad=0.25)
-
-# --- (b) the ghost term on its own, at the scale it actually has --------------
-a = ax[1]
+# --- the ghost term on its own, at the scale it actually has ----------------
 true8 = R * line(nu, NU0[7])
-a.plot(lam, true8, color='0.55', lw=2.4, alpha=0.55,
-       label='the line $A_8(\\lambda)$')
-a.plot(lam, ghost_u[7], color=VERM, lw=1.1,
-       label='$+$ summed $P_g$, uniform')
-a.plot(lam, ghost_r[7], color=BLUE, lw=1.1,
-       label='$+$ summed $P_g$, randomized')
+a.plot(lam, true8, color='0.55', lw=2.4, alpha=0.55, label='$A_8(\\lambda)$')
+a.plot(lam, ghost_u[7], color=VERM, lw=1.1, label='summed $P_g$, uniform spacing')
+a.plot(lam, ghost_r[7], color=BLUE, lw=1.1, label='summed $P_g$, randomized spacing')
 a.set_yscale('log')
 a.set_ylim(1e-8, 0.6)
 a.set_xlim(-0.52, 0.52)
 a.set_xlabel('wavelength offset [nm]', labelpad=1.5)
 a.set_ylabel('reflectance', labelpad=1.5)
-a.set_title('(b) ghosts under grating 8', fontsize=7)
-leg = a.legend(fontsize=5.0, loc='lower center', frameon=True,
-               framealpha=0.85, edgecolor='none', handlelength=1.3,
-               labelspacing=0.18, borderaxespad=0.2)
+leg = a.legend(fontsize=5.4, loc='upper left', frameon=True,
+               framealpha=0.9, handlelength=1.4, labelspacing=0.2, borderaxespad=0.25)
 leg.set_zorder(7)
 
 os.makedirs('figs', exist_ok=True)
