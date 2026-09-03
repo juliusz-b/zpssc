@@ -298,7 +298,7 @@ cx.set_yticks([0, 0.5, 1.0])
 cx.tick_params(labelsize=5.8, length=2.2)
 cx.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
 cx.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
-cx.text(0.97, 0.93, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
+cx.text(0.97, 0.80, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
 _, corr0, _ = delay_profile(Z, noise=False)
 print('noise rms (with minus without): %.1e of the first direct return' % (np.std(corr - corr0) / ref_meas))
 
