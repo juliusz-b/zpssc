@@ -130,7 +130,7 @@ ax[0].set_ylim(-0.18, 1.45)
 ax[0].set_xlim(0, 8)
 ax[0].set_xlabel('time [chip periods]')
 ax[0].set_ylabel('code-induced shift  ' + r'$\delta\lambda/\Delta\lambda_{\mathrm{ch}}$')
-ax[0].set_title('(a) The code chirps the laser', fontsize=9)
+FS.letter(ax[0], 'a')
 ax[0].axhline(plateau, color='#D55E00', ls=':', lw=0.8)
 ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
                arrowprops=dict(arrowstyle='<->', lw=0.9, color='#0072B2'))
@@ -161,7 +161,7 @@ ax[1].set_ylim(0, 1.62)
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
-ax[1].set_title('(b) FM-to-AM through the kernel $p(\\xi)$', fontsize=9)
+FS.letter(ax[1], 'b')
 ax[1].legend(fontsize=5.8, loc='upper right',
              ncol=1, frameon=True, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.18, borderaxespad=0.25)
@@ -176,7 +176,7 @@ ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[2].set_yscale('log')
 ax[2].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[2].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
-ax[2].set_title('(c) What the references remove', fontsize=9)
+FS.letter(ax[2], 'c')
 ax[2].set_ylim(0.5, 3000)
 ax[2].legend(fontsize=5.8, loc='upper left',
              ncol=2, frameon=True, handlelength=1.5, columnspacing=0.8,

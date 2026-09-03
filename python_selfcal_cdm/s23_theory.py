@@ -54,8 +54,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import warnings; warnings.filterwarnings('ignore')
 import common as C
-import figstyle as FS
-FS.apply()
+import figstyle as FIG
+FIG.apply()
 
 
 PM = C.PM_PER_GHZ
@@ -188,7 +188,7 @@ ax[0].plot(Dfr[::2], siml[::2], 's', color='#D55E00', ms=4, mfc='none',
 ax[0].set_ylim(-1.03, 0.03)
 ax[0].set_xlabel(r'neighbor detuning  $\Delta/\sigma$')
 ax[0].set_ylabel('$\\delta\\lambda_{k\\leftarrow j}$ [pm]')
-ax[0].set_title(r'(a) Rule A, $R = 1\%$', fontsize=8.3)
+FIG.letter(ax[0], 'a')
 ax[0].legend(fontsize=5.8, loc='lower right',
              ncol=2, frameon=False, handlelength=1.4, labelspacing=0.18,
              columnspacing=0.8)
@@ -205,7 +205,7 @@ ax[1].plot(cent * PM, binned_r, 's-', color='#009E73', ms=3.6, lw=1.0,
            mfc='none', label='mean, 2 refs')
 ax[1].set_xlabel(r'position in the band $\nu_k$ [pm]')
 ax[1].set_ylabel('mean bias $\\overline{\\delta\\lambda}(\\nu_k)$ [pm]')
-ax[1].set_title('(b) Rule B and two references', fontsize=8.3)
+FIG.letter(ax[1], 'b')
 ax[1].legend(fontsize=5.7, loc='upper left', ncol=1, frameon=False,
              handlelength=1.4, labelspacing=0.2)
 ax[1].grid(True, alpha=0.25)
@@ -222,7 +222,6 @@ ax[2].minorticks_off()
 ax[2].set_ylim(0, bound / 1e3 * 1.25)
 ax[2].set_xlabel('code length $N$')
 ax[2].set_ylabel(r'$K_{\max}\,f_r$ [10$^3$ sensor$\cdot$Hz]')
-ax[2].set_title(r'Invariant: $N$ cancels', fontsize=8.3)
 ax[2].legend(fontsize=5.7, loc='lower left',
              ncol=1, frameon=False, handlelength=1.5, labelspacing=0.16)
 ax[2].grid(True, which='both', alpha=0.25)

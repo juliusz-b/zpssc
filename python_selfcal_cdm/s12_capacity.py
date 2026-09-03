@@ -269,8 +269,7 @@ ax[0].axhline(FLOOR, color='0.75', lw=0.6)
 ax[0].set_ylim(0.125, 400)
 ax[0].set_xlabel('gratings on the fiber, $K$')
 ax[0].set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
-ax[0].set_title(r'(a) Error mechanisms vs array size, $R = %.0f\%%$'
-                % (R_A * 100))
+FS.letter(ax[0], 'a')
 handles0, labels0 = ax[0].get_legend_handles_labels()
 ax[0].grid(False, which='both', alpha=0.25)
 
@@ -282,7 +281,7 @@ ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
 ax[1].set_ylim(0, 58)
 ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
-ax[1].set_title('(b) Capacity vs reflectivity')
+FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both', alpha=0.25)
 ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
              frameon=True, handlelength=1.5, columnspacing=0.7,

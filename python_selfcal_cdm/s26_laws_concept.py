@@ -46,8 +46,7 @@ DETS = [(0.0, 'co-tuned, $\\Delta\\lambda_{jk}=0$'),
 
 
 def panel_title(ax, letter, text):
-    ax.set_title('(%s) %s' % (letter, text), loc='left', pad=4,
-                 fontsize=7.6)
+    FS.letter(ax, letter)
 
 
 def gaussian(x, amp, centre, width, baseline):

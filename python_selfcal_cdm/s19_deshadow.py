@@ -151,7 +151,7 @@ FS.dim_gap(axb, p_true / 1000.0, p_shad / 1000.0, 1.13,
            tail=0.055, side='right')
 axb.set_xlim(-0.45, 0.45); axb.set_ylim(0, 1.62)
 axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('readout / peak of $R_4$')
-axb.set_title(r'(a) grating 4 behind three, $R = 20\%$', fontsize=7)
+FS.letter(axb, 'a')
 axb.legend(fontsize=5.5, loc='upper left', ncol=1, frameon=True,
            handlelength=1.4, columnspacing=0.7, labelspacing=0.2)
 
@@ -162,7 +162,7 @@ axc.semilogy(Ks, fixed, 's-', color='#009E73', label='corrected $\\widehat S_k$'
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
-axc.set_title(r'(b) Gain and its limit, $R = 10\%$', fontsize=7)
+FS.letter(axc, 'b')
 axc.legend(fontsize=5.5, loc='lower right',
            ncol=1, frameon=True, handlelength=1.4, columnspacing=0.65)
 axc.grid(False, which='both', alpha=0.25)

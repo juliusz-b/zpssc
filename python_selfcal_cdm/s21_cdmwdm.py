@@ -137,8 +137,7 @@ axa.set_xlim(0, NCH); axa.set_ylim(0, Wb + 0.30)
 axa.set_yticks([])
 axa.set_xlabel('delay bin $\\tau$ (grating position)')
 axa.set_ylabel('wavelength band')
-axa.set_title('(a) CDM-WDM addressing', fontsize=9)
-
+FS.letter(axa, 'a')
 # --- (b) banding resets the mechanisms ---------------------------------------
 axc = ax[1]
 vals = [e_one32, e_band, e_one8]
@@ -152,7 +151,7 @@ for i, v in enumerate(vals):
 axc.set_xticks(np.arange(3)); axc.set_xticklabels(labels, fontsize=7)
 axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 axc.set_ylim(0, max(vals) * 1.22)
-axc.set_title('(b) Banding resets the error chain', fontsize=9)
+FS.letter(axc, 'b')
 axc.set_axisbelow(True)      # siatka pod slupkami, nie na nich
 axc.grid(False, axis='y', alpha=0.25)
 

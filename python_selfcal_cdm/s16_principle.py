@@ -99,8 +99,7 @@ box(6.6, 0.35, 3.7, 1.0, 'delay-wavelength map  ->  peak fit  ->  $\\lambda_B$',
 ax.text(0.1, 1.3, 'one code on the fiber\nat a time: the sweep\nvisits wavelengths\n'
                   'in sequence, so gratings\nare separated by the\nAUTOCORRELATION\n'
                   'side lobe', fontsize=7.2, va='center', color='#0072B2')
-ax.set_title('(a) Coded interrogation of a grating array', fontsize=9)
-
+FS.letter(ax, 'a')
 # --- (b) despread map ------------------------------------------------------
 ax2 = fig.add_subplot(gs[0, 1])
 M = 96
@@ -127,7 +126,7 @@ for k in range(K):
              color='w', fontsize=7)
 ax2.set_xlabel('delay bin  [chip]  ->  grating position')
 ax2.set_ylabel('wavelength offset [nm]')
-ax2.set_title('(b) What the correlator returns', fontsize=9)
+FS.letter(ax2, 'b')
 cb = fig.colorbar(im, ax=ax2, pad=0.02); cb.set_label('despread reflectance', fontsize=7.5)
 cb.ax.tick_params(labelsize=7)
 ax2.text(0.98, 0.04, 'a horizontal cut is one grating spectrum',
@@ -197,8 +196,7 @@ axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
              arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
 axb.text(50, 0.02, 'delay bin $\\tau$ (grating position)', ha='center',
          fontsize=6.8, color='0.4')
-axb.set_title('(a) Spacing decides ghost collisions', fontsize=8.1)
-
+FS.letter(axb, 'a')
 # --- (c) code leakage ------------------------------------------------------
 Mc = 96
 nuc = np.linspace(-2.6 * F, 2.6 * F, Mc)
@@ -215,7 +213,7 @@ ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
            color='#D55E00', lw=1.2, ls='--', label=r'$|L_k|$, Gold side lobe $17/N$')
 ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 3.0)
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
-ax[1].set_title('(b) Side-lobe leakage, $K = %d$' % Kc, fontsize=8.1)
+FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both', alpha=0.2)
 # legenda w pustym lewym gornym rogu, a nie pod osiami: pod osiami
 # zabierala ponad jedna trzecia wysokosci calej figury

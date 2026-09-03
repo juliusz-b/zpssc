@@ -100,6 +100,11 @@ def panel(fig, x, y, letter, size=8.5):
     fig.text(x, y, letter, fontsize=size, fontweight='bold', va='top')
 
 
+def letter(ax, s):
+    """Panel letter in the convention of Fig. 4: bold lowercase, above the top-left corner."""
+    ax.text(0.02, 1.06, s, transform=ax.transAxes, fontsize=9, fontweight='bold', va='bottom')
+
+
 def despine_all(ax):
     for s in ('top', 'right', 'left', 'bottom'):
         ax.spines[s].set_visible(False)

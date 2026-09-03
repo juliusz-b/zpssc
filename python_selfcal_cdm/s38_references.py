@@ -143,8 +143,7 @@ axa.text(6.9, y2 + 0.42, 'sensors, nothing in front of them', ha='center',
 axa.text(0.05, y2 + 0.92, 'branch: the reference path is separate',
          fontsize=6.2, color='0.2')
 
-axa.text(5.3, 5.28, '(a) two places the references can sit',
-         ha='center', va='top', fontsize=7.0)
+FS.letter(axa, 'a')
 
 # ==========================================================================
 # (b) what the three references report when they sit inline
@@ -180,7 +179,7 @@ axb.set_ylim(-9, 17.5)
 axb.set_xticks([-180, 0, 180])
 axb.set_xlabel('band position [pm]', labelpad=1.5)
 axb.set_ylabel('reported axis error [pm]', labelpad=1.5)
-axb.set_title('(b) inline references misread the axis', fontsize=7.0)
+FS.letter(axb, 'b')
 axb.legend(fontsize=5.2, loc='upper left', frameon=True, handlelength=1.5,
            labelspacing=0.18, borderaxespad=0.2)
 
@@ -198,7 +197,7 @@ axc.set_xlim(0.25, 13)
 axc.set_ylim(0, 7.5)
 axc.set_xlabel('reference reflectivity [%]', labelpad=1.5)
 axc.set_ylabel('RMS sensor error [pm]', labelpad=1.5)
-axc.set_title('(c) what the fit leaves', fontsize=7.0)
+FS.letter(axc, 'c')
 axc.legend(fontsize=5.2, loc='upper left', frameon=True, handlelength=1.6,
            labelspacing=0.2, borderaxespad=0.25)
 axc.grid(False, which='both', alpha=0.22)
