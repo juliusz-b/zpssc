@@ -17,11 +17,11 @@ figures of the paper.
       so that the ghosts do not collide, except the pair (a,b,c)/(c,b,a),
       which share one delay for any spacing.
   (c) The delay profile of the same three gratings in the time-domain model:
-      z = 4, 9.6, 20 m (the ratios of (a)), R = 10 %, unipolar m-sequence
-      N = 511 at 100 Mchip/s, every path up to the third order, record mean
+      z = 8, 19.2, 40 m (the ratios of (a)), R = 10 %, unipolar m-sequence
+      N = 127 at 25 Mchip/s (Table III), every path up to the third order, record mean
       removed, correlation with the bipolar replica, constant offset of the
-      periodic correlation subtracted. Linear scale expanded to the ghost
-      level, so the direct returns run off the top.
+      periodic correlation subtracted. Broken linear scale: the direct
+      returns above, the ghosts below.
 """
 import os
 import numpy as np
@@ -87,7 +87,9 @@ gs = fig.add_gridspec(2, 2, height_ratios=[1.5, 1.0], width_ratios=[1.0, 1.0],
                       hspace=0.22, wspace=0.32, left=0.075, right=0.985, bottom=0.115, top=0.95)
 ax = fig.add_subplot(gs[0, :])
 bx = fig.add_subplot(gs[1, 0])
-cx = fig.add_subplot(gs[1, 1])
+gsc = gs[1, 1].subgridspec(2, 1, height_ratios=[1.0, 1.5], hspace=0.08)
+cT = fig.add_subplot(gsc[0, 0])          # direct returns
+cb = fig.add_subplot(gsc[1, 0], sharex=cT)   # ghosts
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
@@ -202,9 +204,9 @@ bx.spines['bottom'].set_bounds(0, TMAX)
 # the periodic correlation (-1/N per return) subtracted.
 from scipy.signal import bessel, filtfilt
 C_LIGHT, NG = 2.998e8, 1.468
-CHIP_RATE, NBITS, R = 100e6, 9, 0.10
+CHIP_RATE, NBITS, R = 25e6, 7, 0.10
 SPC_FINE, NS = 32, 8                                 # fine grid and ADC samples per chip
-Z = {'b': 4.0, 'c': 9.6, 'a': 20.0}                  # metres, the ratios of (a)
+Z = {'b': 8.0, 'c': 19.2, 'a': 40.0}                 # metres, the ratios of (a)
 M_PER_CHIP = C_LIGHT / NG / CHIP_RATE / 2.0
 P0, ALPHA, NEP, RESP = 1e-3, 10 ** (-4.0 / 10), 0.5e-12, 0.9   # W, link loss, W/sqrt(Hz), A/W
 RIN_DB, ADC_BITS = -130.0, 12
@@ -241,7 +243,7 @@ def paths(Zd):
     return out
 
 
-def delay_profile(Zd):
+def delay_profile(Zd, noise=True):
     code01 = C._mls01(NBITS)
     n = code01.size
     fs = CHIP_RATE * SPC_FINE
@@ -251,10 +253,12 @@ def delay_profile(Zd):
     for seq, amp, zpos in paths(Zd):
         popt += amp * np.roll(tx, int(round(zpos / M_PER_CHIP * SPC_FINE)))
     popt *= P0 * ALPHA
-    popt *= 1.0 + RNG.normal(0.0, np.sqrt(10 ** (RIN_DB / 10) * fs / 2), popt.size)   # laser RIN
+    if noise:
+        popt *= 1.0 + RNG.normal(0.0, np.sqrt(10 ** (RIN_DB / 10) * fs / 2), popt.size)   # laser RIN
     i_pd = RESP * popt
-    i_pd += RNG.normal(0.0, np.sqrt(2 * Q_E * RESP * popt.mean() * fs / 2), i_pd.size)   # shot noise
-    i_pd += RNG.normal(0.0, RESP * NEP * np.sqrt(fs / 2), i_pd.size)                     # receiver NEP
+    if noise:
+        i_pd += RNG.normal(0.0, np.sqrt(2 * Q_E * RESP * popt.mean() * fs / 2), i_pd.size)   # shot noise
+        i_pd += RNG.normal(0.0, RESP * NEP * np.sqrt(fs / 2), i_pd.size)                     # receiver NEP
     b_, a_ = bessel(4, 0.75 * CHIP_RATE / (fs / 2), norm='mag')
     i_pd = filtfilt(b_, a_, i_pd)                    # receiver low-pass, zero phase
     dec = SPC_FINE // NS
@@ -272,35 +276,51 @@ def delay_profile(Zd):
 zaxis, corr, n = delay_profile(Z)
 P = paths(Z)
 ref = P[0][1]                                      # ideal amplitude of the first direct return
-ref_meas = corr[(zaxis > 3.0) & (zaxis < 5.0)].max()   # its peak after the receiver chain
+ref_meas = corr[(zaxis > 6.0) & (zaxis < 10.0)].max()   # its peak after the receiver chain
 print('first direct return after the receiver chain: %.3f of ideal' % (ref_meas / ref))
-YC = 0.022
-m = zaxis <= 40.0
-cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.7, zorder=3)
+XMAX = 80.0
+m = zaxis <= XMAX
+y = corr[m] / ref_meas
+for a_ in (cT, cb):
+    a_.plot(zaxis[m], y, color='0.25', lw=0.7, zorder=3)
+# top part: the direct returns
+cT.set_ylim(0.3, 1.12)
+cT.set_yticks([0.5, 1.0])
 for seq, amp, zpos in P:
     if len(seq) == 1:
-        cx.text(zpos, YC * 0.98, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='top', fontsize=6.2,
-                bbox=dict(facecolor='white', edgecolor='none', pad=0.6))
+        cT.text(zpos, 1.09, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='top', fontsize=6.2)
+# bottom part: the ghosts, with the expected height of every one
+YC = 0.022
+cb.set_ylim(0, YC)
+cb.set_yticks([0, 0.01, 0.02])
 pos = {}
 for seq, amp, zpos in P:
     if len(seq) == 3:
         pos.setdefault(round(zpos, 3), []).append((seq, amp))
 for zpos, lst in pos.items():
     tot = sum(a for _, a in lst) / ref
-    cx.plot(zpos, tot + 0.0016, 'v', color=GH[lst[0][0][0]], ms=3.2, mec='white', mew=0.4, zorder=5)
-cx.set_xlim(0, 40)
-cx.set_ylim(0, YC)
-cx.set_xticks([0, 10, 20, 30, 40])
-cx.set_yticks([0, 0.01, 0.02])
-cx.tick_params(labelsize=5.8, length=2.2)
-cx.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
-cx.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
-cx.text(0.97, 0.80, r'$R=10\%$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
-cx.text(0.97, 0.68, r'$N=511$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
-quiet = (zaxis > 1.5) & (zaxis < 2.5)
-print('noise rms in the quiet stretch: %.1e of the first direct return' % (np.std(corr[quiet]) / ref_meas))
+    cb.plot(zpos, tot + 0.0016, 'v', color=GH[lst[0][0][0]], ms=3.2, mec='white', mew=0.4, zorder=5)
+# the break
+cT.spines['bottom'].set_visible(False)
+cb.spines['top'].set_visible(False)
+cT.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+cb.tick_params(axis='x', which='both', top=False)
+for a_, yy in ((cT, 0.0), (cb, 1.0)):
+    a_.plot([-0.012, 0.012], [yy - 0.03, yy + 0.03], transform=a_.transAxes, color='k', lw=0.6, clip_on=False)
+    a_.plot([1 - 0.012, 1 + 0.012], [yy - 0.03, yy + 0.03], transform=a_.transAxes, color='k', lw=0.6, clip_on=False)
+cb.set_xlim(0, XMAX)
+cb.set_xticks([0, 20, 40, 60, 80])
+for a_ in (cT, cb):
+    a_.tick_params(labelsize=5.8, length=2.2)
+cb.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
+cb.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
+cb.yaxis.set_label_coords(-0.2, 0.85)
+cb.text(0.97, 0.93, r'$R=10\%$, $N=127$', transform=cb.transAxes, ha='right', va='top', fontsize=5.8)
+cx = cT
+_, corr0, _ = delay_profile(Z, noise=False)
+print('noise rms (with minus without): %.1e of the first direct return' % (np.std(corr - corr0) / ref_meas))
 
-for a_, let in ((ax, 'a'), (bx, 'b'), (cx, 'c')):
+for a_, let in ((ax, 'a'), (bx, 'b'), (cT, 'c')):
     a_.text(-0.02 if a_ is ax else -0.04, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
             ha='right', va='bottom')
 
