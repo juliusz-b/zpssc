@@ -20,8 +20,8 @@ figures of the paper.
       z = 8, 19.2, 40 m (the ratios of (a)), R = 10 %, unipolar m-sequence
       N = 127 at 25 Mchip/s (Table III), every path up to the third order, record mean
       removed, correlation with the bipolar replica, constant offset of the
-      periodic correlation subtracted. Broken linear scale: the direct
-      returns above, the ghosts below.
+      periodic correlation subtracted. Linear scale, so that the ghosts
+      show how low they sit under the direct returns.
 """
 import os
 import numpy as np
@@ -87,9 +87,7 @@ gs = fig.add_gridspec(2, 2, height_ratios=[1.5, 1.0], width_ratios=[1.0, 1.0],
                       hspace=0.22, wspace=0.32, left=0.075, right=0.985, bottom=0.115, top=0.95)
 ax = fig.add_subplot(gs[0, :])
 bx = fig.add_subplot(gs[1, 0])
-gsc = gs[1, 1].subgridspec(2, 1, height_ratios=[1.0, 1.5], hspace=0.08)
-cT = fig.add_subplot(gsc[0, 0])          # direct returns
-cb = fig.add_subplot(gsc[1, 0], sharex=cT)   # ghosts
+cx = fig.add_subplot(gs[1, 1])
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
@@ -280,47 +278,31 @@ ref_meas = corr[(zaxis > 6.0) & (zaxis < 10.0)].max()   # its peak after the rec
 print('first direct return after the receiver chain: %.3f of ideal' % (ref_meas / ref))
 XMAX = 80.0
 m = zaxis <= XMAX
-y = corr[m] / ref_meas
-for a_ in (cT, cb):
-    a_.plot(zaxis[m], y, color='0.25', lw=0.7, zorder=3)
-# top part: the direct returns
-cT.set_ylim(0.3, 1.12)
-cT.set_yticks([0.5, 1.0])
+cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.7, zorder=3)
 for seq, amp, zpos in P:
     if len(seq) == 1:
-        cT.text(zpos, 1.09, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='top', fontsize=6.2)
-# bottom part: the ghosts, with the expected height of every one
-YC = 0.022
-cb.set_ylim(0, YC)
-cb.set_yticks([0, 0.01, 0.02])
+        cx.text(zpos, 1.07, r'$%s$' % seq[0], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.2)
+# the ghosts: a marker above every expected position, at the expected height
 pos = {}
 for seq, amp, zpos in P:
     if len(seq) == 3:
         pos.setdefault(round(zpos, 3), []).append((seq, amp))
 for zpos, lst in pos.items():
     tot = sum(a for _, a in lst) / ref
-    cb.plot(zpos, tot + 0.0016, 'v', color=GH[lst[0][0][0]], ms=3.2, mec='white', mew=0.4, zorder=5)
-# the break
-cT.spines['bottom'].set_visible(False)
-cb.spines['top'].set_visible(False)
-cT.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-cb.tick_params(axis='x', which='both', top=False)
-for a_, yy in ((cT, 0.0), (cb, 1.0)):
-    a_.plot([-0.012, 0.012], [yy - 0.03, yy + 0.03], transform=a_.transAxes, color='k', lw=0.6, clip_on=False)
-    a_.plot([1 - 0.012, 1 + 0.012], [yy - 0.03, yy + 0.03], transform=a_.transAxes, color='k', lw=0.6, clip_on=False)
-cb.set_xlim(0, XMAX)
-cb.set_xticks([0, 20, 40, 60, 80])
-for a_ in (cT, cb):
-    a_.tick_params(labelsize=5.8, length=2.2)
-cb.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
-cb.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
-cb.yaxis.set_label_coords(-0.2, 0.85)
-cb.text(0.97, 0.93, r'$R=10\%$, $N=127$', transform=cb.transAxes, ha='right', va='top', fontsize=5.8)
-cx = cT
+    cx.plot(zpos, tot + 0.05, 'v', color=GH[lst[0][0][0]], ms=3.2, mec='white', mew=0.4, zorder=5)
+cx.text(0.5 * (min(pos) + max(pos)), 0.13, 'ghosts', color='0.45', ha='center', va='bottom', fontsize=5.8)
+cx.set_xlim(0, XMAX)
+cx.set_ylim(0, 1.2)
+cx.set_xticks([0, 20, 40, 60, 80])
+cx.set_yticks([0, 0.5, 1.0])
+cx.tick_params(labelsize=5.8, length=2.2)
+cx.set_xlabel('position (m)', fontsize=6.2, labelpad=1.5)
+cx.set_ylabel('correlation, norm.', fontsize=6.2, labelpad=1.5)
+cx.text(0.97, 0.93, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=5.8)
 _, corr0, _ = delay_profile(Z, noise=False)
 print('noise rms (with minus without): %.1e of the first direct return' % (np.std(corr - corr0) / ref_meas))
 
-for a_, let in ((ax, 'a'), (bx, 'b'), (cT, 'c')):
+for a_, let in ((ax, 'a'), (bx, 'b'), (cx, 'c')):
     a_.text(-0.02 if a_ is ax else -0.04, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
             ha='right', va='bottom')
 
