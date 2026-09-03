@@ -22,7 +22,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import FancyArrowPatch, Rectangle
 import figstyle as FS
 
 FS.apply()
@@ -36,6 +36,8 @@ COL = {'a': FS.VERM, 'b': FS.ORANGE, 'c': FS.GREEN}
 PUR = FS.PURPLE
 GREY = '0.45'
 TMAX = 11.3
+TMIN = -1.9      # room on the left for the fiber with the gratings
+FIB_T = -1.0     # where the fiber is drawn
 
 
 def z(g):
@@ -64,7 +66,7 @@ GHOST_LABELS = {2 * TC - TB: (r'$2\tau_c{-}\tau_b$', r'$R_bR_c^{2}$'),
 
 fig = plt.figure(figsize=(3.45, 3.4))
 gs = fig.add_gridspec(2, 1, height_ratios=[1.55, 1.0], hspace=0.06,
-                      left=0.115, right=0.985, bottom=0.05, top=0.94)
+                      left=0.075, right=0.985, bottom=0.05, top=0.94)
 ax = fig.add_subplot(gs[0, 0])
 bx = fig.add_subplot(gs[1, 0], sharex=ax)
 
@@ -82,16 +84,28 @@ def seg_arrow(a_, p0, p1, color, lw, ms=7, frac=0.55):
 # ---------------- (a) space-time diagram -------------------------------------
 ZMAX = z('a') + 0.55
 # gratings: horizontal dotted lines with labels on the left
+# the fiber itself, drawn vertically on the left, with the photodiode at the
+# bottom and a grating symbol (short stripes) at every z_k
+ax.plot([FIB_T, FIB_T], [0.0, ZMAX - 0.12], color='0.72', lw=3.4, solid_capstyle='butt', zorder=2)
+ax.plot([FIB_T, FIB_T], [0.0, ZMAX - 0.12], color='0.5', lw=0.7, solid_capstyle='butt', zorder=2)
+ax.add_patch(FancyArrowPatch((FIB_T, ZMAX - 0.4), (FIB_T, ZMAX - 0.02), arrowstyle='-|>', mutation_scale=7,
+                             color='0.5', lw=0.7, shrinkA=0, shrinkB=0, zorder=3))
+ax.text(FIB_T - 0.32, ZMAX - 0.05, 'position $z$', color=GREY, ha='right', va='top', fontsize=6.2)
+ax.add_patch(Rectangle((FIB_T - 0.25, -0.1), 0.5, 0.2, facecolor='0.35', edgecolor='none', zorder=4))
+ax.text(FIB_T - 0.42, 0.0, 'PD', color=GREY, ha='right', va='center', fontsize=6.6)
 for g in 'bca':
-    ax.plot([0, TMAX], [z(g), z(g)], color=COL[g], lw=0.9, ls=(0, (1.2, 1.8)), zorder=1)
-    ax.text(-0.12, z(g), r'$%s$, $R_%s$' % (g, g), color=COL[g], ha='right', va='center', fontsize=7)
-ax.text(-0.12, ZMAX - 0.05, 'position $z$', color=GREY, ha='right', va='top', fontsize=6.2)
-ax.text(-0.12, 0.0, 'PD', color=GREY, ha='right', va='center', fontsize=6.6)
+    zg = z(g)
+    ax.add_patch(Rectangle((FIB_T - 0.24, zg - 0.1), 0.48, 0.2, facecolor='white', edgecolor=COL[g], lw=0.7, zorder=3))
+    for k in range(5):
+        xk = FIB_T - 0.16 + 0.08 * k
+        ax.plot([xk, xk], [zg - 0.07, zg + 0.07], color=COL[g], lw=0.7, zorder=4)
+    ax.plot([FIB_T + 0.26, TMAX], [zg, zg], color=COL[g], lw=0.9, ls=(0, (1.2, 1.8)), zorder=1)
+    ax.text(FIB_T - 0.32, zg, r'FBG $%s$' % g, color=COL[g], ha='right', va='center', fontsize=6.8)
 
 # the launched code climbs the diagonal past every grating
 seg_arrow(ax, (0, 0), (z('a'), z('a')), '0.5', LW_IN, ms=8, frac=0.45)
 ax.plot([z('a'), z('a') + 0.45], [z('a'), z('a') + 0.45], color='0.5', lw=LW_IN, ls=(0, (1.2, 1.4)), zorder=2)
-ax.text(1.8, 2.12, 'launched code', color=GREY, ha='right', va='center', fontsize=6.2)
+ax.text(1.85, 2.12, 'launched code', color=GREY, ha='right', va='center', fontsize=6.2)
 
 # direct returns
 for g in 'bca':
@@ -122,13 +136,14 @@ for g in 'bca':
 for seq in GHOST_SEQS:
     ax.plot(path_points(seq)[-1, 0], 0, 'o', color=PUR, ms=3.0, mec='white', mew=0.5, zorder=5)
 
-ax.set_xlim(-0.05, TMAX)
-ax.set_ylim(-0.12, ZMAX)
+ax.set_xlim(TMIN, TMAX)
+ax.set_ylim(-0.14, ZMAX)
 ax.set_yticks([]); ax.set_xticks([])
 for s in ('top', 'right', 'left'):
     ax.spines[s].set_visible(False)
 ax.spines['bottom'].set_color('0.3')
 ax.spines['bottom'].set_position(('data', 0))
+ax.spines['bottom'].set_bounds(0, TMAX)
 
 # ---------------- (b) arrivals on the same time axis ------------------------
 H_DIR, H_GH = 1.0, 0.33
@@ -138,11 +153,12 @@ for g in 'bca':
     bx.text(T[g], -0.1, r'$\tau_%s$' % g, color=COL[g], ha='center', va='top', fontsize=7)
 for tg, (lab_t, lab_r) in GHOST_LABELS.items():
     double = abs(tg - (TA - TB + TC)) < 1e-9
+    low = double or abs(tg - (2 * TA - TB)) < 1e-9
     xs = (tg - 0.09, tg + 0.09) if double else (tg,)
     for x_ in xs:
         bx.plot([x_, x_], [0, H_GH], color=PUR, lw=2.2, solid_capstyle='butt', zorder=3)
     bx.text(tg, H_GH + 0.06 + (0.22 if double else 0), lab_r, color=PUR, ha='center', va='bottom', fontsize=6.6)
-    bx.text(tg, -0.1 - (0.24 if double else 0), lab_t, color=PUR, ha='center', va='top', fontsize=6.4)
+    bx.text(tg, -0.1 - (0.24 if low else 0), lab_t, color=PUR, ha='center', va='top', fontsize=6.4)
 # leaders from the arrival dots to the bars
 for g in 'bca':
     bx.plot([T[g], T[g]], [H_DIR + 0.02, 1.62], color=COL[g], lw=0.7, ls=(0, (1, 1.6)), alpha=0.8, zorder=0)
@@ -152,13 +168,14 @@ for tg in GHOST_LABELS:
 bx.text(TMAX - 0.05, 0.12, r'time $\tau$', color='0.25', ha='right', va='bottom', fontsize=7)
 for a_ in (ax, bx):
     a_.add_patch(FancyArrowPatch((TMAX - 0.6, 0), (TMAX, 0), arrowstyle='-|>', mutation_scale=7, color='0.3', lw=0.9, shrinkA=0, shrinkB=0, zorder=4, clip_on=False))
-bx.text(0.0, 1.55, 'arrivals at the PD, heights not to scale', color=GREY, ha='left', va='top', fontsize=6.2)
+bx.text(TMIN + 0.15, 1.55, 'arrivals at the PD, heights not to scale', color=GREY, ha='left', va='top', fontsize=6.2)
 bx.set_ylim(-0.6, 1.62)
 bx.set_yticks([]); bx.set_xticks([])
 for s in ('top', 'right', 'left'):
     bx.spines[s].set_visible(False)
 bx.spines['bottom'].set_color('0.3')
 bx.spines['bottom'].set_position(('data', 0))
+bx.spines['bottom'].set_bounds(0, TMAX)
 
 for a_, let in ((ax, 'a'), (bx, 'b')):
     a_.text(-0.02, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold', ha='right', va='bottom')
