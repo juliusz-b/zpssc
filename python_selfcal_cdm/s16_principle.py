@@ -206,21 +206,27 @@ nubs = rng3.uniform(-25, 25, Kc)
 Ac = 0.05 * np.exp(-0.5 * ((nuc[None, :] - nubs[:, None]) / SIG) ** 2)
 wanted = Ac[0]
 leak = (-1.0 / NCH) * (Ac[1:].sum(axis=0))
-ax[1].plot(nuc * PM / 1000.0, wanted, color='#0072B2', lw=1.4, label='wanted $A_k(\\lambda)$')
-ax[1].plot(nuc * PM / 1000.0, np.abs(leak), color='0.45', lw=1.2,
-           label=r'$|L_k|$, m-sequence side lobe $1/N$')
-ax[1].plot(nuc * PM / 1000.0, np.abs((-17.0 / NCH) * (Ac[1:].sum(axis=0))),
-           color='#D55E00', lw=1.2, ls='--', label=r'$|L_k|$, Gold side lobe $17/N$')
-ax[1].set_yscale('log'); ax[1].set_ylim(1e-5, 3.0)
-ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('despread reflectance')
+# linear scale on purpose: the leakage adds to the line, and addition is
+# only visible as addition on a linear axis
+xnm = nuc * PM / 1000.0
+summ = wanted + leak
+c_true = C.gauss_fit_peak(nuc, wanted) * PM
+c_meas = C.gauss_fit_peak(nuc, summ) * PM
+print('leakage panel: fitted center moves by %.1f pm (K=%d, N=%d)' % (c_meas - c_true, Kc, NCH))
+ax[1].axhline(0, color='0.75', lw=0.6, zorder=1)
+ax[1].plot(xnm, wanted / 0.05, color='#0072B2', lw=1.4, label='$A_k$, the line of grating $k$')
+ax[1].plot(xnm, leak / 0.05, color='0.45', lw=1.2, label='$L_k$, m-sequence, $-1/N$')
+ax[1].plot(xnm, summ / 0.05, color='#000000', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, what the receiver sees')
+ax[1].plot(xnm, (17.0 * leak) / 0.05, color='#D55E00', lw=1.0, ls='--', label='$L_k$, Gold code, 17 times larger')
+ax[1].plot([c_true / 1000.0, c_true / 1000.0], [0.92, 1.08], color='#0072B2', lw=0.8)
+ax[1].plot([c_meas / 1000.0, c_meas / 1000.0], [0.92, 1.08], color='#000000', lw=0.8)
+ax[1].set_ylim(-0.75, 1.15)
+ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
+ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
 FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both', alpha=0.2)
-# legenda w pustym lewym gornym rogu, a nie pod osiami: pod osiami
-# zabierala ponad jedna trzecia wysokosci calej figury
-# dol posrodku: trzy kolumny mieszcza sie pod dzwonami, a gorny rog
-# zostaje wolny dla samych krzywych
 ax[1].legend(fontsize=5.2, loc='upper left', ncol=1, frameon=True,
-             handlelength=1.4, labelspacing=0.2, borderaxespad=0.3)
+             handlelength=1.6, labelspacing=0.2, borderaxespad=0.3)
 
 fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
                      wspace=0.30)
