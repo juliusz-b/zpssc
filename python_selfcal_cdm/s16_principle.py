@@ -205,22 +205,47 @@ Kc = 32
 nubs = rng3.uniform(-25, 25, Kc)
 Ac = 0.05 * np.exp(-0.5 * ((nuc[None, :] - nubs[:, None]) / SIG) ** 2)
 wanted = Ac[0]
-leak = (-1.0 / NCH) * (Ac[1:].sum(axis=0))
-# linear scale on purpose: the leakage adds to the line, and addition is
-# only visible as addition on a linear axis
+# real leakage for both codes: every grating in its own random delay bin,
+# and the periodic autocorrelation of the transmitted sequence at the bin
+# difference weights the spectrum of every other grating (eq. leakterm)
+binsc = np.sort(rng3.choice(np.arange(1, NCH), size=Kc, replace=False))
+
+
+def autocorr(code01):
+    code01 = np.asarray(code01)
+    pm = code01.astype(float) if code01.min() < 0 else C._to_pm1(code01).astype(float)   # gold_set is already bipolar
+    r = np.fft.ifft(np.fft.fft(pm) * np.conj(np.fft.fft(pm))).real
+    return r / r[0]
+
+
+rho_m = autocorr(C._mls01(7))                 # -1/N at every nonzero lag
+rho_g = autocorr(C.gold_set(7)[2])            # three values of mixed sign
+print('Gold side lobes at N=%d: %s' % (NCH, sorted(set(np.round(rho_g[1:] * NCH).astype(int)))))
+
+
+def leakage(rho):
+    out = np.zeros_like(wanted)
+    for j in range(1, Kc):
+        out += rho[(binsc[0] - binsc[j]) % NCH] * Ac[j]
+    return out
+
+
+leak_m, leak_g = leakage(rho_m), leakage(rho_g)
 xnm = nuc * PM / 1000.0
-summ = wanted + leak
 c_true = C.gauss_fit_peak(nuc, wanted) * PM
-c_meas = C.gauss_fit_peak(nuc, summ) * PM
-print('leakage panel: fitted center moves by %.1f pm (K=%d, N=%d)' % (c_meas - c_true, Kc, NCH))
+c_m = C.gauss_fit_peak(nuc, wanted + leak_m) * PM
+c_g = C.gauss_fit_peak(nuc, wanted + leak_g) * PM
+print('leakage panel: fitted center moves by %.1f pm (m-sequence) and %.1f pm (Gold), K=%d, N=%d'
+      % (c_m - c_true, c_g - c_true, Kc, NCH))
 ax[1].axhline(0, color='0.75', lw=0.6, zorder=1)
-ax[1].plot(xnm, wanted / 0.05, color='#0072B2', lw=1.4, label='$A_k$, the line of grating $k$')
-ax[1].plot(xnm, leak / 0.05, color='0.45', lw=1.2, label='$L_k$, m-sequence, $-1/N$')
-ax[1].plot(xnm, summ / 0.05, color='#000000', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, what the receiver sees')
-ax[1].plot(xnm, (17.0 * leak) / 0.05, color='#D55E00', lw=1.0, ls='--', label='$L_k$, Gold code, 17 times larger')
-ax[1].plot([c_true / 1000.0, c_true / 1000.0], [0.92, 1.08], color='#0072B2', lw=0.8)
-ax[1].plot([c_meas / 1000.0, c_meas / 1000.0], [0.92, 1.08], color='#000000', lw=0.8)
-ax[1].set_ylim(-0.75, 1.6)
+ax[1].plot(xnm, wanted / 0.05, color='#0072B2', lw=1.5, label='$A_k$, the line of grating $k$')
+ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=1.1, label='$L_k$, m-sequence')
+ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-sequence')
+ax[1].plot(xnm, leak_g / 0.05, color='#D55E00', lw=1.1, label='$L_k$, Gold code')
+ax[1].plot(xnm, (wanted + leak_g) / 0.05, color='#D55E00', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, Gold code')
+for cc, col in ((c_true, '#0072B2'), (c_m, '0.2'), (c_g, '#D55E00')):
+    ax[1].plot([cc / 1000.0, cc / 1000.0], [1.04, 1.16], color=col, lw=0.9)
+ax[1].set_ylim(-0.6, 2.15)
 ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
 FS.letter(ax[1], 'b')
