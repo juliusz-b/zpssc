@@ -6,10 +6,10 @@ figures of the paper.
 
   (a) Space-time diagram. Horizontal axis: time since the launch, in units of
       the delay. Vertical axis: position along the fibre, with the fibre
-      itself, its three gratings a, b, c and the photodiode drawn on the
+      itself, its three gratings 1, 2, 3 and the photodiode drawn on the
       left. The launched code climbs the diagonal; every reflection descends
       back to z = 0 and lands on the time axis at its delay. The three direct
-      returns and the third-order path (a,b,c) are drawn in full, the other
+      returns and the third-order path (3,1,2) are drawn in full, the other
       four third-order paths as thin lines. Every ghost carries the colour of
       the grating of its first reflection, greyed.
   (b) The delay profile of the same three gratings in the time-domain model:
@@ -20,7 +20,7 @@ figures of the paper.
       curve, a coloured bar marks every arrival with its delay: three direct
       returns of power ~ R and five third-order paths of power ~ R^3, bar
       heights not to scale. The spacing is non-uniform on purpose so that the
-      ghosts do not collide, except the pair (a,b,c)/(c,b,a), which share one
+      ghosts do not collide, except the pair (3,1,2)/(2,1,3), which share one
       delay for any spacing.
 """
 import os
@@ -42,6 +42,7 @@ TB, TC, TA = 1.0, 2.4, 5.0
 T = {'a': TA, 'b': TB, 'c': TC}
 COL = {'a': FS.VERM, 'b': FS.ORANGE, 'c': FS.GREEN}
 GREY = '0.45'
+NAME = {'b': '1', 'c': '2', 'a': '3'}   # gratings numbered by position in the figure
 TMAX = 11.3
 TMIN = -1.9      # room on the left for the fiber with the gratings
 FIB_T = -1.0     # where the fiber is drawn
@@ -77,10 +78,10 @@ def path_points(seq):
 
 
 GHOST_SEQS = [('c', 'b', 'c'), ('a', 'b', 'c'), ('c', 'b', 'a'), ('a', 'c', 'a'), ('a', 'b', 'a')]
-GHOST_LABELS = {2 * TC - TB: r'$2\tau_c{-}\tau_b$',
-                TA - TB + TC: r'$\tau_a{-}\tau_b{+}\tau_c$',
-                2 * TA - TC: r'$2\tau_a{-}\tau_c$',
-                2 * TA - TB: r'$2\tau_a{-}\tau_b$'}
+GHOST_LABELS = {2 * TC - TB: r'$2\tau_2{-}\tau_1$',
+                TA - TB + TC: r'$\tau_3{-}\tau_1{+}\tau_2$',
+                2 * TA - TC: r'$2\tau_3{-}\tau_2$',
+                2 * TA - TB: r'$2\tau_3{-}\tau_1$'}
 
 fig = plt.figure(figsize=(3.45, 3.6))
 gs = fig.add_gridspec(2, 1, height_ratios=[1.5, 1.0],
@@ -117,7 +118,7 @@ for g in 'bca':
         xk = FIB_T - 0.16 + 0.08 * k
         ax.plot([xk, xk], [zg - 0.07, zg + 0.07], color=COL[g], lw=0.7, zorder=4)
     ax.plot([FIB_T + 0.26, TMAX], [zg, zg], color=COL[g], lw=0.9, ls=(0, (1.2, 1.8)), zorder=1)
-    ax.text(FIB_T - 0.32, zg, r'FBG $%s$' % g, color=COL[g], ha='right', va='center', fontsize=6.8)
+    ax.text(FIB_T - 0.32, zg, 'FBG %s' % NAME[g], color=COL[g], ha='right', va='center', fontsize=6.8)
 
 # the launched code climbs the diagonal past every grating
 seg_arrow(ax, (0, 0), (z('a'), z('a')), '0.5', LW_IN, ms=8, frac=0.45)
@@ -128,7 +129,7 @@ ax.text(1.85, 2.12, 'launched code', color=GREY, ha='right', va='center', fontsi
 for g in 'bca':
     p = path_points((g,))
     seg_arrow(ax, tuple(p[1]), tuple(p[2]), COL[g], LW_RET, frac=0.6)
-    ax.text(p[1][0] + 0.12, p[1][1] - 0.02, r'$\times R_%s$' % g, color=COL[g], ha='left', va='top', fontsize=6.6)
+    ax.text(p[1][0] + 0.12, p[1][1] - 0.02, r'$\times R_%s$' % NAME[g], color=COL[g], ha='left', va='top', fontsize=6.6)
 
 # the other third-order paths, thin
 for seq in GHOST_SEQS:
@@ -137,15 +138,15 @@ for seq in GHOST_SEQS:
     p = path_points(seq)
     ax.plot(p[1:, 0], p[1:, 1], color=GH[seq[0]], lw=LW_GHF + 0.2, zorder=2)
 
-# the path (a,b,c) in full
+# the path (3,1,2) in full
 p = path_points(('a', 'b', 'c'))
 seg_arrow(ax, tuple(p[1]), tuple(p[2]), GH['a'], LW_GH, ms=6, frac=0.55)
 seg_arrow(ax, tuple(p[2]), tuple(p[3]), GH['a'], LW_GH, ms=6, frac=0.55)
 seg_arrow(ax, tuple(p[3]), tuple(p[4]), GH['a'], LW_GH, ms=6, frac=0.55)
-ax.text(p[2][0] + 0.1, p[2][1] + 0.05, r'$\times R_b$', color=COL['b'], ha='left', va='bottom', fontsize=6.6)
-ax.text(p[3][0] + 0.12, p[3][1] - 0.02, r'$\times R_c$', color=COL['c'], ha='left', va='top', fontsize=6.6)
-ax.text(TMAX - 0.1, 2.05, r'path $(a,b,c)$: $\tau_a{-}\tau_b{+}\tau_c$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
-ax.text(TMAX - 0.1, 1.82, r'power $\propto R_aR_bR_c$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
+ax.text(p[2][0] + 0.1, p[2][1] + 0.05, r'$\times R_1$', color=COL['b'], ha='left', va='bottom', fontsize=6.6)
+ax.text(p[3][0] + 0.12, p[3][1] - 0.02, r'$\times R_2$', color=COL['c'], ha='left', va='top', fontsize=6.6)
+ax.text(TMAX - 0.1, 2.05, r'path $(3,1,2)$: $\tau_3{-}\tau_1{+}\tau_2$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
+ax.text(TMAX - 0.1, 1.82, r'power $\propto R_3R_1R_2$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
 
 # arrivals at the photodiode: dots on the time axis
 for g in 'bca':
@@ -252,12 +253,12 @@ XMAX = 80.0
 m = zaxis <= XMAX
 # every arrival as a bar, heights schematic (direct returns 1, ghosts 0.33)
 H_DIR, H_GH = 1.0, 0.33
-LABEL = {('c', 'b', 'c'): (r'$2\tau_c{-}\tau_b$', 0), ('a', 'b', 'c'): (r'$\tau_a{-}\tau_b{+}\tau_c$', 1),
-         ('a', 'c', 'a'): (r'$2\tau_a{-}\tau_c$', 0), ('a', 'b', 'a'): (r'$2\tau_a{-}\tau_b$', 1)}
+LABEL = {('c', 'b', 'c'): (r'$2\tau_2{-}\tau_1$', 0), ('a', 'b', 'c'): (r'$\tau_3{-}\tau_1{+}\tau_2$', 1),
+         ('a', 'c', 'a'): (r'$2\tau_3{-}\tau_2$', 0), ('a', 'b', 'a'): (r'$2\tau_3{-}\tau_1$', 1)}
 for seq, amp, zpos in P:
     if len(seq) == 1:
         cx.plot([zpos, zpos], [0, H_DIR], color=COL[seq[0]], lw=2.4, solid_capstyle='butt', zorder=2)
-        cx.text(zpos, H_DIR + 0.05, r'$\tau_%s$' % seq[0], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.4)
+        cx.text(zpos, H_DIR + 0.05, r'$\tau_%s$' % NAME[seq[0]], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.4)
     else:
         off = 0.45 if seq == ('a', 'b', 'c') else (-0.45 if seq == ('c', 'b', 'a') else 0.0)
         cx.plot([zpos + off, zpos + off], [0, H_GH], color=GH[seq[0]], lw=1.8, solid_capstyle='butt', zorder=2)
