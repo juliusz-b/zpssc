@@ -12,6 +12,10 @@ figures of the paper.
       returns and the third-order path (3,1,2) are drawn in full, the other
       four third-order paths as thin lines. Every ghost carries the colour of
       the grating of its first reflection, greyed.
+  (c) Spectrum of the last grating of an eight-grating uniform array at
+      R = 10 % (the spectral model of s41): shadowing lowers and shifts the
+      measured line, the sequential correction restores it, but the ghosts
+      under this grating stay and are scaled up together with the line.
   (b) The delay profile of the same three gratings in the time-domain model:
       z = 8, 19.2, 40 m (the ratios of (a)), R = 10 %, unipolar m-sequence
       N = 127 at 25 Mchip/s (Table III), every path up to the third order,
@@ -83,11 +87,12 @@ GHOST_LABELS = {2 * TC - TB: r'$2\tau_2{-}\tau_1$',
                 2 * TA - TC: r'$2\tau_3{-}\tau_2$',
                 2 * TA - TB: r'$2\tau_3{-}\tau_1$'}
 
-fig = plt.figure(figsize=(3.45, 3.6))
-gs = fig.add_gridspec(2, 1, height_ratios=[1.5, 1.0],
-                      hspace=0.2, left=0.075, right=0.985, bottom=0.11, top=0.95)
+fig = plt.figure(figsize=(3.45, 5.0))
+gs = fig.add_gridspec(3, 1, height_ratios=[1.5, 1.0, 1.0],
+                      hspace=0.32, left=0.105, right=0.985, bottom=0.08, top=0.965)
 ax = fig.add_subplot(gs[0, 0])
 cx = fig.add_subplot(gs[1, 0])
+dx = fig.add_subplot(gs[2, 0])
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
@@ -276,7 +281,67 @@ cx.set_xlabel('position (m)', fontsize=6.8, labelpad=1.5)
 cx.set_ylabel('correlation, norm.', fontsize=6.8, labelpad=1.5)
 cx.text(0.985, 0.95, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=6.0)
 cx.text(0.985, 0.83, 'bar heights not to scale', transform=cx.transAxes, ha='right', va='top', fontsize=5.8, color=GREY)
-for a_, let in ((ax, 'a'), (cx, 'b')):
+# ---------------- (c) what deshadowing does to a ghost -----------------------
+# Spectral model of s41: eight gratings at R = 10 %, uniform 4-m spacing,
+# lines spread over the band, every third-order ghost summed under each
+# grating, the -1/N leakage of the other lines, then the sequential
+# correction (14). Shown for the last grating, which carries the most ghosts.
+K8, R8, FWHM8, N8, B8 = 8, 0.10, 250.0, 127, 100e6
+NU0 = np.linspace(-175.0, 175.0, K8)
+
+
+def sline(nu, nu0):
+    return np.exp(-0.5 * ((nu - nu0) / (FWHM8 / 2.35482)) ** 2)
+
+
+def spectral(zpos, ghosts=True):
+    nu = np.linspace(-520.0, 520.0, 1041)
+    tau = 2.0 * NG * zpos / C_LIGHT * B8
+    shapes = np.array([sline(nu, c) for c in NU0])
+    trans = np.ones((K8, nu.size))
+    for k in range(1, K8):
+        trans[k] = trans[k - 1] * (1.0 - R8 * shapes[k - 1]) ** 2
+    A = R8 * shapes * trans
+    ghost = np.zeros_like(A)
+    if ghosts:
+        for b in range(K8):
+            for a in range(K8):
+                for c in range(K8):
+                    if b < a and b < c:
+                        tg = tau[a] - tau[b] + tau[c]
+                        for k in range(K8):
+                            w = 1.0 - abs(tau[k] - tg)
+                            if w > 0.02:
+                                ghost[k] += w * R8 ** 3 * shapes[a] * shapes[b] * shapes[c]
+    meas = np.empty_like(A)
+    for k in range(K8):
+        meas[k] = A[k] + ghost[k] - (1.0 / N8) * (A.sum(axis=0) - A[k])
+    est = np.ones_like(nu)
+    corr = np.empty_like(A)
+    for k in range(K8):
+        corr[k] = meas[k] / np.maximum(est, 0.05)
+        est = est * (1.0 - np.clip(corr[k], 0.0, 0.99)) ** 2
+    return nu, shapes, meas, corr
+
+
+z8 = 4.0 * np.arange(1, K8 + 1)
+nu8, shapes8, meas8, corr8 = spectral(z8)
+_, _, _, corr8_0 = spectral(z8, ghosts=False)
+k8 = K8 - 1
+dx.plot(nu8, shapes8[k8], color='0.6', lw=1.8, label='line of grating 8', zorder=2)
+dx.plot(nu8, meas8[k8] / R8, color=COL['b'], lw=1.0, label='measured', zorder=3)
+dx.plot(nu8, corr8[k8] / R8, color=FS.BLUE, lw=1.0, label='deshadowed', zorder=4)
+dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=COL['a'], lw=0.9, ls='--', label='ghosts left after deshadowing', zorder=3)
+dx.set_xlim(-500, 500)
+dx.set_ylim(0, 1.12)
+dx.set_yticks([0, 0.5, 1.0])
+dx.tick_params(labelsize=6.2, length=2.4)
+dx.set_xlabel('wavelength offset (pm)', fontsize=6.8, labelpad=1.5)
+dx.set_ylabel('reflectance / $R$', fontsize=6.8, labelpad=1.5)
+dx.legend(fontsize=5.8, loc='upper left', frameon=True, handlelength=1.8, borderpad=0.4, labelspacing=0.25)
+dx.text(0.985, 0.95, '8 gratings, uniform 4 m, $R=10\%$', transform=dx.transAxes, ha='right', va='top', fontsize=5.8, color=GREY)
+
+for a_, let in ((ax, 'a'), (cx, 'b'), (dx, 'c')):
     a_.text(-0.02, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
             ha='right', va='bottom')
 
