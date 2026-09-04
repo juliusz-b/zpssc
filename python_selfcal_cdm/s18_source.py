@@ -37,7 +37,7 @@ FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
-BAND_HALF = 28.0                     # +-225 pm window of the bench
+BAND_HALF = 25.0                     # +-200 pm, the band W of Table III
 
 # ---------------------------------------------------------------------------
 # (a) chirp waveform during code modulation, in units of the excursion
