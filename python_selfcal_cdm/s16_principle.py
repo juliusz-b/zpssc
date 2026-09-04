@@ -138,65 +138,11 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # This figure is included at 0.72 text width in the paper. Draw it at that
 # physical width so the 7 pt labels remain 7 pt after LaTeX placement.
-fig2, ax = plt.subplots(1, 2, figsize=(5.1, 1.98))
+fig2, ax1 = plt.subplots(1, 1, figsize=(3.45, 2.3))
+ax = [None, ax1]
 
-# --- (b) ghost delays ------------------------------------------------------
-axb = ax[0]
-axb.set_xlim(-2, 102); axb.set_ylim(-0.35, 10.9); axb.axis('off')
-DOT = 0.24                          # odstep kropek w slupku
-
-UNI = [10, 25, 40, 55, 70]          # skok 15
-RND = [15, 25, 41, 67, 86]          # odstepy 10, 16, 26, 19
-
-
-def in_span_ghosts(bins):
-    """Wszystkie sciezki trzeciego rzedu, ktore wracaja w obrebie tablicy."""
-    out = []
-    for ib, b in enumerate(bins):
-        for a in bins[ib + 1:]:
-            for c in bins[ib + 1:]:
-                g = a - b + c
-                if bins[0] <= g <= bins[-1]:
-                    out.append(g)
-    return out
-
-
-def draw_row(y, bins, col, title):
-    paths = in_span_ghosts(bins)
-    mult = Counter(paths)
-    hits = [x for x in paths if x in bins]
-    # wlokno z siatkami: fizyczny uklad, ten sam w obu wierszach
-    axb.plot([0, 100], [y, y], color='#555', lw=1.2, zorder=1)
-    for x in bins:
-        axb.add_patch(Rectangle((x - 1.5, y - 0.26), 3.0, 0.52, fc=col,
-                                ec='#333', lw=0.5, zorder=3))
-    # jedna kropka na sciezke, slupek na wspolne opoznienie
-    for x in sorted(mult):
-        on = x in bins
-        c = '#D55E00' if on else '0.62'
-        axb.plot([x, x], [y - 0.30, y - 0.70], color=c,
-                 lw=1.0 if on else 0.7, zorder=2)
-        for i in range(mult[x]):
-            axb.plot([x], [y - 0.84 - DOT * i], marker='o', ms=2.3,
-                     color=c, mec='none', zorder=4)
-    axb.text(0, y + 0.62, title, fontsize=6.8, color=col)
-    # podpis pod najglebszym slupkiem wiersza, bo slupki maja rozna dlugosc
-    deep = y - 0.84 - DOT * (max(mult.values()) - 1)
-    axb.text(0, deep - 0.78, '%d ghost paths return inside the array, %d on a grating'
-             % (len(paths), len(hits)), fontsize=6.2,
-             color='#D55E00' if hits else '0.45')
-
-
-axb.text(0, 10.45, r'a ghost returns at $\tau_a-\tau_b+\tau_c$',
-         fontsize=6.4, color='0.35')
-draw_row(9.00, UNI, '#D55E00', 'uniform spacing: every ghost lands on a grating')
-draw_row(4.35, RND, '#0072B2', 'randomized spacing: almost none does')
-
-axb.annotate('', xy=(100, 0.85), xytext=(0, 0.85),
-             arrowprops=dict(arrowstyle='-|>', color='0.55', lw=0.7))
-axb.text(50, 0.02, 'delay bin $\\tau$ (grating position)', ha='center',
-         fontsize=6.8, color='0.4')
-FS.letter(axb, 'a')
+# (the former panel (a) with five gratings spaced two ways is superseded by
+# the Golomb-ruler figure, s53)
 # --- (c) code leakage ------------------------------------------------------
 Mc = 96
 nuc = np.linspace(-2.6 * F, 2.6 * F, Mc)
@@ -247,7 +193,6 @@ ax[1].set_xlim(-0.5, 0.5)
 ax[1].set_ylim(-0.6, 2.2)
 ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
-FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both', alpha=0.2)
 ax[1].legend(fontsize=5.0, loc='upper right', ncol=1, frameon=True,
              columnspacing=0.7, handlelength=1.4, labelspacing=0.2, borderaxespad=0.3)
@@ -270,8 +215,7 @@ ins.set_xticks([]); ins.set_yticks([])
 ins.text(0.03, 0.95, 'fitted centers', transform=ins.transAxes, ha='left', va='top', fontsize=5.4, color='0.35')
 ax[1].indicate_inset_zoom(ins, edgecolor='0.6', lw=0.6)
 
-fig2.subplots_adjust(left=0.055, right=0.99, top=0.9, bottom=0.19,
-                     wspace=0.30)
+fig2.subplots_adjust(left=0.13, right=0.98, top=0.97, bottom=0.17)
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=150, bbox_inches='tight')
 fig2.savefig('figs/fig_s16_mechanisms.pdf', bbox_inches='tight')
 

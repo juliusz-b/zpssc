@@ -11,8 +11,9 @@ first reflection. The delay axis is in chips of the code, one bin per chip.
   (b) The same four gratings on the Golomb ruler {0, 1, 4, 6}. The six
       pairwise differences, drawn as brackets, each occur once, so no ghost
       lands on a grating.
-  (c) The ruler with a code of N = 11 chips: the delays 11 and 12 fold back
-      to bins 0 and 1, and two ghosts land on gratings.
+  (c) The ruler with a code of N = 7 chips: every delay beyond 6 folds back
+      and six ghosts land on the gratings at 0, 1 and 4. Both N are real
+      m-sequence lengths.
 """
 import os
 import numpy as np
@@ -55,7 +56,7 @@ fig = plt.figure(figsize=(3.45, 3.1))
 gs = fig.add_gridspec(3, 1, height_ratios=[1.0, 1.55, 1.0], hspace=0.5,
                       left=0.03, right=0.9, bottom=0.08, top=0.94)
 ax, bx, cx = (fig.add_subplot(gs[i, 0]) for i in range(3))
-XMAX = 13
+XMAX = 15
 
 
 def bins_panel(a_, marks, N, note, brackets=False):
@@ -102,10 +103,10 @@ def bins_panel(a_, marks, N, note, brackets=False):
     return hits
 
 
-h_a = bins_panel(ax, UNIFORM, 13, r'uniform spacing $\{0,1,2,3\}$: ghosts land on gratings')
-h_b = bins_panel(bx, RULER, 13, r'Golomb ruler $\{0,1,4,6\}$: every difference once, no ghost on a grating', brackets=True)
-h_c = bins_panel(cx, RULER, 11, r'the ruler with $N=11$: two ghosts fold back onto gratings')
-cx.text(1.9, 0.75, r'$11\to0$, $12\to1$', color=FS.VERM, ha='left', va='center', fontsize=6.0)
+h_a = bins_panel(ax, UNIFORM, 15, r'uniform spacing $\{0,1,2,3\}$: ghosts land on gratings')
+h_b = bins_panel(bx, RULER, 15, r'Golomb ruler $\{0,1,4,6\}$ with $N=15$: no ghost on a grating', brackets=True)
+h_c = bins_panel(cx, RULER, 7, r'the same ruler with $N=7$: delays beyond 6 fold back onto gratings')
+cx.text(7.6, 0.75, r'$7\to0$, $8\to1$, $11\to4$', color=FS.VERM, ha='left', va='center', fontsize=6.0)
 cx.text(XMAX + 1.4, -0.14, 'delay (chips)', color=GREY, ha='right', va='top', fontsize=6.0)
 print('ghosts on gratings: uniform %d, ruler %d, ruler with N=11 %d' % (h_a, h_b, h_c))
 
