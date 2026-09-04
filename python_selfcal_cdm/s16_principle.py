@@ -220,12 +220,12 @@ ax[1].plot(xnm, summ / 0.05, color='#000000', lw=1.0, ls=(0, (3, 1.5)), label='$
 ax[1].plot(xnm, (17.0 * leak) / 0.05, color='#D55E00', lw=1.0, ls='--', label='$L_k$, Gold code, 17 times larger')
 ax[1].plot([c_true / 1000.0, c_true / 1000.0], [0.92, 1.08], color='#0072B2', lw=0.8)
 ax[1].plot([c_meas / 1000.0, c_meas / 1000.0], [0.92, 1.08], color='#000000', lw=0.8)
-ax[1].set_ylim(-0.75, 1.15)
+ax[1].set_ylim(-0.75, 1.6)
 ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
 FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both', alpha=0.2)
-ax[1].legend(fontsize=5.2, loc='upper left', ncol=1, frameon=True,
+ax[1].legend(fontsize=5.2, loc='upper left', ncol=2, frameon=True, columnspacing=0.8,
              handlelength=1.6, labelspacing=0.2, borderaxespad=0.3)
 
 fig2.subplots_adjust(left=0.055, right=0.99, top=0.87, bottom=0.19,
