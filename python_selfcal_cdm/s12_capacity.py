@@ -50,6 +50,7 @@ Outputs
   (b) Capacity (largest array meeting a 10 pm target) vs reflectivity, for
       uniform and randomized spacing.
 """
+import os
 import numpy as np, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
@@ -194,63 +195,73 @@ def sweep(Ks, R, mode, ntrials, seed, **kw):
 # ---------------------------------------------------------------------------
 # (a) error vs array size at R = 10 percent, decomposed
 # ---------------------------------------------------------------------------
-Ks = np.array([4, 8, 16, 24, 32, 48, 64, 96])
-NT = 4
-R_A = 0.10
-full_rnd = sweep(Ks, R_A, 'random', NT, 100)
-full_uni = sweep(Ks, R_A, 'uniform', NT, 100)
-only_shadow = sweep(Ks, R_A, 'random', NT, 100, with_ghosts=False, with_leak=False,
-                    with_noise=False)
-only_ghost = sweep(Ks, R_A, 'random', NT, 100, with_shadow=False, with_leak=False,
-                   with_noise=False)
-only_ghost_uni = sweep(Ks, R_A, 'uniform', NT, 100, with_shadow=False, with_leak=False,
+# Results cache: the Monte Carlo below takes about half an hour. With
+# S12_REPLOT=1 and an existing out/s12_results.npz only the figure is redrawn.
+CACHE = 'out/s12_results.npz'
+if os.environ.get('S12_REPLOT') == '1' and os.path.exists(CACHE):
+    _c = np.load(CACHE)
+    for _k in _c.files:
+        globals()[_k] = _c[_k].item() if _c[_k].ndim == 0 else _c[_k]
+else:
+    Ks = np.array([4, 8, 16, 24, 32, 48, 64, 96])
+    NT = 4
+    R_A = 0.10
+    full_rnd = sweep(Ks, R_A, 'random', NT, 100)
+    full_uni = sweep(Ks, R_A, 'uniform', NT, 100)
+    only_shadow = sweep(Ks, R_A, 'random', NT, 100, with_ghosts=False, with_leak=False,
+                        with_noise=False)
+    only_ghost = sweep(Ks, R_A, 'random', NT, 100, with_shadow=False, with_leak=False,
                        with_noise=False)
-only_leak = sweep(Ks, R_A, 'random', NT, 100, with_shadow=False, with_ghosts=False)
-peeled_rnd = sweep(Ks, R_A, 'random', NT, 100, peel=True)
+    only_ghost_uni = sweep(Ks, R_A, 'uniform', NT, 100, with_shadow=False, with_leak=False,
+                           with_noise=False)
+    only_leak = sweep(Ks, R_A, 'random', NT, 100, with_shadow=False, with_ghosts=False)
+    peeled_rnd = sweep(Ks, R_A, 'random', NT, 100, peel=True)
 
-# ---------------------------------------------------------------------------
-# (b) capacity vs reflectivity
-# ---------------------------------------------------------------------------
-Rs = np.array([0.0003, 0.001, 0.003, 0.01, 0.03, 0.05, 0.10, 0.20, 0.30])
-Ks_cap = np.array([4, 8, 16, 32, 48, 64, 96])
-
-
-def capacity(R, mode, seed, **kw):
-    e = sweep(Ks_cap, R, mode, 3, seed, **kw)
-    if e[0] > TARGET_PM:
-        return 0.0
-    if e[-1] <= TARGET_PM:
-        return float(Ks_cap[-1])
-    i = int(np.argmax(e > TARGET_PM))
-    x0, x1 = Ks_cap[i - 1], Ks_cap[i]
-    y0, y1 = e[i - 1], e[i]
-    return float(x0 + (TARGET_PM - y0) * (x1 - x0) / (y1 - y0))
+    # ---------------------------------------------------------------------------
+    # (b) capacity vs reflectivity
+    # ---------------------------------------------------------------------------
+    Rs = np.array([0.0003, 0.001, 0.003, 0.01, 0.03, 0.05, 0.10, 0.20, 0.30])
+    Ks_cap = np.array([4, 8, 16, 32, 48, 64, 96])
 
 
-cap_rnd = np.array([capacity(R, 'random', 500 + i * 37) for i, R in enumerate(Rs)])
-cap_uni = np.array([capacity(R, 'uniform', 900 + i * 37) for i, R in enumerate(Rs)])
-cap_peel = np.array([capacity(R, 'random', 500 + i * 37, peel=True) for i, R in enumerate(Rs)])
+    def capacity(R, mode, seed, **kw):
+        e = sweep(Ks_cap, R, mode, 3, seed, **kw)
+        if e[0] > TARGET_PM:
+            return 0.0
+        if e[-1] <= TARGET_PM:
+            return float(Ks_cap[-1])
+        i = int(np.argmax(e > TARGET_PM))
+        x0, x1 = Ks_cap[i - 1], Ks_cap[i]
+        y0, y1 = e[i - 1], e[i]
+        return float(x0 + (TARGET_PM - y0) * (x1 - x0) / (y1 - y0))
 
-# code family check at a common operating point
-K_CHK, R_CHK = 32, 0.03
-e_mseq = np.mean([run(K_CHK, R_CHK, 'random', np.random.default_rng(11 + t),
-                      acorr=ACORR_MSEQ) for t in range(5)])
-e_gold = np.mean([run(K_CHK, R_CHK, 'random', np.random.default_rng(11 + t),
-                      acorr=ACORR_GOLD) for t in range(5)])
 
-# bench configuration: 3 procured gratings, R = 10 percent
-bench = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t)) for t in range(8)])
-bench_ns = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
-                        with_shadow=False) for t in range(8)])
-bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
-                        peel=True) for t in range(8)])
+    cap_rnd = np.array([capacity(R, 'random', 500 + i * 37) for i, R in enumerate(Rs)])
+    cap_uni = np.array([capacity(R, 'uniform', 900 + i * 37) for i, R in enumerate(Rs)])
+    cap_peel = np.array([capacity(R, 'random', 500 + i * 37, peel=True) for i, R in enumerate(Rs)])
+
+    # code family check at a common operating point
+    K_CHK, R_CHK = 32, 0.03
+    e_mseq = np.mean([run(K_CHK, R_CHK, 'random', np.random.default_rng(11 + t),
+                          acorr=ACORR_MSEQ) for t in range(5)])
+    e_gold = np.mean([run(K_CHK, R_CHK, 'random', np.random.default_rng(11 + t),
+                          acorr=ACORR_GOLD) for t in range(5)])
+
+    # bench configuration: 3 procured gratings, R = 10 percent
+    bench = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t)) for t in range(8)])
+    bench_ns = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
+                            with_shadow=False) for t in range(8)])
+    bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
+                            peel=True) for t in range(8)])
+    os.makedirs('out', exist_ok=True)
+    np.savez(CACHE, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
 
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(2, 1, figsize=(3.45, 4.6))
+fig, ax = plt.subplots(2, 1, figsize=(2.7, 4.3))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#CC79A7', lw=1.2,
                label='shadowing $A_k$')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#D55E00', lw=1.2,
@@ -288,7 +299,7 @@ ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
              labelspacing=0.16, borderaxespad=0.25)
 ax[1].legend(fontsize=5.8, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
-fig.subplots_adjust(left=0.15, right=0.98, top=0.95, bottom=0.09, hspace=0.42)
+fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.09, hspace=0.42)
 plt.savefig('figs/fig_s12_capacity.png', dpi=140)
 plt.savefig('figs/fig_s12_capacity.pdf')
 
