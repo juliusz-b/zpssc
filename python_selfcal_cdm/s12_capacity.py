@@ -277,7 +277,7 @@ ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0,
               label='%.0f pm target' % TARGET_PM)
 # os schodzi ponizej podlogi, zeby znaczniki punktow docietych byly cale
 ax[0].axhline(FLOOR, color='0.75', lw=0.6)
-ax[0].set_ylim(0.125, 400)
+ax[0].set_ylim(0.02, 400)
 ax[0].set_xlabel('gratings on the fiber, $K$')
 ax[0].set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[0], 'a')
