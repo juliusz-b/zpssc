@@ -1,9 +1,10 @@
 """s53_ruler.py - why gratings on a Golomb ruler never receive a ghost.
 
-Replaces the TikZ drawing fig_ruler.tex. Same vocabulary as the ghost
-figure: tall bars are gratings, short bars are third-order ghosts at their
-delay tau_i - tau_j + tau_l, in the greyed colour of the grating of their
-first reflection. The delay axis is in chips of the code, one bin per chip.
+Replaces the TikZ drawing fig_ruler.tex. Blue squares mark gratings, grey
+dots mark third-order paths at delay tau_i - tau_j + tau_l, and orange
+crosses mark paths arriving at occupied bins. One marker represents one
+path, with coincident paths stacked vertically at the exact delay bin.
+The delay axis is in chips of the code, one bin per chip.
 
   (a) Four gratings at uniform spacing {0, 1, 2, 3}: every ghost delay is
       again a grid point, and from the third grating on the ghosts land on
@@ -52,68 +53,82 @@ def ghosts(marks):
     return out
 
 
-fig = plt.figure(figsize=(3.45, 3.1))
-gs = fig.add_gridspec(3, 1, height_ratios=[1.0, 1.55, 1.0], hspace=0.5,
-                      left=0.03, right=0.9, bottom=0.08, top=0.94)
+# Separate physical grating positions from the count of paths at each delay.
+from matplotlib.lines import Line2D
+
+fig = plt.figure(figsize=(3.45, 3.45))
+gs = fig.add_gridspec(3, 1, height_ratios=[1.0, 1.75, 1.0], hspace=0.54,
+                      left=0.06, right=0.98, bottom=0.09, top=0.84)
 ax, bx, cx = (fig.add_subplot(gs[i, 0]) for i in range(3))
-XMAX = 15
+legend = [Line2D([], [], marker='s', ls='none', color=FS.BLUE, ms=4,
+                 label='Grating'),
+          Line2D([], [], marker='o', ls='none', color='0.50', ms=3.2,
+                 label='Ghost path'),
+          Line2D([], [], marker='x', ls='none', color=FS.VERM, ms=4,
+                 label='Collision')]
+fig.legend(handles=legend, loc='upper center', bbox_to_anchor=(0.52, 1.005),
+           ncol=3, frameon=False, fontsize=6.2, handlelength=0.8,
+           handletextpad=0.4, columnspacing=0.9)
 
 
-def bins_panel(a_, marks, N, note, brackets=False):
-    """Delay axis of N bins with the gratings and every ghost."""
-    a_.plot([0, N - 1], [0, 0], color='0.3', lw=0.9, zorder=1)
-    if N <= XMAX:
-        a_.plot([N - 1, N - 0.3], [0, 0], color='0.3', lw=0.9, ls=(0, (1.2, 1.4)), zorder=1)
-        a_.add_patch(FancyArrowPatch((N - 0.55, 0.0), (N - 0.55, -0.55), connectionstyle='arc3,rad=-0.6',
-                                     arrowstyle='-|>', mutation_scale=6, color='0.4', lw=0.7, zorder=1))
-        a_.text(N - 0.35, -0.5, 'to 0', color=GREY, ha='left', va='center', fontsize=5.8)
+def bins_panel(axis, marks, N, title, letter, brackets=False):
+    axis.set_xlim(-0.7, 14.7)
+    axis.set_ylim(-1.42, 1.77 if brackets else 0.28)
+    axis.axis('off')
+    axis.text(-0.035, 1.10, letter, transform=axis.transAxes,
+              fontweight='bold', fontsize=9, va='bottom')
+    axis.text(0.04, 1.10, title, transform=axis.transAxes,
+              fontsize=6.9, fontweight='bold', va='bottom', color='0.22')
+    axis.plot([-0.35, N - 0.65], [0, 0], color='0.35', lw=0.85)
     for m in range(N):
-        a_.plot([m, m], [0, -0.08], color='0.3', lw=0.6)
-        a_.text(m, -0.14, str(m), ha='center', va='top', fontsize=6.0, color='0.3')
-    for g, m in enumerate(marks):
-        a_.plot([m, m], [0, 1.0], color=COL[g], lw=2.6, solid_capstyle='butt', zorder=3)
+        axis.plot([m, m], [0, -1.12], color='0.90', lw=0.45, zorder=0)
+        axis.text(m, -1.22, str(m), ha='center', va='top', fontsize=6.0,
+                  color='0.30')
+    for m in marks:
+        axis.plot(m, 0, 's', color=FS.BLUE, ms=4.3, zorder=4)
     per_bin = {}
-    for d, g in ghosts(marks):
-        per_bin.setdefault(d % N, []).append((d, g))
+    for delay, first in ghosts(marks):
+        per_bin.setdefault(delay % N, []).append((delay, first))
     hits = 0
-    for b_, lst in per_bin.items():
-        n = len(lst)
-        for k, (d, g) in enumerate(lst):
-            off = (k - 0.5 * (n - 1)) * 0.16
-            on_grating = b_ in marks
-            if on_grating:
-                off += 0.24                              # beside the grating bar it lands on
-            a_.plot([b_ + off, b_ + off], [0, 0.38], color=GH[g], lw=2.0, solid_capstyle='butt', zorder=2)
-            if on_grating:
-                hits += 1
-        if b_ in marks:
-            a_.plot(b_, 1.14, 'x', color=FS.VERM, ms=5, mew=1.2, zorder=5, clip_on=False)
+    for delay, paths_here in sorted(per_bin.items()):
+        collision = delay in marks
+        if collision:
+            hits += len(paths_here)
+        for j, _ in enumerate(paths_here):
+            axis.plot(delay, -0.25 - 0.17 * j,
+                      marker='x' if collision else 'o', ls='none',
+                      ms=3.3 if collision else 2.8, mew=0.95,
+                      color=FS.VERM if collision else '0.50', zorder=3)
     if brackets:
-        pairs = sorted(((marks[q] - marks[p], p, q) for p in range(4) for q in range(p + 1, 4)))
-        for n, (d, p, q) in enumerate(pairs):
-            h = 1.25 + 0.24 * n
-            x0, x1 = marks[p], marks[q]
-            a_.plot([x0, x0, x1, x1], [1.06, h, h, 1.06], color='0.55', lw=0.6, zorder=2)
-            a_.text(0.5 * (x0 + x1), h, str(d), ha='center', va='center', fontsize=6.0, color='0.25',
-                    bbox=dict(facecolor='white', edgecolor='none', pad=0.6), zorder=4)
-    a_.set_xlim(-0.4, XMAX + 1.4)
-    a_.set_ylim(-0.6, 2.75 if brackets else 1.35)
-    a_.axis('off')
-    a_.text(0.035, 1.0, note, transform=a_.transAxes, ha='left', va='bottom', fontsize=6.4, color=GREY)
+        pairs = sorted((marks[j] - marks[i], marks[i], marks[j])
+                       for i in range(len(marks)) for j in range(i + 1, len(marks)))
+        for k, (distance, x0, x1) in enumerate(pairs):
+            y = 0.28 + 0.24 * k
+            axis.plot([x0, x0, x1, x1], [0.10, y, y, 0.10],
+                      color='0.60', lw=0.6, zorder=1)
+            axis.text((x0 + x1) / 2, y, str(distance), fontsize=6.0,
+                      ha='center', va='center', color='0.25',
+                      bbox=dict(facecolor='white', edgecolor='none', pad=0.4))
+    score_y = 1.03 if brackets else -0.20
+    axis.text(10.2, score_y, '%d of 14 paths collide' % hits,
+              fontsize=6.2, color=FS.VERM if hits else FS.BLUE,
+              ha='center', va='center')
+    if N == 7:
+        axis.axvline(6.5, ymin=0.08, ymax=0.88, lw=0.7,
+                     color='0.65', ls=(0, (2, 2)))
+        axis.text(10.2, -0.59, 'Wrapped delays', ha='center', fontsize=5.8,
+                  color='0.40')
+        axis.text(10.2, -0.94, r'$7\to0,\quad8\to1,\quad11\to4$',
+                  ha='center', fontsize=6.0, color=FS.VERM)
     return hits
 
 
-h_a = bins_panel(ax, UNIFORM, 15, r'uniform spacing $\{0,1,2,3\}$: ghosts land on gratings')
-h_b = bins_panel(bx, RULER, 15, r'Golomb ruler $\{0,1,4,6\}$ with $N=15$: no ghost on a grating', brackets=True)
-h_c = bins_panel(cx, RULER, 7, r'the same ruler with $N=7$: delays beyond 6 fold back onto gratings')
-cx.text(7.6, 0.75, r'$7\to0$, $8\to1$, $11\to4$', color=FS.VERM, ha='left', va='center', fontsize=6.0)
-cx.text(XMAX + 1.4, -0.14, 'delay (chips)', color=GREY, ha='right', va='top', fontsize=6.0)
-print('ghosts on gratings: uniform %d, ruler %d, ruler with N=11 %d' % (h_a, h_b, h_c))
-
-for a_, let in ((ax, 'a'), (bx, 'b'), (cx, 'c')):
-    a_.text(-0.01, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold', ha='right', va='bottom')
-
+h_a = bins_panel(ax, UNIFORM, 15, 'Uniform spacing, $N=15$', 'a')
+h_b = bins_panel(bx, RULER, 15, 'Golomb ruler, $N=15$', 'b', brackets=True)
+h_c = bins_panel(cx, RULER, 7, 'Same ruler, $N=7$', 'c')
+fig.text(0.52, 0.022, 'Delay bin (chips)', ha='center', fontsize=7.0)
+print('ghosts on gratings: uniform %d, ruler %d, ruler with N=7 %d' % (h_a, h_b, h_c))
 os.makedirs('figs', exist_ok=True)
 fig.savefig('figs/fig_s53_ruler.pdf')
-fig.savefig('figs/fig_s53_ruler.png', dpi=220)
+fig.savefig('figs/fig_s53_ruler.png', dpi=300)
 print('saved figs/fig_s53_ruler.pdf')

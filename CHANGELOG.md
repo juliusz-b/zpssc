@@ -12,6 +12,15 @@ Format: data | zadanie | pliki | opis zmian
 
 ---
 
+## 2026-09-05 | Ghost-path and Golomb-ruler figures
+
+- Simplified the space-time diagram in `python_selfcal_cdm/s50_ghostpath.py` to three direct returns and one highlighted third-order path.
+- Separated arrival markers from the correlation amplitude and added a late-echo inset. The spectral panel and all computed arrays are unchanged.
+- Redrew `python_selfcal_cdm/s53_ruler.py` with one marker per path at its exact delay, distinct collision markers, readable pairwise separations, and explicit collision counts of 4, 0, and 6.
+- Verified identical numerical arrays before and after the display changes and regenerated the two PDF/PNG pairs.
+
+---
+
 ## 2026-01-15 | Optymalizacja Gaussian fit - 21.6 pm MAE
 
 ### Wyniki

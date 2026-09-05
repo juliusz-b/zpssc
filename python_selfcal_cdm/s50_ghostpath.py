@@ -9,9 +9,8 @@ figures of the paper.
       itself, its three gratings 1, 2, 3 and the photodiode drawn on the
       left. The launched code climbs the diagonal; every reflection descends
       back to z = 0 and lands on the time axis at its delay. The three direct
-      returns and the third-order path (3,1,2) are drawn in full, the other
-      four third-order paths as thin lines. Every ghost carries the colour of
-      the grating of its first reflection, greyed.
+      returns are blue, and the third-order path (3,1,2) is highlighted in
+      orange. Other paths appear in the arrival strip of panel (b).
   (c) Spectrum of the last grating of an eight-grating uniform array at
       R = 10 % (the spectral model of s41): shadowing lowers and shifts the
       measured line, the sequential correction restores it, but the ghosts
@@ -20,10 +19,11 @@ figures of the paper.
       z = 8, 19.2, 40 m (the ratios of (a)), R = 10 %, unipolar m-sequence
       N = 127 at 25 Mchip/s (Table III), every path up to the third order,
       record mean removed, correlation with the bipolar replica, constant
-      offset of the periodic correlation subtracted, linear scale. Behind the
-      curve, a coloured bar marks every arrival with its delay: three direct
-      returns of power ~ R and five third-order paths of power ~ R^3, bar
-      heights not to scale. The spacing is non-uniform on purpose so that the
+      offset of the periodic correlation subtracted, linear scale. Above the
+      curve, a separate strip marks three direct returns with squares and
+      five third-order paths with circles. Stacking indicates paths at the
+      same delay, not optical power. An inset magnifies the late echoes.
+      The spacing is non-uniform on purpose so that the
       ghosts do not collide, except the pair (3,1,2)/(2,1,3), which share one
       delay for any spacing.
 """
@@ -88,11 +88,11 @@ GHOST_LABELS = {2 * TC - TB: r'$2\tau_2{-}\tau_1$',
                 2 * TA - TB: r'$2\tau_3{-}\tau_1$'}
 
 fig = plt.figure(figsize=(3.45, 5.0))
-gs = fig.add_gridspec(3, 1, height_ratios=[1.5, 1.0, 1.0],
-                      hspace=0.32, left=0.105, right=0.985, bottom=0.08, top=0.965)
-ax = fig.add_subplot(gs[0, 0])
-cx = fig.add_subplot(gs[1, 0])
-dx = fig.add_subplot(gs[2, 0])
+ax = fig.add_axes([0.105, 0.665, 0.88, 0.295])
+cx = fig.add_axes([0.105, 0.365, 0.88, 0.205])
+arrivals = fig.add_axes([0.105, 0.582, 0.88, 0.05])
+dx = fig.add_axes([0.105, 0.08, 0.88, 0.205])
+DIRECT, GHOST = FS.BLUE, FS.VERM
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
@@ -106,70 +106,62 @@ def seg_arrow(a_, p0, p1, color, lw, ms=7, frac=0.55):
 
 
 # ---------------- (a) space-time diagram -------------------------------------
-ZMAX = z('a') + 0.55
-# the fiber itself, drawn vertically on the left, with the photodiode at the
-# bottom and a grating symbol (short stripes) at every z_k
-ax.plot([FIB_T, FIB_T], [0.0, ZMAX - 0.12], color='0.72', lw=3.4, solid_capstyle='butt', zorder=2)
-ax.plot([FIB_T, FIB_T], [0.0, ZMAX - 0.12], color='0.5', lw=0.7, solid_capstyle='butt', zorder=2)
-ax.add_patch(FancyArrowPatch((FIB_T, ZMAX - 0.4), (FIB_T, ZMAX - 0.02), arrowstyle='-|>', mutation_scale=7,
-                             color='0.5', lw=0.7, shrinkA=0, shrinkB=0, zorder=3))
-ax.text(FIB_T - 0.32, ZMAX - 0.05, 'position $z$', color=GREY, ha='right', va='top', fontsize=6.2)
-ax.add_patch(Rectangle((FIB_T - 0.25, -0.1), 0.5, 0.2, facecolor='0.35', edgecolor='none', zorder=4))
-ax.text(FIB_T - 0.42, 0.0, 'PD', color=GREY, ha='right', va='center', fontsize=6.6)
+# Draw the direct returns and one complete ghost path. The remaining paths
+# are counted in the separate arrival strip above panel (b).
+ZMAX, diagram_end = z('a') + 0.40, 8.5
+ax.plot([FIB_T, FIB_T], [0, ZMAX - 0.1], color='0.65', lw=1.2, zorder=1)
+ax.add_patch(Rectangle((FIB_T - 0.17, -0.08), 0.34, 0.16,
+                       facecolor='0.3', edgecolor='none'))
+ax.text(FIB_T - 0.28, 0, 'PD', ha='right', va='center', fontsize=6.2,
+         color='0.30')
+ax.text(FIB_T - 0.1, ZMAX + 0.02, 'Position $z$', ha='center',
+         va='bottom', fontsize=6.0, color='0.35')
 for g in 'bca':
     zg = z(g)
-    ax.add_patch(Rectangle((FIB_T - 0.24, zg - 0.1), 0.48, 0.2, facecolor='white', edgecolor=COL[g], lw=0.7, zorder=3))
-    for k in range(5):
-        xk = FIB_T - 0.16 + 0.08 * k
-        ax.plot([xk, xk], [zg - 0.07, zg + 0.07], color=COL[g], lw=0.7, zorder=4)
-    ax.plot([FIB_T + 0.26, TMAX], [zg, zg], color=COL[g], lw=0.9, ls=(0, (1.2, 1.8)), zorder=1)
-    ax.text(FIB_T - 0.32, zg, 'FBG %s' % NAME[g], color=COL[g], ha='right', va='center', fontsize=6.8)
+    ax.plot([FIB_T + 0.2, diagram_end], [zg, zg], color='0.82',
+             lw=0.5, ls=(0, (2, 2)), zorder=0)
+    ax.add_patch(Rectangle((FIB_T - 0.18, zg - 0.09), 0.36, 0.18,
+                           facecolor='white', edgecolor=DIRECT, lw=0.7, zorder=4))
+    for xg in np.linspace(FIB_T - 0.12, FIB_T + 0.12, 4):
+        ax.plot([xg, xg], [zg - 0.065, zg + 0.065],
+                 color=DIRECT, lw=0.55, zorder=5)
+    ax.text(FIB_T - 0.30, zg, 'FBG ' + NAME[g], ha='right', va='center',
+             fontsize=6.2, color='0.25')
 
-# the launched code climbs the diagonal past every grating
-seg_arrow(ax, (0, 0), (z('a'), z('a')), '0.5', LW_IN, ms=8, frac=0.45)
-ax.plot([z('a'), z('a') + 0.45], [z('a'), z('a') + 0.45], color='0.5', lw=LW_IN, ls=(0, (1.2, 1.4)), zorder=2)
-ax.text(1.85, 2.12, 'launched code', color=GREY, ha='right', va='center', fontsize=6.2)
-
-# direct returns
+seg_arrow(ax, (0, 0), (z('a'), z('a')), '0.40', 1.1, ms=5.5)
+ax.text(0.91, 1.56, 'Launch', color='0.4', fontsize=6.0,
+         rotation=0, ha='center')
 for g in 'bca':
-    p = path_points((g,))
-    seg_arrow(ax, tuple(p[1]), tuple(p[2]), COL[g], LW_RET, frac=0.6)
-    ax.text(p[1][0] + 0.12, p[1][1] - 0.02, r'$\times R_%s$' % NAME[g], color=COL[g], ha='left', va='top', fontsize=6.6)
+    direct_path = path_points((g,))
+    seg_arrow(ax, tuple(direct_path[1]), tuple(direct_path[2]),
+              DIRECT, 0.9, ms=5, frac=0.70)
+    ax.plot(T[g], 0, 's', color=DIRECT, ms=3.2, zorder=6)
+    ax.text(T[g], -0.15, r'$\tau_%s$' % NAME[g], color=DIRECT,
+             ha='center', va='top', fontsize=6.3)
 
-# the other third-order paths, thin
-for seq in GHOST_SEQS:
-    if seq == ('a', 'b', 'c'):
-        continue
-    p = path_points(seq)
-    ax.plot(p[1:, 0], p[1:, 1], color=GH[seq[0]], lw=LW_GHF + 0.2, zorder=2)
-
-# the path (3,1,2) in full
-p = path_points(('a', 'b', 'c'))
-seg_arrow(ax, tuple(p[1]), tuple(p[2]), GH['a'], LW_GH, ms=6, frac=0.55)
-seg_arrow(ax, tuple(p[2]), tuple(p[3]), GH['a'], LW_GH, ms=6, frac=0.55)
-seg_arrow(ax, tuple(p[3]), tuple(p[4]), GH['a'], LW_GH, ms=6, frac=0.55)
-ax.text(p[2][0] + 0.1, p[2][1] + 0.05, r'$\times R_1$', color=COL['b'], ha='left', va='bottom', fontsize=6.6)
-ax.text(p[3][0] + 0.12, p[3][1] - 0.02, r'$\times R_2$', color=COL['c'], ha='left', va='top', fontsize=6.6)
-ax.text(TMAX - 0.1, 2.05, r'path $(3,1,2)$: $\tau_3{-}\tau_1{+}\tau_2$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
-ax.text(TMAX - 0.1, 1.82, r'power $\propto R_3R_1R_2$', color=GHT['a'], ha='right', va='bottom', fontsize=6.4)
-
-# arrivals at the photodiode: dots on the time axis
-for g in 'bca':
-    ax.plot(T[g], 0, 'o', color=COL[g], ms=3.6, mec='white', mew=0.5, zorder=5)
-for seq in GHOST_SEQS:
-    ax.plot(path_points(seq)[-1, 0], 0, 'o', color=GH[seq[0]], ms=3.0, mec='white', mew=0.5, zorder=5)
-ax.text(TMAX - 0.7, 0.12, r'time $\tau$', color='0.25', ha='right', va='bottom', fontsize=7)
-ax.add_patch(FancyArrowPatch((TMAX - 0.6, 0), (TMAX, 0), arrowstyle='-|>', mutation_scale=7, color='0.3',
-                             lw=0.9, shrinkA=0, shrinkB=0, zorder=4, clip_on=False))
-
-ax.set_xlim(TMIN, TMAX)
-ax.set_ylim(-0.14, ZMAX)
-ax.set_yticks([]); ax.set_xticks([])
-for s in ('top', 'right', 'left'):
-    ax.spines[s].set_visible(False)
-ax.spines['bottom'].set_color('0.3')
-ax.spines['bottom'].set_position(('data', 0))
-ax.spines['bottom'].set_bounds(0, TMAX)
+ghost_path = path_points(('a', 'b', 'c'))
+for i in range(1, len(ghost_path) - 1):
+    seg_arrow(ax, tuple(ghost_path[i]), tuple(ghost_path[i + 1]),
+              GHOST, 1.45, ms=5.6, frac=0.65)
+ax.plot(ghost_path[1:-1, 0], ghost_path[1:-1, 1], 'o', color=GHOST,
+         ms=3.0, mec='white', mew=0.5, zorder=6)
+ax.plot(ghost_path[-1, 0], 0, 'o', color=GHOST, ms=3.5, zorder=6)
+ax.text(ghost_path[-1, 0], -0.15, r'$\tau_g$', ha='center', va='top',
+         fontsize=6.3, color=GHOST)
+ax.text(8.32, 2.66, r'Ghost $3\to1\to2$', ha='right',
+         fontsize=6.6, color=GHOST)
+ax.text(8.32, 2.24, r'$\tau_g=\tau_3-\tau_1+\tau_2$', ha='right',
+         fontsize=6.2, color=GHOST)
+ax.text(8.32, 1.92, r'$P_g\propto R_3R_1R_2$', ha='right',
+         fontsize=6.2, color=GHOST)
+ax.text(1.55, 0.25, 'Direct', fontsize=5.8, color=DIRECT, ha='center')
+ax.add_patch(FancyArrowPatch((0, 0), (diagram_end, 0), arrowstyle='-|>',
+                             mutation_scale=6, lw=0.7, color='0.3', zorder=1))
+ax.text(diagram_end, -0.15, r'Delay $\tau$', ha='right', va='top',
+         fontsize=6.2, color='0.25')
+ax.set_xlim(TMIN, diagram_end)
+ax.set_ylim(-0.40, ZMAX)
+ax.axis('off')
 
 # ---------------- (b) delay profile with the arrivals as bars ---------------
 # Receiver chain as in Section IV: launched power P0 into a link of loss ALPHA,
@@ -256,31 +248,48 @@ ref_meas = corr[(zaxis > 6.0) & (zaxis < 10.0)].max()   # its peak after the rec
 print('first direct return after the receiver chain: %.3f of ideal' % (ref_meas / ref))
 XMAX = 80.0
 m = zaxis <= XMAX
-# every arrival as a bar, heights schematic (direct returns 1, ghosts 0.33)
-H_DIR, H_GH = 1.0, 0.33
-LABEL = {('c', 'b', 'c'): (r'$2\tau_2{-}\tau_1$', 0), ('a', 'b', 'c'): (r'$\tau_3{-}\tau_1{+}\tau_2$', 1),
-         ('a', 'c', 'a'): (r'$2\tau_3{-}\tau_2$', 0), ('a', 'b', 'a'): (r'$2\tau_3{-}\tau_1$', 1)}
+# The arrival strip encodes path count and delay, never optical amplitude.
+arrivals.set_xlim(0, XMAX)
+arrivals.set_ylim(0, 2.7)
+arrivals.axis('off')
+arrivals.plot([0, XMAX], [0.65, 0.65], color='0.85', lw=0.5)
+ghost_count = {}
 for seq, amp, zpos in P:
     if len(seq) == 1:
-        cx.plot([zpos, zpos], [0, H_DIR], color=COL[seq[0]], lw=2.4, solid_capstyle='butt', zorder=2)
-        cx.text(zpos, H_DIR + 0.05, r'$\tau_%s$' % NAME[seq[0]], color=COL[seq[0]], ha='center', va='bottom', fontsize=6.4)
+        arrivals.plot(zpos, 0.65, 's', color=DIRECT, ms=3.4)
+        arrivals.text(zpos, 1.40, r'$\tau_%s$' % NAME[seq[0]], color=DIRECT,
+                       ha='center', va='bottom', fontsize=6.1)
     else:
-        off = 0.45 if seq == ('a', 'b', 'c') else (-0.45 if seq == ('c', 'b', 'a') else 0.0)
-        cx.plot([zpos + off, zpos + off], [0, H_GH], color=GH[seq[0]], lw=1.8, solid_capstyle='butt', zorder=2)
-        if seq in LABEL:
-            lab, row = LABEL[seq]
-            col = '0.4' if seq == ('a', 'b', 'c') else GHT[seq[0]]
-            cx.text(zpos, H_GH + 0.06 + 0.17 * row, lab, color=col, ha='center', va='bottom', fontsize=5.8)
-cx.plot(zaxis[m], corr[m] / ref_meas, color='0.25', lw=0.8, zorder=3)
+        stack = ghost_count.get(zpos, 0)
+        arrivals.plot(zpos, 0.65 + 0.72 * stack, 'o', color=GHOST, ms=3.1)
+        ghost_count[zpos] = stack + 1
+arrivals.text(0, 2.50, 'Arrival times', fontsize=5.8, color='0.40',
+               ha='left', va='bottom')
+cx.plot(zaxis[m], corr[m] / ref_meas, color='0.22', lw=0.95, zorder=3)
 cx.set_xlim(0, XMAX)
-cx.set_ylim(0, 1.2)
+cx.set_ylim(0, 1.12)
 cx.set_xticks([0, 20, 40, 60, 80])
 cx.set_yticks([0, 0.5, 1.0])
 cx.tick_params(labelsize=6.2, length=2.4)
-cx.set_xlabel('position (m)', fontsize=6.8, labelpad=1.5)
-cx.set_ylabel('correlation, norm.', fontsize=6.8, labelpad=1.5)
-cx.text(0.985, 0.95, r'$R=10\%$, $N=127$', transform=cx.transAxes, ha='right', va='top', fontsize=6.0)
-cx.text(0.985, 0.83, 'bar heights not to scale', transform=cx.transAxes, ha='right', va='top', fontsize=5.8, color=GREY)
+cx.set_xlabel('Equivalent position (m)', fontsize=6.8, labelpad=1.5)
+cx.set_ylabel('Normalized correlation', fontsize=6.8, labelpad=1.5)
+
+zoom = cx.inset_axes([0.62, 0.44, 0.35, 0.43])
+late = (zaxis >= 46) & (zaxis <= 77)
+zoom.plot(zaxis[late], corr[late] / ref_meas, color='0.22', lw=0.8)
+for zpos in sorted(ghost_count):
+    if zpos > 46:
+        zoom.axvline(zpos, color=GHOST, ls=(0, (2, 2)), lw=0.55, zorder=0)
+zoom.set_xlim(46, 77)
+zoom.set_ylim(0, 0.021)
+zoom.set_xticks([50, 60, 70])
+zoom.set_yticks([0, 0.01, 0.02])
+zoom.tick_params(labelsize=4.8, length=1.7, pad=1.2)
+zoom.minorticks_off()
+for spine in zoom.spines.values():
+    spine.set_linewidth(0.65)
+zoom.set_title('Late echoes', fontsize=5.8, pad=2.2, loc='center')
+
 # ---------------- (c) what deshadowing does to a ghost -----------------------
 # Spectral model of s41: eight gratings at R = 10 %, uniform 4-m spacing,
 # lines spread over the band, every third-order ghost summed under each
@@ -341,13 +350,12 @@ dx.set_ylabel('reflectance / $R$', fontsize=6.8, labelpad=1.5)
 dx.legend(fontsize=5.8, loc='upper left', frameon=True, handlelength=1.8, borderpad=0.4, labelspacing=0.25)
 dx.text(0.985, 0.95, '8 gratings, uniform 4 m, $R=10\%$', transform=dx.transAxes, ha='right', va='top', fontsize=5.8, color=GREY)
 
-for a_, let in ((ax, 'a'), (cx, 'b'), (dx, 'c')):
-    a_.text(-0.02, 1.02, let, transform=a_.transAxes, fontsize=9, fontweight='bold',
-            ha='right', va='bottom')
+for letter, ypos in (('a', 0.976), ('b', 0.644), ('c', 0.304)):
+    fig.text(0.028, ypos, letter, fontsize=9, fontweight='bold', va='bottom')
 
 os.makedirs('figs', exist_ok=True)
 fig.savefig('figs/fig_s50_ghostpath.pdf')
-fig.savefig('figs/fig_s50_ghostpath.png', dpi=220)
+fig.savefig('figs/fig_s50_ghostpath.png', dpi=300)
 print('saved figs/fig_s50_ghostpath.pdf')
 for seq, amp, zpos in P:
     print('  %-10s amp %.2e  z %5.1f m' % ('(' + ','.join(seq) + ')', amp, zpos))
