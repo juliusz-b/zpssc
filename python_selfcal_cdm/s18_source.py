@@ -245,7 +245,7 @@ i60 = int(np.argmin(np.abs(xpm + 1.5)))
 ax[2].text(-1.5, cal['smooth'][i60] + 3.5, 'axis error: drift + chirp', fontsize=5.2,
            color='0.25', ha='center', va='bottom')
 ax[2].plot(cal['sen_nu'] * PM / 1000.0, cal['sen_err'], 'o', color=GREY, ms=3.0, mfc='white',
-           mew=0.8, label='sensors, as read')
+           mew=0.8, label='sensors')
 cstyle = {1: ('#E69F00', 's', '1 ref'), 2: ('#0072B2', '^', '2 refs'), 3: ('#009E73', 'd', '3 refs')}
 for n in (1, 2, 3):
     col, mk, lab = cstyle[n]
@@ -253,14 +253,14 @@ for n in (1, 2, 3):
     ax[2].plot(xpm, r['fit'], color=col, lw=0.9, ls='--')
     ax[2].plot(r['nu'] * PM / 1000.0, r['rd'], mk, color=col, ms=4.2, label=lab + ', fit')
     ax[2].plot(cal['sen_nu'] * PM / 1000.0, r['res'], mk, color=col, ms=2.4, mew=0)
-ax[2].plot([], [], 'o', color='0.3', ms=2.4, mew=0, label='sensors after the fit')
+ax[2].plot([], [], 'o', color='0.3', ms=2.4, mew=0, label='after fit')
 ax[2].text(4.8, 4.0, 'after the fit', fontsize=5.2, color='0.25', ha='right', va='bottom')
 ax[2].set_xlim(-5, 5)
 lo = min(cal['smooth'].min(), cal['sen_err'].min())
 hi = max(cal['smooth'].max(), cal['drift'].max())
 ax[2].set_ylim(lo - 0.55 * (hi - lo), hi + 14)
 ax[2].set_xlabel('sweep position [nm]')
-ax[2].set_ylabel('reported $-$ true $\\lambda_B$ [pm]')
+ax[2].set_ylabel('reported $-$ true [pm]')
 FS.letter(ax[2], 'c')
 ax[2].legend(fontsize=5.0, loc='lower left', ncol=2, frameon=True, handlelength=1.4,
              columnspacing=0.6, labelspacing=0.15, borderaxespad=0.25)
