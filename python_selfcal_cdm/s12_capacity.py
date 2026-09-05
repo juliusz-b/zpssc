@@ -184,11 +184,17 @@ def _peel(S, nub, floor=0.05):
     return errs
 
 
-def sweep(Ks, R, mode, ntrials, seed, **kw):
+TRIALS = {}      # per-trial values of the curves that get a spread band
+
+
+def sweep(Ks, R, mode, ntrials, seed, keep=None, **kw):
     out = []
     for K in Ks:
         rng = np.random.default_rng(seed + K)
-        out.append(np.mean([run(K, R, mode, rng, **kw) for _ in range(ntrials)]))
+        vals = [run(K, R, mode, rng, **kw) for _ in range(ntrials)]
+        out.append(np.mean(vals))
+        if keep is not None:
+            TRIALS.setdefault(keep, []).append(vals)
     return np.array(out)
 
 
@@ -204,9 +210,9 @@ if os.environ.get('S12_REPLOT') == '1' and os.path.exists(CACHE):
         globals()[_k] = _c[_k].item() if _c[_k].ndim == 0 else _c[_k]
 else:
     Ks = np.array([4, 8, 16, 24, 32, 48, 64, 96])
-    NT = 4
+    NT = 12
     R_A = 0.10
-    full_rnd = sweep(Ks, R_A, 'random', NT, 100)
+    full_rnd = sweep(Ks, R_A, 'random', NT, 100, keep='full_rnd')
     full_uni = sweep(Ks, R_A, 'uniform', NT, 100)
     only_shadow = sweep(Ks, R_A, 'random', NT, 100, with_ghosts=False, with_leak=False,
                         with_noise=False)
@@ -215,7 +221,7 @@ else:
     only_ghost_uni = sweep(Ks, R_A, 'uniform', NT, 100, with_shadow=False, with_leak=False,
                            with_noise=False)
     only_leak = sweep(Ks, R_A, 'random', NT, 100, with_shadow=False, with_ghosts=False)
-    peeled_rnd = sweep(Ks, R_A, 'random', NT, 100, peel=True)
+    peeled_rnd = sweep(Ks, R_A, 'random', NT, 100, keep='peeled_rnd', peel=True)
 
     # ---------------------------------------------------------------------------
     # (b) capacity vs reflectivity
@@ -225,7 +231,7 @@ else:
 
 
     def capacity(R, mode, seed, **kw):
-        e = sweep(Ks_cap, R, mode, 3, seed, **kw)
+        e = sweep(Ks_cap, R, mode, 8, seed, **kw)
         if e[0] > TARGET_PM:
             return 0.0
         if e[-1] <= TARGET_PM:
@@ -254,7 +260,8 @@ else:
     bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
                             peel=True) for t in range(8)])
     os.makedirs('out', exist_ok=True)
-    np.savez(CACHE, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
+    band_full = np.array(TRIALS['full_rnd']); band_peel = np.array(TRIALS['peeled_rnd'])
+    np.savez(CACHE, band_full=band_full, band_peel=band_peel, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
 
 # ---------------------------------------------------------------------------
 # figure
@@ -270,6 +277,10 @@ ax[0].semilogy(Ks, cl(only_ghost), 'X:', color='#009E73', lw=1.2,
                label='ghosts $\\tau_g$, randomized')
 ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.2,
                label='leakage $L_k$ + noise')
+ax[0].fill_between(Ks, cl(np.percentile(band_full, 10, axis=1)), cl(np.percentile(band_full, 90, axis=1)),
+                   color='#0072B2', alpha=0.18, lw=0)
+ax[0].fill_between(Ks, cl(np.percentile(band_peel, 10, axis=1)), cl(np.percentile(band_peel, 90, axis=1)),
+                   color='#E69F00', alpha=0.18, lw=0)
 ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#0072B2', lw=1.8, label='full, randomized')
 ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#E69F00', lw=1.8,
                label='full + deshadowing $\\widehat S_k$')

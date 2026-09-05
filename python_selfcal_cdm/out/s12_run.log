@@ -1,0 +1,46 @@
+CDM capacity study: N=127 chips, M=64 wavelength slots, FWHM=250 pm, detuning spread +-25 GHz
+link budget: 0 dBm source, 4 dB loss, NEP 0.5 pW/rtHz, B = 25 Mchip/s,
+             processing gain sqrt(127), unipolar factor 0.5 -> sigma = 1.11e-06 (referred to R=1)
+             equivalent SNR of a single R=10% grating: 99 dB
+--- (a) RMS Bragg error [pm] vs array size, R = 10% ---
+     K   full/rand   shadowing   ghost/uni  ghost/rand  leak+noise   deshadowed
+     4       10.80       12.01        0.35        0.00        0.79         0.93
+     8       21.59       21.86        2.37        0.19        1.64         2.95
+    16       40.77       39.79        6.87        1.18        3.09         7.61
+    24       56.27       61.33       16.55        3.76        4.70        17.77
+    32       62.16       84.94       40.78        8.26        6.84        42.22
+    48       76.21      123.50       59.91       31.66       10.30        72.68
+    64       89.38      146.37       70.44       55.79       14.03        88.87
+    96      100.37      179.50       89.69       83.49       21.62       100.51
+--- (b) capacity at the 10 pm target ---
+     R[%]   K_max random   K_max uniform   K_max deshadowed
+     0.03           46.3            46.7               47.0
+     0.10           47.6            44.4               49.6
+     0.30           39.9            39.1               47.2
+     1.00           25.9            27.3               39.6
+     3.00           13.2            11.5               31.0
+     5.00            7.0             7.1               26.1
+    10.00            4.1             0.0               16.4
+    20.00            0.0             0.0                9.0
+    30.00            0.0             0.0                4.8
+  => randomized spacing peaks at R = 0.10% with K_max = 48
+--- code family, K=32, R=3%, randomized spacing ---
+  m-sequence (side lobe 1/N)  : 26.25 pm
+  Gold code (three valued)    : 44.70 pm
+--- leakage-only ceiling vs code length (R = 0.3%%, randomized spacing) ---
+       N      K    RMS error [pm]
+     127     16             3.56
+     127     32             6.79
+     127     48             9.67
+     127     64            13.92
+     127     96            22.67
+     511     16             0.87
+     511     32             1.64
+     511     48             2.26
+     511     64             3.21
+     511     96             5.02
+--- bench configuration: 3 procured gratings, R = 10%% ---
+  full model            : 8.19 pm
+  shadowing switched off: 0.55 pm
+  sequential deshadowing: 0.59 pm
+saved figs/fig_s12_capacity.png
