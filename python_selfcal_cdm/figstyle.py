@@ -142,3 +142,33 @@ def dim_gap(ax, x1, x2, y, label, color='k', tail=None, side='right',
     else:
         ax.text(lo - tail - pad, y, label, ha='right', va='center',
                 fontsize=fontsize, color=color, zorder=6)
+
+
+# ---------------------------------------------------------------------------
+# Axis labels start with a capital letter (decision of 6.09.2026). Applied at
+# import, so every script that uses this module gets it without edits. Labels
+# that start with math ($...$) or a symbol are left alone.
+# ---------------------------------------------------------------------------
+import matplotlib.axes as _mpl_axes
+
+
+def _capitalize_label(s):
+    if isinstance(s, str) and s and s[0].islower():
+        return s[0].upper() + s[1:]
+    return s
+
+
+_orig_set_xlabel = _mpl_axes.Axes.set_xlabel
+_orig_set_ylabel = _mpl_axes.Axes.set_ylabel
+
+
+def _set_xlabel(self, xlabel, *a, **k):
+    return _orig_set_xlabel(self, _capitalize_label(xlabel), *a, **k)
+
+
+def _set_ylabel(self, ylabel, *a, **k):
+    return _orig_set_ylabel(self, _capitalize_label(ylabel), *a, **k)
+
+
+_mpl_axes.Axes.set_xlabel = _set_xlabel
+_mpl_axes.Axes.set_ylabel = _set_ylabel
