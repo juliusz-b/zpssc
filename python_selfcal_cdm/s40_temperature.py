@@ -79,7 +79,7 @@ for name, cfg in CFG.items():
         rows.append((np.array(rec_pm) - NU0[k]) / PM_PER_K)
     rec[name] = np.array(rows)
 
-fig, ax = plt.subplots(figsize=(3.45, 3.30))
+fig, ax = plt.subplots(figsize=(2.55, 2.45))
 
 arr = rec['datasheet']
 ax.fill_between(tk, arr.min(axis=0), arr.max(axis=0), color='#D55E00',

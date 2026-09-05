@@ -113,7 +113,7 @@ e_one8 = avg(8, 1, R0, 300)
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-fig, ax = plt.subplots(1, 2, figsize=(4.8, 2.20))
+fig, ax = plt.subplots(2, 1, figsize=(3.45, 3.7))
 
 # --- (a) addressing plane ---------------------------------------------------
 axa = ax[0]
@@ -130,8 +130,8 @@ for wί in range(Wb):
     lam = rng.uniform(0.15, 0.72, size=b.size)
     axa.plot(b, wί + lam, 'v', ms=5, color=BAND_COLS[wί])
 axa.axvline(SHARED, color='0.3', ls=':', lw=0.9)
-axa.annotate('one bin, four bands', xy=(SHARED, 3.92), xytext=(SHARED - 6, 4.16),
-             fontsize=5.8, color='0.3', ha='right',
+axa.annotate('one bin, four bands', xy=(SHARED, 0.05), xytext=(SHARED + 5, 0.16),
+             fontsize=5.8, color='0.3', ha='left',
              arrowprops=dict(arrowstyle='-', color='0.3', lw=0.5))
 axa.set_xlim(0, NCH); axa.set_ylim(0, Wb + 0.30)
 axa.set_yticks([])

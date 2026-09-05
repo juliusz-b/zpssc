@@ -250,7 +250,7 @@ bench_pl = np.mean([run(3, 0.10, 'random', np.random.default_rng(700 + t),
 # ---------------------------------------------------------------------------
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(1, 2, figsize=(7.1, 2.45))
+fig, ax = plt.subplots(2, 1, figsize=(3.45, 4.6))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color='#CC79A7', lw=1.2,
                label='shadowing $A_k$')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color='#D55E00', lw=1.2,
@@ -288,7 +288,7 @@ ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
              labelspacing=0.16, borderaxespad=0.25)
 ax[1].legend(fontsize=5.8, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
-fig.subplots_adjust(left=0.075, right=0.99, top=0.88, bottom=0.17, wspace=0.30)
+fig.subplots_adjust(left=0.15, right=0.98, top=0.95, bottom=0.09, hspace=0.42)
 plt.savefig('figs/fig_s12_capacity.png', dpi=140)
 plt.savefig('figs/fig_s12_capacity.pdf')
 
