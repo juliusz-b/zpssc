@@ -274,12 +274,12 @@ for n in (0, 1, 2, 3):
     ax[3].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
 ax[3].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[3].set_yscale('log')
-ax[3].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
+ax[3].set_xlabel(r'chirp span  $\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[3], 'd')
-ax[3].set_ylim(0.5, 3000)
-ax[3].legend(fontsize=5.8, loc='upper left',
-             ncol=2, frameon=True, handlelength=1.5, columnspacing=0.8,
+ax[3].set_ylim(0.5, 6000)
+ax[3].legend(fontsize=5.4, loc='upper left',
+             ncol=2, frameon=True, handlelength=1.4, columnspacing=0.7,
              labelspacing=0.15)
 ax[3].grid(False, which='both', alpha=0.25)
 
