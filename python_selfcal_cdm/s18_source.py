@@ -172,8 +172,9 @@ def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
         ref_as = rng.uniform(-0.05, 0.05, nref)
         ref_rd = np.array([err(ref_nu[j], ref_as[j]) for j in range(nref)])
         coef = np.polyfit(ref_nu, ref_rd, nref - 1)
+        res = out['sen_err'] - np.polyval(coef, sen_nu)
         out['refs'][nref] = dict(nu=ref_nu, rd=ref_rd, fit=np.polyval(coef, grid),
-                                 rms=float(np.sqrt(np.mean((out['sen_err'] - np.polyval(coef, sen_nu)) ** 2))))
+                                 res=res, rms=float(np.sqrt(np.mean(res ** 2))))
     return out
 
 
@@ -251,14 +252,17 @@ for n in (1, 2, 3):
     r = cal['refs'][n]
     ax[2].plot(xpm, r['fit'], color=col, lw=0.9, ls='--')
     ax[2].plot(r['nu'] * PM / 1000.0, r['rd'], mk, color=col, ms=4.2, label=lab + ', fit')
+    ax[2].plot(cal['sen_nu'] * PM / 1000.0, r['res'], mk, color=col, ms=2.4, mew=0)
+ax[2].plot([], [], 'o', color='0.3', ms=2.4, mew=0, label='sensors after the fit')
+ax[2].text(4.8, 4.0, 'after the fit', fontsize=5.2, color='0.25', ha='right', va='bottom')
 ax[2].set_xlim(-5, 5)
 lo = min(cal['smooth'].min(), cal['sen_err'].min())
 hi = max(cal['smooth'].max(), cal['drift'].max())
-ax[2].set_ylim(lo - 0.42 * (hi - lo), hi + 14)
+ax[2].set_ylim(lo - 0.55 * (hi - lo), hi + 14)
 ax[2].set_xlabel('sweep position [nm]')
 ax[2].set_ylabel('reported $-$ true $\\lambda_B$ [pm]')
 FS.letter(ax[2], 'c')
-ax[2].legend(fontsize=5.2, loc='lower left', ncol=2, frameon=True, handlelength=1.4,
+ax[2].legend(fontsize=5.0, loc='lower left', ncol=2, frameon=True, handlelength=1.4,
              columnspacing=0.6, labelspacing=0.15, borderaxespad=0.25)
 ax[2].grid(False, alpha=0.2)
 
