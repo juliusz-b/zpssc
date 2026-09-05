@@ -10,7 +10,8 @@ figures of the paper.
       left. The launched code climbs the diagonal; every reflection descends
       back to z = 0 and lands on the time axis at its delay. The three direct
       returns are blue, and the third-order path (3,1,2) is highlighted in
-      orange. Other paths appear in the arrival strip of panel (b).
+      orange. The four other third-order paths are grey. All paths also
+      appear in the arrival strip of panel (b).
   (c) Spectrum of the last grating of an eight-grating uniform array at
       R = 10 % (the spectral model of s41): shadowing lowers and shifts the
       measured line, the sequential correction restores it, but the ghosts
@@ -97,18 +98,18 @@ DIRECT, GHOST = FS.BLUE, FS.VERM
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
 
-def seg_arrow(a_, p0, p1, color, lw, ms=7, frac=0.55):
+def seg_arrow(a_, p0, p1, color, lw, ms=7, frac=0.55, zorder=3):
     """A line segment with an arrowhead at fraction frac of its length."""
-    a_.plot([p0[0], p1[0]], [p0[1], p1[1]], color=color, lw=lw, solid_capstyle='round', zorder=3)
+    a_.plot([p0[0], p1[0]], [p0[1], p1[1]], color=color, lw=lw, solid_capstyle='round', zorder=zorder)
     q = (p0[0] + frac * (p1[0] - p0[0]), p0[1] + frac * (p1[1] - p0[1]))
     a_.add_patch(FancyArrowPatch(p0, q, arrowstyle='-|>', mutation_scale=ms, color=color,
-                                 lw=0, shrinkA=0, shrinkB=0, zorder=4))
+                                 lw=0, shrinkA=0, shrinkB=0, zorder=zorder + 0.5))
 
 
 # ---------------- (a) space-time diagram -------------------------------------
-# Draw the direct returns and one complete ghost path. The remaining paths
-# are counted in the separate arrival strip above panel (b).
-ZMAX, diagram_end = z('a') + 0.40, 8.5
+# Draw all three direct returns and all five third-order paths, with one
+# ghost highlighted so the reflection sequence can be followed separately.
+ZMAX, diagram_end = z('a') + 0.40, TMAX
 ax.plot([FIB_T, FIB_T], [0, ZMAX - 0.1], color='0.65', lw=1.2, zorder=1)
 ax.add_patch(Rectangle((FIB_T - 0.17, -0.08), 0.34, 0.16,
                        facecolor='0.3', edgecolor='none'))
@@ -131,6 +132,18 @@ for g in 'bca':
 seg_arrow(ax, (0, 0), (z('a'), z('a')), '0.40', 1.1, ms=5.5)
 ax.text(0.91, 1.56, 'Launch', color='0.4', fontsize=6.0,
          rotation=0, ha='center')
+for seq in GHOST_SEQS:
+    if seq == ('a', 'b', 'c'):
+        continue
+    other_path = path_points(seq)
+    for i in range(1, len(other_path) - 1):
+        seg_arrow(ax, tuple(other_path[i]), tuple(other_path[i + 1]),
+                  '0.62', 0.72, ms=4.2, frac=0.65, zorder=2)
+    shared = np.isclose(other_path[-1, 0], TA - TB + TC)
+    ax.plot(other_path[-1, 0], 0, 'o', color='0.55',
+             ms=5.1 if shared else 3.0, mfc='white' if shared else '0.55',
+             mec='0.55' if shared else 'white', mew=0.6 if shared else 0.35,
+             zorder=5)
 for g in 'bca':
     direct_path = path_points((g,))
     seg_arrow(ax, tuple(direct_path[1]), tuple(direct_path[2]),
@@ -148,12 +161,15 @@ ax.plot(ghost_path[1:-1, 0], ghost_path[1:-1, 1], 'o', color=GHOST,
 ax.plot(ghost_path[-1, 0], 0, 'o', color=GHOST, ms=3.5, zorder=6)
 ax.text(ghost_path[-1, 0], -0.15, r'$\tau_g$', ha='center', va='top',
          fontsize=6.3, color=GHOST)
-ax.text(8.32, 2.66, r'Ghost $3\to1\to2$', ha='right',
+ax.text(diagram_end - 0.18, 2.66, r'Ghost $3\to1\to2$', ha='right',
          fontsize=6.6, color=GHOST)
-ax.text(8.32, 2.24, r'$\tau_g=\tau_3-\tau_1+\tau_2$', ha='right',
+ax.text(diagram_end - 0.18, 2.24, r'$\tau_g=\tau_3-\tau_1+\tau_2$', ha='right',
          fontsize=6.2, color=GHOST)
-ax.text(8.32, 1.92, r'$P_g\propto R_3R_1R_2$', ha='right',
+ax.text(diagram_end - 0.18, 1.92, r'$P_g\propto R_3R_1R_2$', ha='right',
          fontsize=6.2, color=GHOST)
+ax.plot([8.10, 8.65], [1.55, 1.55], color='0.62', lw=0.72)
+ax.text(diagram_end - 0.18, 1.55, 'Other ghosts', ha='right', va='center',
+         fontsize=5.8, color='0.45')
 ax.text(1.55, 0.25, 'Direct', fontsize=5.8, color=DIRECT, ha='center')
 ax.add_patch(FancyArrowPatch((0, 0), (diagram_end, 0), arrowstyle='-|>',
                              mutation_scale=6, lw=0.7, color='0.3', zorder=1))

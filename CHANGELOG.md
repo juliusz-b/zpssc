@@ -18,6 +18,7 @@ Format: data | zadanie | pliki | opis zmian
 - Separated arrival markers from the correlation amplitude and added a late-echo inset. The spectral panel and all computed arrays are unchanged.
 - Redrew `python_selfcal_cdm/s53_ruler.py` with one marker per path at its exact delay, distinct collision markers, readable pairwise separations, and explicit collision counts of 4, 0, and 6.
 - Verified identical numerical arrays before and after the display changes and regenerated the two PDF/PNG pairs.
+- In the follow-up revision, restored all five third-order paths in panel (a), retaining the orange highlighted path and grey background paths. A ring distinguishes the coincident arrival. Numerical arrays remain unchanged.
 
 ---
 
