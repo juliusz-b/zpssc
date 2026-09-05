@@ -267,8 +267,8 @@ ax[2].legend(fontsize=5.0, loc='lower left', ncol=2, frameon=True, handlelength=
 ax[2].grid(False, alpha=0.2)
 
 # --- (d) -------------------------------------------------------------------
-styles = {0: ('o-', '#D55E00', 'no reference'), 1: ('s-', '#E69F00', '1 reference'),
-          2: ('^-', '#0072B2', '2 references'), 3: ('d-', '#009E73', '3 references')}
+styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
+          2: ('^-', '#0072B2', '2 refs'), 3: ('d-', '#009E73', '3 refs')}
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
     ax[3].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
@@ -278,8 +278,8 @@ ax[3].set_xlabel(r'chirp span  $\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[3], 'd')
 ax[3].set_ylim(0.5, 6000)
-ax[3].legend(fontsize=5.4, loc='upper left',
-             ncol=2, frameon=True, handlelength=1.4, columnspacing=0.7,
+ax[3].legend(fontsize=5.2, loc='upper left',
+             ncol=2, frameon=True, handlelength=1.2, columnspacing=0.5,
              labelspacing=0.15)
 ax[3].grid(False, which='both', alpha=0.25)
 
