@@ -85,7 +85,7 @@ centres = 0.5 * (edges[1:] + edges[:-1])
 # ---------------------------------------------------------------------------
 # (b) FM-to-AM on the grating flank
 # ---------------------------------------------------------------------------
-DELTA_DEMO = 0.30 * F                # excursion used for the illustration only
+DELTA_DEMO = 0.15 * F                # excursion used for the illustration only
 ASYM = 0.30
 g = np.linspace(-2.6 * F, 2.6 * F, 1200)
 true_line = C.fbg_tanh(g, 0.0, F, n_side=ASYM)
@@ -100,7 +100,7 @@ p_chirp = C.gauss_fit_peak(g, chirped) * PM
 # ---------------------------------------------------------------------------
 def chirp_residual(ratio, nref, nsen=8, seed=3):
     rng = np.random.default_rng(seed)
-    delta = ratio * F
+    delta = ratio * F / 2.0             # Delta_ch = 2 x std of the dwell distribution
     ref_nu = (np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, nref) if nref > 1
               else np.array([0.0]))
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
@@ -139,7 +139,7 @@ CAL_RATIO, DRIFT_OFF, DRIFT_GAIN = 0.30, 20.0, 0.003  # FWHM, pm, relative
 
 def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
     rng = np.random.default_rng(seed)
-    delta = ratio * F
+    delta = ratio * F / 2.0             # Delta_ch = 2 x std of the dwell distribution
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)
 

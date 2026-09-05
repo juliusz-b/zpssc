@@ -114,13 +114,13 @@ def code_corr_stats(codes):
 # Fiber Bragg grating spectra
 # ----------------------------------------------------------------------------
 def fbg_gauss(nu, nu_b, fwhm):
-    sig = fwhm / 2.35482
+    sig = fwhm / (2.0 * np.arccosh(np.sqrt(2.0)))   # sech^2 has FWHM = 2 s arccosh(sqrt 2)
     return np.exp(-0.5 * ((nu - nu_b) / sig)**2)
 
 def fbg_tanh(nu, nu_b, fwhm, n_side=0.0):
     """tanh^2 (coupled-mode) approximation with optional asymmetry n_side.
     The asymmetry models the real, slightly non-symmetric grating lineshape."""
-    sig = fwhm / 2.35482
+    sig = fwhm / (2.0 * np.arccosh(np.sqrt(2.0)))   # sech^2 has FWHM = 2 s arccosh(sqrt 2)
     x = (nu - nu_b) / sig
     base = 1.0 / np.cosh(x)**2
     if n_side != 0.0:

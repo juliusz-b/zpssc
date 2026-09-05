@@ -64,7 +64,7 @@ def fmam_residual(chirp_ratio, nref, band_half=BAND_HALF, nsen=8, seed=3):
     as in s3; what survives is the lineshape-dependent remainder.
     """
     rng = np.random.default_rng(seed)
-    delta = chirp_ratio * F
+    delta = chirp_ratio * F / 2.0      # Delta_ch = 2 x std of the dwell distribution
     ref_nu = np.linspace(-0.9 * band_half, 0.9 * band_half, max(nref, 1))
     sen_nu = np.sort(rng.uniform(-band_half, band_half, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)

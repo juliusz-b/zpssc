@@ -40,7 +40,7 @@ BLUE, VERM, ORAN, GREE = '#0072B2', '#D55E00', '#E69F00', '#009E73'
 GREY = '0.45'
 
 rng = np.random.default_rng(SEED)
-delta = RATIO * F
+delta = RATIO * F / 2.0
 sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, NSEN))
 sen_as = rng.uniform(-0.30, 0.30, NSEN)
 
