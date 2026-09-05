@@ -21,7 +21,14 @@ was missing from the earlier draft. Three panels.
       asymmetric flank returns a biased value. Summed across the sweep, the
       recovered line is displaced. That is the FM-to-AM error.
 
-  (c) How far the references get. The chirp offset varies smoothly across the
+  (c) How the references calibrate. At one operating point (0.3 FWHM of
+      chirp, plus a drift of the lambda(V) table of +20 pm and 3 percent
+      gain) the axis error across the band, what each reference reads at
+      its own band position, and the polynomial through the readings: a
+      constant from one reference, a line from two, a parabola from three.
+      A single reference sits at the band centre.
+
+  (d) How far the references get. The chirp offset varies smoothly across the
       band, so temperature-stabilised references sample it and a low-order fit
       removes it. One reference removes the constant, two the slope, three the
       curvature. What survives scales with the excursion and with the spread of
@@ -88,7 +95,8 @@ p_chirp = C.gauss_fit_peak(g, chirped) * PM
 def chirp_residual(ratio, nref, nsen=8, seed=3):
     rng = np.random.default_rng(seed)
     delta = ratio * F
-    ref_nu = np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, max(nref, 1))
+    ref_nu = (np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, nref) if nref > 1
+              else np.array([0.0]))
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)
     ref_as = rng.uniform(-0.05, 0.05, max(nref, 1))
@@ -113,14 +121,62 @@ def chirp_residual(ratio, nref, nsen=8, seed=3):
 
 
 ratios = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0])
+
+# ---------------------------------------------------------------------------
+# (c) the calibration itself at one operating point
+# ---------------------------------------------------------------------------
+CAL_RATIO, DRIFT_OFF, DRIFT_GAIN = 0.30, 20.0, 0.03   # FWHM, pm, relative
+
+
+def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
+    rng = np.random.default_rng(seed)
+    delta = ratio * F
+    sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
+    sen_as = rng.uniform(-0.30, 0.30, nsen)
+
+    def off(nb):
+        x = nb / BAND_HALF
+        return delta * (0.20 + 0.20 * x + 0.15 * x ** 2 + 0.10 * np.sin(2.5 * x))
+
+    def chirp_shift(nb, asym):
+        gg = np.linspace(nb - 5 * F, nb + 5 * F, 801)
+        a = C.fmam_readout(gg, nb, F, delta, mean_off=off(nb), skew=1.2,
+                           shape='tanh', asym=asym)
+        b = C.fbg_tanh(gg, nb, F, n_side=asym)
+        return (C.gauss_fit_peak(gg, a) - C.gauss_fit_peak(gg, b)) * PM
+
+    def drift(nb):
+        return DRIFT_OFF + DRIFT_GAIN * nb * PM
+
+    def err(nb, asym):
+        return drift(nb) + chirp_shift(nb, asym)
+
+    grid = np.linspace(-BAND_HALF, BAND_HALF, 121)
+    out = dict(grid=grid, drift=drift(grid),
+               smooth=np.array([err(x, 0.0) for x in grid]),
+               sen_nu=sen_nu,
+               sen_err=np.array([err(sen_nu[i], sen_as[i]) for i in range(nsen)]),
+               refs={})
+    for nref in (1, 2, 3):
+        ref_nu = (np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, nref) if nref > 1
+                  else np.array([0.0]))
+        ref_as = rng.uniform(-0.05, 0.05, nref)
+        ref_rd = np.array([err(ref_nu[j], ref_as[j]) for j in range(nref)])
+        coef = np.polyfit(ref_nu, ref_rd, nref - 1)
+        out['refs'][nref] = dict(nu=ref_nu, rd=ref_rd, fit=np.polyval(coef, grid),
+                                 rms=float(np.sqrt(np.mean((out['sen_err'] - np.polyval(coef, sen_nu)) ** 2))))
+    return out
+
+
+cal = calibration()
 curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2, 3)}
 
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
-# The paper places this at 0.85 text width (about 6.0 in). Draw at the final
+# The paper places this at full text width (7.16 in). Draw at the final
 # physical width so annotations remain legible after inclusion.
-fig, ax = plt.subplots(1, 3, figsize=(6.0, 1.95))
+fig, ax = plt.subplots(1, 4, figsize=(7.16, 1.95))
 
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
@@ -167,24 +223,55 @@ ax[1].legend(fontsize=5.8, loc='upper right',
              labelspacing=0.18, borderaxespad=0.25)
 
 # --- (c) -------------------------------------------------------------------
+GREY = '0.45'
+xpm = cal['grid'] * PM
+ax[2].axhline(0, color='0.6', lw=0.6)
+chirp_part = cal['smooth'] - cal['drift']
+ax[2].plot(xpm, cal['drift'], color='0.25', lw=0.8, ls=':')
+ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3)
+ax[2].text(-192, cal['drift'][0] + 2.5, 'drift of the $\\lambda(V)$ table', fontsize=5.2,
+           color='0.25', ha='left', va='bottom')
+i60 = int(np.argmin(np.abs(xpm + 60)))
+ax[2].text(-60, cal['smooth'][i60] + 3.5, 'axis error: drift + chirp', fontsize=5.2,
+           color='0.25', ha='center', va='bottom')
+ax[2].plot(cal['sen_nu'] * PM, cal['sen_err'], 'o', color=GREY, ms=3.0, mfc='white',
+           mew=0.8, label='sensors, as read')
+cstyle = {1: ('#E69F00', 's', '1 ref'), 2: ('#0072B2', '^', '2 refs'), 3: ('#009E73', 'd', '3 refs')}
+for n in (1, 2, 3):
+    col, mk, lab = cstyle[n]
+    r = cal['refs'][n]
+    ax[2].plot(xpm, r['fit'], color=col, lw=0.9, ls='--')
+    ax[2].plot(r['nu'] * PM, r['rd'], mk, color=col, ms=4.2, label=lab + ', fit')
+ax[2].set_xlim(-200, 200)
+lo = min(cal['smooth'].min(), cal['sen_err'].min())
+hi = max(cal['smooth'].max(), cal['drift'].max())
+ax[2].set_ylim(lo - 0.42 * (hi - lo), hi + 14)
+ax[2].set_xlabel('band position [pm]')
+ax[2].set_ylabel('reported $-$ true $\\lambda_B$ [pm]')
+FS.letter(ax[2], 'c')
+ax[2].legend(fontsize=5.2, loc='lower left', ncol=2, frameon=True, handlelength=1.4,
+             columnspacing=0.6, labelspacing=0.15, borderaxespad=0.25)
+ax[2].grid(False, alpha=0.2)
+
+# --- (d) -------------------------------------------------------------------
 styles = {0: ('o-', '#D55E00', 'no reference'), 1: ('s-', '#E69F00', '1 reference'),
           2: ('^-', '#0072B2', '2 references'), 3: ('d-', '#009E73', '3 references')}
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
-    ax[2].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
-ax[2].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
-ax[2].set_yscale('log')
-ax[2].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
-ax[2].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
-FS.letter(ax[2], 'c')
-ax[2].set_ylim(0.5, 3000)
-ax[2].legend(fontsize=5.8, loc='upper left',
+    ax[3].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
+ax[3].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
+ax[3].set_yscale('log')
+ax[3].set_xlabel('chirp excursion  ' + r'$\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
+ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
+FS.letter(ax[3], 'd')
+ax[3].set_ylim(0.5, 3000)
+ax[3].legend(fontsize=5.8, loc='upper left',
              ncol=2, frameon=True, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.15)
-ax[2].grid(False, which='both', alpha=0.25)
+ax[3].grid(False, which='both', alpha=0.25)
 
-fig.subplots_adjust(left=0.075, right=0.99, top=0.87, bottom=0.17,
-                    wspace=0.34)
+fig.subplots_adjust(left=0.065, right=0.99, top=0.87, bottom=0.17,
+                    wspace=0.40)
 fig.savefig('figs/fig_s18_source.png', dpi=150, bbox_inches='tight')
 fig.savefig('figs/fig_s18_source.pdf', bbox_inches='tight')
 
@@ -195,4 +282,7 @@ print('  Delta/FWHM ' + ''.join('%9.2f' % r for r in ratios))
 for n in (0, 1, 2, 3):
     print('  %d ref%s     ' % (n, ' ' if n == 1 else 's') +
           ''.join('%9.2f' % v for v in curves[n]))
+print('(c) at %.2f FWHM, drift %+.0f pm and %.0f%% gain: RMS after 1/2/3 refs = %s pm'
+      % (CAL_RATIO, DRIFT_OFF, 100 * DRIFT_GAIN,
+         [round(cal['refs'][n]['rms'], 2) for n in (1, 2, 3)]))
 print('saved figs/fig_s18_source.png')
