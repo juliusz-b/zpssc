@@ -4,6 +4,14 @@ Format: data | zadanie | pliki | opis zmian
 
 ---
 
+## 2026-09-05 | Reference-placement figure
+
+- Redrew panel (a) in `python_selfcal_cdm/s38_references.py` with aligned optical paths, explicit circulator, detector and coupler symbols, and consistent reference and sensor labels.
+- Shortened panel (b) annotations to match the reference labels and avoid overlap. Regenerated the PDF and PNG without changing the numerical results.
+- Documented that the branch calculation assumes ideal reference readings and excludes mutual reference shadowing.
+
+---
+
 ## 2026-01-15 | Optymalizacja Gaussian fit - 21.6 pm MAE
 
 ### Wyniki

@@ -14,13 +14,11 @@ percent reflectivity the three references disagree with each other by more
 than the error they are there to remove, and the correction ends up leaving
 more error than doing nothing at all.
 
-A coupler fixes it. Put the references on a short stub of their own and they
-shadow nothing and nothing shadows them, so the fit measures the source error
-and only the source error. The cost is 6 dB on the round trip, which a link
-budget with 99 dB of margin does not notice.
-
-This is a design rule the paper was missing, and it follows from its own
-Law A without any new physics.
+The branch case assumes ideal reference readings, isolated from the sensors.
+Mutual shadowing among the serial reference gratings is not modeled in that
+case. The zero residual is therefore an assumption of the comparison, not a
+prediction for an arbitrary serial reference branch. The extra 6 dB of optical
+loss reduces the detector-noise SNR from 99 to 87 dB in the 20log10 convention.
 
 Output: figs/fig_s38_references.pdf, full text width.
 """
@@ -79,69 +77,102 @@ axc = fig.add_axes([0.792, 0.175, 0.200, 0.745])
 # ==========================================================================
 # (a) the two places a reference can sit
 # ==========================================================================
-axa.set_xlim(0, 10.6)
-axa.set_ylim(0.30, 5.35)
+axa.set_xlim(0, 10.8)
+axa.set_ylim(0, 7.4)
+axa.set_aspect('equal', adjustable='box')
 axa.axis('off')
+
+INK = '#40464D'
+SENSOR = VERM
+
+
+def fiber(xs, ys):
+    axa.plot(xs, ys, color=INK, lw=1.05, solid_capstyle='round', zorder=1)
+
+
+def component(x, y, width, height, label):
+    axa.add_patch(Rectangle((x, y - height / 2), width, height,
+                            facecolor='white', edgecolor=INK, lw=0.8, zorder=3))
+    axa.text(x + width / 2, y, label, ha='center', va='center',
+             fontsize=6.2, color=INK, zorder=4)
 
 
 def source(y):
-    axa.add_patch(Rectangle((0.05, y - 0.26), 1.15, 0.52, fc='white',
-                            ec='0.35', lw=0.8))
-    axa.text(0.62, y, 'VCSEL', ha='center', va='center', fontsize=5.8)
-    axa.plot([1.20, 1.62], [y, y], color='0.35', lw=1.0)
-    axa.add_patch(plt.Circle((1.80, y), 0.18, fc='white', ec='0.35', lw=0.8))
-    axa.plot([1.98, 2.25], [y, y], color='0.35', lw=1.0)
-    axa.plot([1.80, 1.80], [y - 0.18, y - 0.62], color='0.35', lw=0.8)
-    axa.text(1.80, y - 0.78, 'PD', ha='center', va='center', fontsize=5.4,
-             color='0.35')
+    component(0.08, y, 1.28, 0.62, 'VCSEL')
+    fiber([1.36, 1.88], [y, y])
+    fiber([2.42, 2.95], [y, y])
+    fiber([2.15, 2.15], [y - 0.27, y - 0.80])
+    axa.add_patch(plt.Circle((2.15, y), 0.27, facecolor='white',
+                            edgecolor=INK, lw=0.8, zorder=3))
+    axa.add_patch(FancyArrowPatch((2.00, y + 0.10), (2.29, y - 0.10),
+                                  connectionstyle='arc3,rad=-0.65',
+                                  arrowstyle='-|>', mutation_scale=4,
+                                  lw=0.65, color=INK, zorder=4))
+    axa.text(2.15, y + 0.55, 'Circulator', ha='center', fontsize=5.6,
+             color=INK)
+    component(1.77, y - 1.03, 0.76, 0.46, 'PD')
 
 
-def grating(x, y, col, h=0.20):
-    for d in (-0.045, 0.0, 0.045):
-        axa.plot([x + d, x + d], [y - h, y + h], color=col, lw=0.9)
+def grating(x, y, color):
+    axa.add_patch(Rectangle((x - 0.11, y - 0.24), 0.22, 0.48,
+                            facecolor='white', edgecolor=color,
+                            lw=0.75, zorder=3))
+    for offset in (-0.15, 0.0, 0.15):
+        axa.plot([x - 0.09, x + 0.09],
+                 [y + offset - 0.055, y + offset + 0.055],
+                 color=color, lw=0.65, zorder=4)
 
 
-# --- inline -----------------------------------------------------------
-y1 = 3.95
-source(y1)
-axa.plot([2.25, 10.3], [y1, y1], color='0.35', lw=1.4)
-axa.add_patch(Rectangle((2.45, y1 - 0.42), 1.55, 0.84, fc='#eaf1fb',
-                        ec=BLUE, lw=0.7, ls=(0, (3, 2))))
-for x in (2.75, 3.22, 3.69):
-    grating(x, y1, BLUE)
-axa.text(3.22, y1 + 0.60, 'references, stabilized', ha='center',
-         fontsize=5.6, color=BLUE)
-for x, c in ((5.1, VERM), (6.3, ORAN), (7.5, GREE), (8.7, PURP)):
-    grating(x, y1, c)
-axa.text(6.9, y1 - 0.62, 'sensors', ha='center', fontsize=5.6, color='0.35')
-axa.text(0.05, y1 + 0.92, 'inline: every sensor looks through all three',
-         fontsize=6.2, color='0.2')
-for x in (5.1, 6.3, 7.5, 8.7):
-    axa.add_patch(FancyArrowPatch((4.05, y1 + 0.30), (x, y1 + 0.30),
-                                  arrowstyle='-', lw=0.4, color=VERM,
-                                  alpha=0.55,
-                                  connectionstyle='arc3,rad=-0.30'))
+def references(xs, y, label_above=True):
+    left, right = xs[0] - 0.36, xs[-1] + 0.36
+    axa.add_patch(Rectangle((left, y - 0.41), right - left, 0.82,
+                            facecolor='#EDF5FA', edgecolor=BLUE, lw=0.65,
+                            linestyle=(0, (3, 2)), zorder=0))
+    for i, x in enumerate(xs, 1):
+        grating(x, y, BLUE)
+        axa.text(x, y - 0.69, '$R_%d$' % i, fontsize=5.8,
+                 color=BLUE, ha='center', va='center')
+    label_y = y + 0.60 if label_above else y - 1.12
+    axa.text((left + right) / 2, label_y, 'References',
+             ha='center', fontsize=6.0, color=BLUE)
 
-# --- branch -----------------------------------------------------------
-y2 = 1.72
-source(y2)
-axa.plot([2.25, 10.3], [y2, y2], color='0.35', lw=1.4)
-axa.plot([3.05, 3.05], [y2, y2 - 0.72], color='0.35', lw=1.0)
-axa.plot([3.05, 4.60], [y2 - 0.72, y2 - 0.72], color='0.35', lw=1.4)
-axa.add_patch(Rectangle((2.98, y2 - 0.10), 0.16, 0.20, fc='0.35', ec='none'))
-axa.text(2.72, y2 + 0.26, 'coupler', fontsize=5.4, color='0.35', ha='center')
-axa.add_patch(Rectangle((3.20, y2 - 1.04), 1.30, 0.64, fc='#eaf1fb',
-                        ec=BLUE, lw=0.7, ls=(0, (3, 2))))
-for x in (3.50, 3.85, 4.20):
-    grating(x, y2 - 0.72, BLUE, h=0.16)
-axa.text(3.85, y2 - 1.22, 'references, own stub', ha='center', fontsize=5.6,
-         color=BLUE)
-for x, c in ((5.1, VERM), (6.3, ORAN), (7.5, GREE), (8.7, PURP)):
-    grating(x, y2, c)
-axa.text(6.9, y2 + 0.42, 'sensors, nothing in front of them', ha='center',
-         fontsize=5.6, color='0.35')
-axa.text(0.05, y2 + 0.92, 'branch: the reference path is separate',
-         fontsize=6.2, color='0.2')
+
+def sensors(y):
+    for i, x in enumerate((6.25, 7.35, 8.45, 9.55), 1):
+        grating(x, y, SENSOR)
+        axa.text(x, y - 0.69, '$S_%d$' % i, fontsize=5.8,
+                 color=INK, ha='center', va='center')
+    axa.text(7.90, y + 0.60, 'Sensors', ha='center', fontsize=6.0,
+             color=INK)
+
+
+# Keep corresponding components aligned between the two arrangements.
+upper, lower = 5.95, 2.65
+axa.text(0.08, 7.10, 'Inline references', fontsize=7.0,
+         fontweight='bold', color=INK)
+source(upper)
+fiber([2.95, 10.40], [upper, upper])
+references((3.65, 4.30, 4.95), upper)
+sensors(upper)
+
+axa.plot([0.08, 10.40], [4.30, 4.30], color='#DDE1E5', lw=0.55)
+axa.text(0.08, 3.83, 'Separate reference branch', fontsize=7.0,
+         fontweight='bold', color=INK)
+source(lower)
+fiber([2.95, 10.40], [lower, lower])
+sensors(lower)
+
+# A boxed splitter makes the extra optical component explicit.
+split_x, ref_y = 3.48, 1.22
+axa.add_patch(Rectangle((3.06, lower - 0.30), 0.84, 0.60,
+                        facecolor='white', edgecolor=INK, lw=0.8, zorder=3))
+axa.plot([3.06, 3.90], [lower, lower], color=INK, lw=0.7, zorder=4)
+axa.plot([split_x, split_x], [lower, lower - 0.30],
+         color=INK, lw=0.7, zorder=4)
+fiber([split_x, split_x, 5.55], [lower - 0.30, ref_y, ref_y])
+axa.text(split_x, lower + 0.55, 'Coupler', ha='center',
+         fontsize=5.6, color=INK)
+references((3.90, 4.50, 5.10), ref_y, label_above=False)
 
 FS.letter(axa, 'a')
 
@@ -168,11 +199,11 @@ for r, v in zip(REFS, read10):
                      arrowprops=dict(arrowstyle='-|>', color=VERM, lw=0.7,
                                      mutation_scale=6, shrinkA=0,
                                      shrinkB=1.5))
-axb.text(-172, -6.6, '1st: nothing in front,\nreads the true error',
+axb.text(-172, -6.6, '$R_1$: no bias',
          fontsize=5.2, color='0.25', ha='left', va='top')
-axb.text(14, 6.6, '2nd: shadowed by the 1st,\nreads $\\delta\\lambda_{k\\leftarrow j}=7.5$ pm too high',
+axb.text(14, 6.6, '$R_2$: +7.5 pm bias',
          fontsize=5.2, color='0.25', ha='left', va='top')
-axb.text(168, 11.6, '3rd: shadowed by two,\nreads 8.4 pm too high',
+axb.text(168, 11.6, '$R_3$: +8.4 pm bias',
          fontsize=5.2, color='0.25', ha='right', va='top')
 axb.set_xlim(-215, 215)
 axb.set_ylim(-9, 17.5)
