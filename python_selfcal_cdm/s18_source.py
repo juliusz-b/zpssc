@@ -26,7 +26,9 @@ was missing from the earlier draft. Three panels.
       gain) the axis error across the band, what each reference reads at
       its own band position, and the polynomial through the readings: a
       constant from one reference, a line from two, a parabola from three.
-      A single reference sits at the band centre.
+      A single reference sits at the sweep centre. The panel spans the
+      whole 10-nm sweep: three references in the edge bands and the centre
+      band serve every band, because the axis error is smooth over the sweep.
 
   (d) How far the references get. The chirp offset varies smoothly across the
       band, so temperature-stabilised references sample it and a low-order fit
@@ -44,7 +46,11 @@ FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
-BAND_HALF = 25.0                     # +-200 pm, the band W of Table III
+BAND_HALF = 625.0                    # +-5 nm, the whole VCSEL sweep. The axis
+                                     # error is smooth over the sweep, so the
+                                     # references are spread over it, not over
+                                     # one 400-pm band. The residual does not
+                                     # depend on this width (normalised).
 
 # ---------------------------------------------------------------------------
 # (a) chirp waveform during code modulation, in units of the excursion
@@ -125,7 +131,10 @@ ratios = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0])
 # ---------------------------------------------------------------------------
 # (c) the calibration itself at one operating point
 # ---------------------------------------------------------------------------
-CAL_RATIO, DRIFT_OFF, DRIFT_GAIN = 0.30, 20.0, 0.03   # FWHM, pm, relative
+CAL_RATIO, DRIFT_OFF, DRIFT_GAIN = 0.30, 20.0, 0.003  # FWHM, pm, relative
+# drift of the lambda(V) table since the last uncoded calibration: 0.2 K of
+# laser temperature at 0.1 nm/K is 20 pm of offset, and 1e-4/K of spring
+# stiffness over 30 K is a 0.3 percent gain error, 15 pm at the sweep edges
 
 
 def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
@@ -224,29 +233,29 @@ ax[1].legend(fontsize=5.8, loc='upper right',
 
 # --- (c) -------------------------------------------------------------------
 GREY = '0.45'
-xpm = cal['grid'] * PM
+xpm = cal['grid'] * PM / 1000.0
 ax[2].axhline(0, color='0.6', lw=0.6)
 chirp_part = cal['smooth'] - cal['drift']
 ax[2].plot(xpm, cal['drift'], color='0.25', lw=0.8, ls=':')
 ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3)
-ax[2].text(-192, cal['drift'][0] + 2.5, 'drift of the $\\lambda(V)$ table', fontsize=5.2,
-           color='0.25', ha='left', va='bottom')
-i60 = int(np.argmin(np.abs(xpm + 60)))
-ax[2].text(-60, cal['smooth'][i60] + 3.5, 'axis error: drift + chirp', fontsize=5.2,
+ax[2].text(4.8, cal['drift'][-1] + 2.5, 'drift of the $\\lambda(V)$ table', fontsize=5.2,
+           color='0.25', ha='right', va='bottom')
+i60 = int(np.argmin(np.abs(xpm + 1.5)))
+ax[2].text(-1.5, cal['smooth'][i60] + 3.5, 'axis error: drift + chirp', fontsize=5.2,
            color='0.25', ha='center', va='bottom')
-ax[2].plot(cal['sen_nu'] * PM, cal['sen_err'], 'o', color=GREY, ms=3.0, mfc='white',
+ax[2].plot(cal['sen_nu'] * PM / 1000.0, cal['sen_err'], 'o', color=GREY, ms=3.0, mfc='white',
            mew=0.8, label='sensors, as read')
 cstyle = {1: ('#E69F00', 's', '1 ref'), 2: ('#0072B2', '^', '2 refs'), 3: ('#009E73', 'd', '3 refs')}
 for n in (1, 2, 3):
     col, mk, lab = cstyle[n]
     r = cal['refs'][n]
     ax[2].plot(xpm, r['fit'], color=col, lw=0.9, ls='--')
-    ax[2].plot(r['nu'] * PM, r['rd'], mk, color=col, ms=4.2, label=lab + ', fit')
-ax[2].set_xlim(-200, 200)
+    ax[2].plot(r['nu'] * PM / 1000.0, r['rd'], mk, color=col, ms=4.2, label=lab + ', fit')
+ax[2].set_xlim(-5, 5)
 lo = min(cal['smooth'].min(), cal['sen_err'].min())
 hi = max(cal['smooth'].max(), cal['drift'].max())
 ax[2].set_ylim(lo - 0.42 * (hi - lo), hi + 14)
-ax[2].set_xlabel('band position [pm]')
+ax[2].set_xlabel('sweep position [nm]')
 ax[2].set_ylabel('reported $-$ true $\\lambda_B$ [pm]')
 FS.letter(ax[2], 'c')
 ax[2].legend(fontsize=5.2, loc='lower left', ncol=2, frameon=True, handlelength=1.4,
@@ -282,7 +291,7 @@ print('  Delta/FWHM ' + ''.join('%9.2f' % r for r in ratios))
 for n in (0, 1, 2, 3):
     print('  %d ref%s     ' % (n, ' ' if n == 1 else 's') +
           ''.join('%9.2f' % v for v in curves[n]))
-print('(c) at %.2f FWHM, drift %+.0f pm and %.0f%% gain: RMS after 1/2/3 refs = %s pm'
+print('(c) at %.2f FWHM, drift %+.0f pm and %.1f%% gain: RMS after 1/2/3 refs = %s pm'
       % (CAL_RATIO, DRIFT_OFF, 100 * DRIFT_GAIN,
          [round(cal['refs'][n]['rms'], 2) for n in (1, 2, 3)]))
 print('saved figs/fig_s18_source.png')
