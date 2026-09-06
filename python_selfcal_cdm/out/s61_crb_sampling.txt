@@ -1,0 +1,26 @@
+Cramer-Rao bound on the fitted centre, in units of (sigma_n/a) x sigma_line
+unknowns: (mu, a, s, b) unless stated
+
+--- equally spaced steps over +-3 sigma (the 64-step sweep of Table III covers +-6 sigma of a 250-pm line) ---
+     M sqrt(CRB) 4 unk sqrt(CRB) mu only
+     4          1.164          1.164
+     5          1.449          1.449
+     6          1.148          1.148
+     8          0.983          0.983
+    12          0.785          0.785
+    16          0.672          0.672
+    32          0.467          0.467
+    64          0.328          0.328
+
+--- best placement of a few samples (numerical search, symmetric start) ---
+3 samples: sqrt(CRB) = nan at x/sigma = [0.06 2.3  2.44]
+4 samples: sqrt(CRB) = 0.821 at x/sigma = [-1.03 -0.99  0.99  1.03]
+5 samples: sqrt(CRB) = 0.753 at x/sigma = [-1. -1.  1.  1.  1.]
+6 samples: sqrt(CRB) = 0.673 at x/sigma = [-1.02 -1.02 -0.98  0.98  1.02  1.02]
+
+--- mu only (a, s, b known): two samples at +-1 sigma give sqrt(CRB) = 1.166, the equally spaced 64-step sweep gives 0.328
+
+--- reading: the 64-step sweep spends most samples where the line carries no information about its centre.
+    Four samples placed by the search reach the precision of about 6 equally spaced steps,
+    so a tracking sweep of a few steps per line raises the refresh rate of (23) by that factor at equal precision,
+    or keeps M and averages that many more code periods per step.

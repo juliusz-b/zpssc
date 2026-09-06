@@ -89,6 +89,10 @@ def make_layout(cfg, rng):
         z = cfg['d_min'] * np.arange(1, K + 1)
     elif cfg['spacing'] == 'given':
         z = np.asarray(cfg['z'], float)
+    elif cfg['spacing'] == 'bins':
+        # distinct chip bins plus a random fraction of a chip, for dense arrays
+        b = np.sort(rng.choice(np.arange(2, int(0.95 * N)), K, replace=False))
+        z = (b + rng.uniform(0.0, 0.5, K)) * m_per_chip
     else:
         # random bins, at least d_min apart, inside 80 percent of the period
         while True:
