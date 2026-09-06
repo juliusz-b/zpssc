@@ -1,0 +1,30 @@
+s62 two-class despreading, N=127, SPC=32, FWHM=250 pm
+
+(a) single grating: true class-mean step vs shift of the fitted centres [pm]
+   A_ad= 20 A_T= 30 tau=0.1 chip: true   3.49  recovered   3.46
+   A_ad= 20 A_T= 30 tau=0.3 chip: true   8.98  recovered   8.96
+   A_ad= 20 A_T= 30 tau=1.0 chip: true  15.70  recovered  15.70
+   A_ad= 20 A_T= 80 tau=0.3 chip: true  23.94  recovered  23.56
+   A_ad=  0 A_T= 80 tau=0.3 chip: true  23.94  recovered  23.56
+
+(b) grating under test at delay 0, neighbour d chips closer, A_T=30 pm tau=0.3 chip, detuning 0: centre bias [pm]
+   d= 1  correlator   4.52  two-class   0.03
+   d= 2  correlator   0.10  two-class   0.10
+   d= 3  correlator   0.03  two-class   0.03
+   d= 4  correlator   0.03  two-class   0.03
+   d= 5  correlator   0.03  two-class   0.03
+   d= 6  correlator   0.03  two-class   0.03
+   d= 7  correlator  -4.50  two-class   0.03
+   d= 8  correlator  -0.06  two-class  -0.06
+   d= 9  correlator   0.02  two-class   0.02
+   d=10  correlator   0.03  two-class   0.03
+   d=11  correlator   0.03  two-class   0.03
+   d=12  correlator   0.03  two-class   0.03
+   shift-and-add lag of this sequence: s=7
+
+(c) smallest singular value of [D_v D_w], normalized, two gratings at lag d
+   d=1: 0.379
+   d=2: 0.702
+   d=6: 0.573
+   d=7: 0.379
+   d=8: 0.702
