@@ -22,7 +22,7 @@ Typical cost: one sweep of 64 steps for 32 gratings in a few seconds.
 """
 import os
 import numpy as np
-from scipy.signal import bessel, lfilter
+from scipy.signal import bessel, sosfilt
 
 C0 = 299792458.0
 N_EFF = 1.45
@@ -255,12 +255,16 @@ def photocurrent(E_out, fs, resp=1.0, p_scale=1e-3, nep=0.5e-12, det_noise=True,
 
 
 def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,), spc=64, bias=0.033, amp=0.018,
-              rise_frac=0.25, linewidth_hz=30e6, thermal=None, det_noise=True, laser_params=None, out=None, verbose=False, ghosts=True):
+              rise_frac=0.25, linewidth_hz=30e6, thermal=None, det_noise=True, laser_params=None, out=None, verbose=False, ghosts=True, osr=4):
     """Sweep the laser over x_pm (pm around LAM0) and return records det[seed, step, sample] plus metadata,
-    in the layout of the VPI runs. sensors, refs: dict(z, det, R, g)."""
+    in the layout of the VPI runs. sensors, refs: dict(z, det, R, g). The optical field is sampled at
+    osr times the detector rate (chip_rate*spc) so that the chirp transients fit in the band, the
+    photocurrent is decimated to the detector rate after the Bessel filter."""
     code = np.asarray(code if code is not None else _mls(7), float)
-    n = code.size * spc
-    fs = chip_rate * spc
+    n_det = code.size * spc
+    osr = max(1, int(osr))
+    n = n_det * osr
+    fs = chip_rate * spc * osr
     x_pm = np.asarray(x_pm if x_pm is not None else np.linspace(-650.0, 650.0, 64), float)
     elems, elems_r = [], []
     for s in sensors:
@@ -269,12 +273,12 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
     for r in refs:
         L, k0, _, _ = calibrate(r["g"], r["R"])
         elems_r.append(dict(z=r["z"], lam_b=LAM0 + r["det"] * 1e-12, length=L, kappa0=k0, apod=GRATINGS[r["g"]].get("apod", "blackman")))
-    I = drive_current(code, spc, bias, amp, rise_frac)
+    I = drive_current(code, spc * osr, bias, amp, rise_frac)
     fk = np.fft.fftfreq(n, 1.0 / fs)
-    b_, a_ = bessel(4, 0.75 * chip_rate, fs=fs, norm="mag")
-    det = np.zeros((len(seeds), x_pm.size, n), np.float32)
+    sos = bessel(4, 0.75 * chip_rate, fs=fs, norm="mag", output="sos")
+    det = np.zeros((len(seeds), x_pm.size, n_det), np.float32)
     for si, seed in enumerate(seeds):
-        key = (seed, bias, amp, rise_frac, fs, code.size, int(code.sum()), str(laser_params), str(thermal))
+        key = (seed, bias, amp, rise_frac, fs, osr, code.size, int(code.sum()), str(laser_params), str(thermal))
         if key not in _LCACHE:
             _LCACHE[key] = laser_record(I, fs, seed=seed, params=laser_params, thermal=thermal)
         E_L, f_c = _LCACHE[key]
@@ -290,7 +294,7 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
             E_in = E_L * np.exp(1j * phase_walk(n, fs, linewidth_hz, rng))
             E_out = np.fft.ifft(np.fft.fft(E_in) * r)
             i_pd = photocurrent(E_out, fs, det_noise=det_noise, rng=rng)
-            det[si, m] = lfilter(b_, a_, np.tile(i_pd, 2))[n:]      # causal filter, periodic warm-up
+            det[si, m] = sosfilt(sos, np.tile(i_pd, 2))[n::osr]      # causal filter, periodic warm-up, decimation
             if verbose and (m % 16 == 0 or m == x_pm.size - 1):
                 print("   seed %d step %d/%d" % (seed, m + 1, x_pm.size), flush=True)
     meta = dict(z=np.array([s["z"] for s in sensors]), det_pm=np.array([s["det"] for s in sensors]), R=np.array([s["R"] for s in sensors]),
