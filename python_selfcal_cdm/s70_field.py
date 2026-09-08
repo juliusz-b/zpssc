@@ -77,6 +77,14 @@ GRATINGS = {
     "bl150": dict(length=7.7e-3, fwhm=150.0),
     "bl400": dict(length=2.9e-3, fwhm=400.0),
     "bl625": dict(length=1.9e-3, fwhm=625.0),
+    "bl175": dict(length=6.6e-3, fwhm=175.0),
+    "bl196": dict(length=5.9e-3, fwhm=196.0),
+    "bl218": dict(length=5.3e-3, fwhm=218.0),
+    "bl239": dict(length=4.8e-3, fwhm=239.0),
+    "bl261": dict(length=4.4e-3, fwhm=261.0),
+    "bl282": dict(length=4.1e-3, fwhm=282.0),
+    "bl304": dict(length=3.8e-3, fwhm=304.0),
+    "bl325": dict(length=3.6e-3, fwhm=325.0),
 }
 
 
