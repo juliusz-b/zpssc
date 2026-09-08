@@ -73,6 +73,10 @@ GRATINGS = {
     "bl250": dict(length=4.6e-3, fwhm=250.0),
     "bl100": dict(length=11.5e-3, fwhm=100.0),
     "uni40": dict(length=10.0e-3, fwhm=40.0, apod="uniform"),
+    "bl060": dict(length=19.0e-3, fwhm=60.0),
+    "bl150": dict(length=7.7e-3, fwhm=150.0),
+    "bl400": dict(length=2.9e-3, fwhm=400.0),
+    "bl625": dict(length=1.9e-3, fwhm=625.0),
 }
 
 
