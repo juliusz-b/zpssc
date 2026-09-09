@@ -184,7 +184,7 @@ c_g = C.gauss_fit_peak(nuc, wanted + leak_g) * PM
 print('leakage panel: fitted center moves by %.1f pm (m-sequence) and %.1f pm (Gold), K=%d, N=%d'
       % (c_m - c_true, c_g - c_true, Kc, NCH))
 ax[1].axhline(0, color='0.75', lw=0.6, zorder=1)
-ax[1].plot(xnm, wanted / 0.05, color='#0072B2', lw=1.5, label='$A_k$, the line of grating $k$')
+ax[1].plot(xnm, wanted / 0.05, color='#0072B2', lw=1.5, label='$A_k$, spectrum of grating $k$')
 ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=1.1, label='$L_k$, m-sequence')
 ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-sequence')
 ax[1].plot(xnm, leak_g / 0.05, color='#D55E00', lw=1.1, label='$L_k$, Gold code')
