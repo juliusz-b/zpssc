@@ -346,17 +346,19 @@ def spectral(zpos, ghosts=True):
     for k in range(K8):
         corr[k] = meas[k] / np.maximum(est, 0.05)
         est = est * (1.0 - np.clip(corr[k], 0.0, 0.99)) ** 2
-    return nu, shapes, meas, corr
+    return nu, shapes, meas, corr, ghost
 
 
 z8 = 4.0 * np.arange(1, K8 + 1)
-nu8, shapes8, meas8, corr8 = spectral(z8)
-_, _, _, corr8_0 = spectral(z8, ghosts=False)
+nu8, shapes8, meas8, corr8, ghost8 = spectral(z8)
+_, _, _, corr8_0, _ = spectral(z8, ghosts=False)
 k8 = K8 - 1
 dx.plot(nu8, shapes8[k8], color='0.6', lw=1.8, label='$R_8$', zorder=2)
 dx.plot(nu8, meas8[k8] / R8, color=COL['b'], lw=1.0, label='measured $S_8$', zorder=3)
 dx.plot(nu8, corr8[k8] / R8, color=FS.BLUE, lw=1.0, label='deshadowed $\widehat S_8$', zorder=4)
-dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=COL['a'], lw=0.9, ls='--', label='ghosts left after deshadowing', zorder=3)
+dx.plot(nu8, ghost8[k8] / R8, color=COL['a'], lw=0.9, ls=':', label='ghost before deshadowing', zorder=3)
+dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=COL['a'], lw=0.9, ls='--', label='ghost after deshadowing', zorder=3)
+print('panel (c): ghost peak / R before %.3f, after %.3f' % (ghost8[k8].max() / R8, ((corr8[k8] - corr8_0[k8]) / R8).max()))
 dx.set_xlim(-500, 500)
 dx.set_ylim(0, 1.12)
 dx.set_yticks([0, 0.5, 1.0])
