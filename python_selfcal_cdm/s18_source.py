@@ -30,11 +30,16 @@ was missing from the earlier draft. Three panels.
       whole 10-nm sweep: three references in the edge bands and the centre
       band serve every band, because the axis error is smooth over the sweep.
 
-  (d) How far the references get. The chirp offset varies smoothly across the
-      band, so temperature-stabilised references sample it and a low-order fit
-      removes it. One reference removes the constant, two the slope, three the
-      curvature. What survives scales with the excursion and with the spread of
-      grating lineshapes.
+  (c) The calibration at one operating point (0.3 FWHM of chirp, drifted
+      lambda(V) table): the axis error across the measured tuning range, the raw
+      sensor readings, three references with the parabola through them and the
+      sensors after correction. Inset: the measured tuning curve minus its
+      quadratic fit, the part a second-order table would leave.
+  (d) How far the references get. The axis error is smooth over the sweep, so
+      temperature-stabilised references sample it and a low-order fit removes
+      it: one reference the offset, two the slope, three the curvature that the
+      nonlinear tuning curve puts into the drift. What survives scales with the
+      chirp span and with the spread of grating lineshapes.
 """
 import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -46,11 +51,7 @@ FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
-BAND_HALF = 625.0                    # +-5 nm, the whole VCSEL sweep. The axis
-                                     # error is smooth over the sweep, so the
-                                     # references are spread over it, not over
-                                     # one 400-pm band. The residual does not
-                                     # depend on this width (normalised).
+# BAND_HALF (half of the measured tuning range) is set below from the tuning curve.
 
 # ---------------------------------------------------------------------------
 # (a) chirp waveform during code modulation, in units of the excursion
@@ -96,9 +97,54 @@ p_true = C.gauss_fit_peak(g, true_line) * PM
 p_chirp = C.gauss_fit_peak(g, chirped) * PM
 
 # ---------------------------------------------------------------------------
-# (c) residual against excursion and reference count
+# Wavelength-axis error model shared by panels (c) and (d)
 # ---------------------------------------------------------------------------
+# Measured tuning curve of a BW10-1550 HCG-VCSEL, 160 static points over 0-14 V
+# and 7.64 nm, represented by its quartic fit (residual 4 pm RMS). The curve is
+# far from linear: dlambda/dV runs from -0.10 to -1.00 nm/V. A quadratic fit
+# leaves a 14-pm RMS, 56-pm peak deviation that no polynomial through three
+# references can remove, so the per-step table must keep at least the quartic.
+TUNE_P4 = np.array([-7.14581756e-05, 1.94718096e-03, -4.51295135e-02, -9.75634596e-02, 1.56974137e+03])  # nm, V^4..V^0
+TUNE_V = np.linspace(0.0, 14.0, 2801)
+TUNE_L = np.polyval(TUNE_P4, TUNE_V)                       # nm, decreasing in V
+TUNE_DL = np.polyval(np.polyder(TUNE_P4), TUNE_V)          # nm/V
+TUNE_C = 0.5 * (TUNE_L[0] + TUNE_L[-1])                    # sweep centre
+BAND_HALF = 0.5 * (TUNE_L[0] - TUNE_L[-1]) * 1000.0 / PM   # half of the measured sweep, GHz
+TUNE_WAVE = (TUNE_L - np.polyval(np.polyfit(TUNE_V, TUNE_L, 2), TUNE_V)) * 1000.0   # pm, what a quadratic table leaves
+
+# drift of the table since the last uncoded calibration: 0.2 K of laser
+# temperature at 0.1 nm/K (20 pm offset), 0.3 percent of spring stiffness
+# (a gain on the tuning from V = 0), and 30 mV of offset voltage (dielectric
+# charging), which acts through the local slope dlambda/dV of the curve
+DRIFT_OFF, DRIFT_GAIN, DRIFT_V0 = 20.0, 0.003, 0.030      # pm, relative, V
+
+
+def _v_of_nu(nb):
+    """sweep position nb [GHz from centre] -> HCG voltage, on the measured curve"""
+    lam = TUNE_C + nb * PM / 1000.0
+    return np.interp(lam, TUNE_L[::-1], TUNE_V[::-1])
+
+
+def axis_error(nb):
+    """reported minus true wavelength [pm] caused by the drifted table, smooth over the sweep"""
+    V = _v_of_nu(np.atleast_1d(nb))
+    lam = np.polyval(TUNE_P4, V)
+    slope = np.polyval(np.polyder(TUNE_P4), V)
+    e = DRIFT_OFF + DRIFT_GAIN * (lam - TUNE_L[0]) * 1000.0 + DRIFT_V0 * slope * 1000.0
+    return e if np.ndim(nb) else float(e[0])
+
+
+def chirp_shift(nb, asym, delta):
+    """FM-to-AM shift of the fitted peak [pm] for a grating with side asymmetry asym; the chirp
+    kernel has the same span and mean offset at every sweep position"""
+    gg = np.linspace(nb - 5 * F, nb + 5 * F, 801)
+    a = C.fmam_readout(gg, nb, F, delta, mean_off=0.20 * delta, skew=1.2, shape='tanh', asym=asym)
+    b = C.fbg_tanh(gg, nb, F, n_side=asym)
+    return (C.gauss_fit_peak(gg, a) - C.gauss_fit_peak(gg, b)) * PM
+
+
 def chirp_residual(ratio, nref, nsen=8, seed=3):
+    """RMS sensor error after a polynomial through nref references, at chirp span ratio x FWHM"""
     rng = np.random.default_rng(seed)
     delta = ratio * F / 2.0             # Delta_ch = 2 x std of the dwell distribution
     ref_nu = (np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, nref) if nref > 1
@@ -106,22 +152,10 @@ def chirp_residual(ratio, nref, nsen=8, seed=3):
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)
     ref_as = rng.uniform(-0.05, 0.05, max(nref, 1))
-
-    def off(nb):
-        x = nb / BAND_HALF
-        return delta * (0.20 + 0.20 * x + 0.15 * x ** 2 + 0.10 * np.sin(2.5 * x))
-
-    def shift(nb, asym):
-        gg = np.linspace(nb - 5 * F, nb + 5 * F, 801)
-        a = C.fmam_readout(gg, nb, F, delta, mean_off=off(nb), skew=1.2,
-                           shape='tanh', asym=asym)
-        b = C.fbg_tanh(gg, nb, F, n_side=asym)
-        return (C.gauss_fit_peak(gg, a) - C.gauss_fit_peak(gg, b)) * PM
-
-    se = np.array([shift(sen_nu[i], sen_as[i]) for i in range(nsen)])
+    se = np.array([axis_error(sen_nu[i]) + chirp_shift(sen_nu[i], sen_as[i], delta) for i in range(nsen)])
     if nref == 0:
         return float(np.sqrt(np.mean(se ** 2)))
-    re = np.array([shift(ref_nu[j], ref_as[j]) for j in range(nref)])
+    re = np.array([axis_error(ref_nu[j]) + chirp_shift(ref_nu[j], ref_as[j], delta) for j in range(nref)])
     p = np.polyfit(ref_nu, re, min(nref - 1, 2))
     return float(np.sqrt(np.mean((se - np.polyval(p, sen_nu)) ** 2)))
 
@@ -131,37 +165,20 @@ ratios = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0])
 # ---------------------------------------------------------------------------
 # (c) the calibration itself at one operating point
 # ---------------------------------------------------------------------------
-CAL_RATIO, DRIFT_OFF, DRIFT_GAIN = 0.30, 20.0, 0.003  # FWHM, pm, relative
-# drift of the lambda(V) table since the last uncoded calibration: 0.2 K of
-# laser temperature at 0.1 nm/K is 20 pm of offset, and 1e-4/K of spring
-# stiffness over 30 K is a 0.3 percent gain error, 15 pm at the sweep edges
+CAL_RATIO = 0.30                     # chirp span in FWHM for panel (c)
 
 
 def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
     rng = np.random.default_rng(seed)
-    delta = ratio * F / 2.0             # Delta_ch = 2 x std of the dwell distribution
+    delta = ratio * F / 2.0
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)
 
-    def off(nb):
-        x = nb / BAND_HALF
-        return delta * (0.20 + 0.20 * x + 0.15 * x ** 2 + 0.10 * np.sin(2.5 * x))
-
-    def chirp_shift(nb, asym):
-        gg = np.linspace(nb - 5 * F, nb + 5 * F, 801)
-        a = C.fmam_readout(gg, nb, F, delta, mean_off=off(nb), skew=1.2,
-                           shape='tanh', asym=asym)
-        b = C.fbg_tanh(gg, nb, F, n_side=asym)
-        return (C.gauss_fit_peak(gg, a) - C.gauss_fit_peak(gg, b)) * PM
-
-    def drift(nb):
-        return DRIFT_OFF + DRIFT_GAIN * nb * PM
-
     def err(nb, asym):
-        return drift(nb) + chirp_shift(nb, asym)
+        return axis_error(nb) + chirp_shift(nb, asym, delta)
 
     grid = np.linspace(-BAND_HALF, BAND_HALF, 121)
-    out = dict(grid=grid, drift=drift(grid),
+    out = dict(grid=grid, drift=axis_error(grid),
                smooth=np.array([err(x, 0.0) for x in grid]),
                sen_nu=sen_nu,
                sen_err=np.array([err(sen_nu[i], sen_as[i]) for i in range(nsen)]),
@@ -243,17 +260,30 @@ r3 = cal['refs'][3]
 ax[2].axhline(0, color='0.6', lw=0.6)
 ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3, label='axis error')
 ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='sensors, raw')
-ax[2].plot(xpm, r3['fit'], color='#009E73', lw=1.0, ls='--', label='parabola through refs')
+ax[2].plot(xpm, r3['fit'], color='#009E73', lw=1.0, ls='--', label='_nolegend_')
 ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color='#009E73', ms=5.2, label='3 references')
 ax[2].plot(snu, r3['res'], 'o', color='#0072B2', ms=3.4, label='sensors, corrected')
-ax[2].set_xlim(-5, 5)
-ax[2].set_ylim(-26, 34)
+xh = 1.02 * BAND_HALF * PM / 1000.0
+ax[2].set_xlim(-xh, xh)
+lo = min(cal['smooth'].min(), cal['sen_err'].min(), r3['res'].min())
+hi = max(cal['smooth'].max(), cal['sen_err'].max(), r3['res'].max())
+ax[2].set_ylim(lo - 0.10 * (hi - lo), hi + 1.05 * (hi - lo))
 ax[2].set_xlabel('sweep position [nm]')
 ax[2].set_ylabel('reported $-$ true [pm]')
 FS.letter(ax[2], 'c')
-ax[2].legend(fontsize=5.2, loc='upper left', ncol=1, frameon=True, handlelength=1.4,
-             labelspacing=0.18, borderaxespad=0.3)
+ax[2].legend(fontsize=4.8, loc='upper left', ncol=1, frameon=True, handlelength=1.1,
+             labelspacing=0.16, borderaxespad=0.3, handletextpad=0.5)
 ax[2].grid(False)
+ins = ax[2].inset_axes([0.62, 0.63, 0.33, 0.29])
+ins.plot(TUNE_V, TUNE_WAVE, color='0.25', lw=0.9)
+ins.axhline(0, color='0.6', lw=0.5)
+ins.set_xlim(0, 14)
+ins.set_xticks([0, 7, 14]); ins.set_yticks([-50, 0, 50]); ins.set_ylim(-70, 110)
+ins.tick_params(labelsize=4.6, length=1.8, pad=1.2)
+ins.set_xlabel('$V$ [V]', fontsize=4.8, labelpad=0.5)
+ins.set_ylabel('[pm]', fontsize=4.8, labelpad=0.5)
+for sp in ins.spines.values():
+    sp.set_linewidth(0.6)
 
 # --- (d) -------------------------------------------------------------------
 styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
@@ -266,7 +296,7 @@ ax[3].set_yscale('log')
 ax[3].set_xlabel(r'chirp span  $\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[3], 'd')
-ax[3].set_ylim(0.5, 6000)
+ax[3].set_ylim(0.3, 400)
 ax[3].legend(fontsize=5.2, loc='upper left',
              ncol=2, frameon=True, handlelength=1.2, columnspacing=0.5,
              labelspacing=0.15)
