@@ -233,38 +233,27 @@ ax[1].legend(fontsize=5.8, loc='upper right',
              labelspacing=0.18, borderaxespad=0.25)
 
 # --- (c) -------------------------------------------------------------------
+# One operating point, three references only: the axis error across the
+# sweep, the raw sensor readings, the reference readings with the parabola
+# through them, and the sensors after subtracting that parabola.
 GREY = '0.45'
 xpm = cal['grid'] * PM / 1000.0
+snu = cal['sen_nu'] * PM / 1000.0
+r3 = cal['refs'][3]
 ax[2].axhline(0, color='0.6', lw=0.6)
-chirp_part = cal['smooth'] - cal['drift']
-ax[2].plot(xpm, cal['drift'], color='0.25', lw=0.8, ls=':')
-ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3)
-ax[2].text(4.8, cal['drift'][-1] + 2.5, 'drift of the $\\lambda(V)$ table', fontsize=5.2,
-           color='0.25', ha='right', va='bottom')
-i60 = int(np.argmin(np.abs(xpm + 1.5)))
-ax[2].text(-1.5, cal['smooth'][i60] + 3.5, 'axis error: drift + chirp', fontsize=5.2,
-           color='0.25', ha='center', va='bottom')
-ax[2].plot(cal['sen_nu'] * PM / 1000.0, cal['sen_err'], 'o', color=GREY, ms=3.0, mfc='white',
-           mew=0.8, label='sensors')
-cstyle = {1: ('#E69F00', 's', '1 ref'), 2: ('#0072B2', '^', '2 refs'), 3: ('#009E73', 'd', '3 refs')}
-for n in (1, 2, 3):
-    col, mk, lab = cstyle[n]
-    r = cal['refs'][n]
-    ax[2].plot(xpm, r['fit'], color=col, lw=0.9, ls='--')
-    ax[2].plot(r['nu'] * PM / 1000.0, r['rd'], mk, color=col, ms=4.2, label=lab + ', fit')
-    ax[2].plot(cal['sen_nu'] * PM / 1000.0, r['res'], mk, color=col, ms=2.4, mew=0)
-ax[2].plot([], [], 'o', color='0.3', ms=2.4, mew=0, label='after fit')
-ax[2].text(4.8, 4.0, 'after the fit', fontsize=5.2, color='0.25', ha='right', va='bottom')
+ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3, label='axis error')
+ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='sensors, raw')
+ax[2].plot(xpm, r3['fit'], color='#009E73', lw=1.0, ls='--', label='parabola through refs')
+ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color='#009E73', ms=5.2, label='3 references')
+ax[2].plot(snu, r3['res'], 'o', color='#0072B2', ms=3.4, label='sensors, corrected')
 ax[2].set_xlim(-5, 5)
-lo = min(cal['smooth'].min(), cal['sen_err'].min())
-hi = max(cal['smooth'].max(), cal['drift'].max())
-ax[2].set_ylim(lo - 0.55 * (hi - lo), hi + 14)
+ax[2].set_ylim(-26, 34)
 ax[2].set_xlabel('sweep position [nm]')
 ax[2].set_ylabel('reported $-$ true [pm]')
 FS.letter(ax[2], 'c')
-ax[2].legend(fontsize=5.0, loc='lower left', ncol=2, frameon=True, handlelength=1.4,
-             columnspacing=0.6, labelspacing=0.15, borderaxespad=0.25)
-ax[2].grid(False, alpha=0.2)
+ax[2].legend(fontsize=5.2, loc='upper left', ncol=1, frameon=True, handlelength=1.4,
+             labelspacing=0.18, borderaxespad=0.3)
+ax[2].grid(False)
 
 # --- (d) -------------------------------------------------------------------
 styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
