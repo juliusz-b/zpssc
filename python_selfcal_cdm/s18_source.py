@@ -143,12 +143,13 @@ def _v_of_nu(nb):
     return np.interp(lam, TUNE_L[::-1], TUNE_V[::-1])
 
 
-def axis_error(nb):
-    """reported minus true wavelength [pm] caused by the drifted table, smooth over the sweep"""
+def axis_error(nb, drift=1.0):
+    """reported minus true wavelength [pm] caused by the drifted table, smooth over the sweep;
+    drift scales all three drift components together (1 = the assumed 0.2 K, 0.3 percent, 30 mV)"""
     V = _v_of_nu(np.atleast_1d(nb))
     lam = np.polyval(TUNE_P4, V)
     slope = np.polyval(np.polyder(TUNE_P4), V)
-    e = DRIFT_OFF + DRIFT_GAIN * (lam - TUNE_L[0]) * 1000.0 + DRIFT_V0 * slope * 1000.0
+    e = drift * (DRIFT_OFF + DRIFT_GAIN * (lam - TUNE_L[0]) * 1000.0 + DRIFT_V0 * slope * 1000.0)
     return e if np.ndim(nb) else float(e[0])
 
 
@@ -161,8 +162,9 @@ def chirp_shift(nb, asym, delta):
     return (C.gauss_fit_peak(gg, a) - C.gauss_fit_peak(gg, b)) * PM
 
 
-def chirp_residual(ratio, nref, nsen=8, seed=3):
-    """RMS sensor error after a polynomial through nref references, at chirp span ratio x FWHM"""
+def chirp_residual(ratio, nref, nsen=8, seed=3, drift=1.0):
+    """RMS sensor error after a polynomial through nref references, at chirp span ratio x FWHM and
+    table drift of drift x the assumed values"""
     rng = np.random.default_rng(seed)
     delta = delta_of(ratio)             # Delta_ch = 2 x std of the skewed kernel
     ref_nu = (np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, nref) if nref > 1
@@ -170,10 +172,10 @@ def chirp_residual(ratio, nref, nsen=8, seed=3):
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)
     ref_as = rng.uniform(-0.05, 0.05, max(nref, 1))
-    se = np.array([axis_error(sen_nu[i]) + chirp_shift(sen_nu[i], sen_as[i], delta) for i in range(nsen)])
+    se = np.array([axis_error(sen_nu[i], drift) + chirp_shift(sen_nu[i], sen_as[i], delta) for i in range(nsen)])
     if nref == 0:
         return float(np.sqrt(np.mean(se ** 2)))
-    re = np.array([axis_error(ref_nu[j]) + chirp_shift(ref_nu[j], ref_as[j], delta) for j in range(nref)])
+    re = np.array([axis_error(ref_nu[j], drift) + chirp_shift(ref_nu[j], ref_as[j], delta) for j in range(nref)])
     p = np.polyfit(ref_nu, re, min(nref - 1, 2))
     return float(np.sqrt(np.mean((se - np.polyval(p, sen_nu)) ** 2)))
 
@@ -215,6 +217,8 @@ def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
 
 cal = calibration()
 curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2, 3)}
+drifts = np.array([0.0, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0])
+dcurves = {n: np.array([chirp_residual(CAL_RATIO, n, drift=d) for d in drifts]) for n in (0, 1, 2, 3)}
 
 # ---------------------------------------------------------------------------
 # figure
@@ -310,13 +314,14 @@ styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
           2: ('^-', '#0072B2', '2 refs'), 3: ('d-', '#009E73', '3 refs')}
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
-    ax[3].plot(ratios, curves[n], mk, color=col, lw=1.2, ms=4, label=lab)
+    ax[3].plot(drifts, dcurves[n], mk, color=col, lw=1.2, ms=4, label=lab)
 ax[3].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[3].set_yscale('log')
-ax[3].set_xlabel(r'chirp span  $\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
+ax[3].set_xlabel('table drift, multiples of (c)')
 ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[3], 'd')
-ax[3].set_ylim(0.3, 2000)
+ax[3].set_ylim(0.01, 3000)
+ax[3].set_xlim(-0.1, 5.1)
 ax[3].legend(fontsize=5.2, loc='upper left',
              ncol=2, frameon=True, handlelength=1.2, columnspacing=0.5,
              labelspacing=0.15)
