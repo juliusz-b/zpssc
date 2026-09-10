@@ -284,7 +284,7 @@ ax[0].fill_between(Ks, cl(np.percentile(band_peel, 10, axis=1)), cl(np.percentil
                    color='#E69F00', alpha=0.18, lw=0)
 ax[0].semilogy(Ks, cl(full_rnd), 's-', color='#0072B2', lw=1.8, label='full, randomized')
 ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color='#E69F00', lw=1.8,
-               label='full + deshadowing $\\widehat S_k$')
+               label='full + deshad. $\\widehat S_k$')
 ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0,
               label='%.0f pm target' % TARGET_PM)
 # os schodzi ponizej podlogi, zeby znaczniki punktow docietych byly cale
@@ -298,13 +298,13 @@ ax[0].grid(False, which='both', alpha=0.25)
 
 ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#D55E00', label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#0072B2', label='randomized')
-ax[1].semilogx(Rs * 100, cap_uni_peel, 'v--', color='#D55E00', mfc='white', label='uniform + deshadowing')
-ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#E69F00', label='randomized + deshadowing')
+ax[1].semilogx(Rs * 100, cap_uni_peel, 'v--', color='#D55E00', mfc='white', label='uniform + deshad.')
+ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#E69F00', label='randomized + deshad.')
 ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(0.75, 55.0), fontsize=5.2,
                color='#D55E00', ha='left', va='center',
                arrowprops=dict(arrowstyle='-', color='#D55E00', lw=0.6, shrinkA=0, shrinkB=2))
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
-              label='gratings of the bench, $R = 10\\%$')
+              label='$R = 10\\%$')
 ax[1].set_ylim(0, 58)
 ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
