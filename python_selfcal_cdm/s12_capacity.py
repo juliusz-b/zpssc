@@ -282,10 +282,10 @@ ax[0].fill_between(Ks, cl(np.percentile(band_full, 10, axis=1)), cl(np.percentil
                    color=FS.BLUE, alpha=0.18, lw=0)
 ax[0].fill_between(Ks, cl(np.percentile(band_peel, 10, axis=1)), cl(np.percentile(band_peel, 90, axis=1)),
                    color=FS.C_CORR, alpha=0.18, lw=0)
-ax[0].semilogy(Ks, cl(full_rnd), 's-', color=FS.BLUE, lw=1.8, label='full, randomized')
-ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color=FS.C_CORR, lw=1.8,
+ax[0].semilogy(Ks, cl(full_rnd), 's-', color=FS.BLUE, lw=1.4, label='full, randomized')
+ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color=FS.C_CORR, lw=1.4,
                label='full + deshad. $\\widehat S_k$')
-ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0,
+ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.2,
               label='%.0f pm target' % TARGET_PM)
 # os schodzi ponizej podlogi, zeby znaczniki punktow docietych byly cale
 ax[0].axhline(FLOOR, color='0.75', lw=0.6)
@@ -294,7 +294,7 @@ ax[0].set_xlabel('gratings on the fiber, $K$')
 ax[0].set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[0], 'a')
 handles0, labels0 = ax[0].get_legend_handles_labels()
-ax[0].grid(False, which='both', alpha=0.25)
+ax[0].grid(False, which='both')
 
 ax[1].semilogx(Rs * 100, cap_uni, 'o-', color=FS.VERM, label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color=FS.BLUE, label='randomized')
@@ -303,17 +303,17 @@ ax[1].semilogx(Rs * 100, cap_peel, '^--', color=FS.C_GOOD, mfc='white', label='r
 ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(0.75, 52.5), fontsize=5.2,
                color=FS.VERM, ha='left', va='center',
                arrowprops=dict(arrowstyle='-', color=FS.VERM, lw=0.6, shrinkA=0, shrinkB=2))
-ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
+ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.2,
               label='$R = 10\\%$')
 ax[1].set_ylim(0, 60)
 ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 FS.letter(ax[1], 'b')
-ax[1].grid(False, which='both', alpha=0.25)
-ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
+ax[1].grid(False, which='both')
+ax[0].legend(handles0, labels0, fontsize=6, loc='lower right', ncol=2,
              frameon=True, handlelength=1.5, columnspacing=0.7,
              labelspacing=0.16, borderaxespad=0.25)
-ax[1].legend(fontsize=5.8, loc='lower left', frameon=True,
+ax[1].legend(fontsize=6, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
 fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.12, hspace=0.42)
 plt.savefig('figs/fig_s12_capacity.png', dpi=140, bbox_inches='tight', pad_inches=0.03)

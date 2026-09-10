@@ -69,7 +69,7 @@ nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
 CASES = ((0.0, FS.BLUE, 'co-tuned'), (DSTAR, FS.VERM, 'worst'),
          (400.0, FS.GREEN, 'far'))
-ANN = ((-215, 0.60), (235, 0.66), (470, 0.50))
+ANN = ((-185, 0.50), (250, 0.58), (450, 0.42))
 shifts = []
 for (det, colr, name), (tx, ty) in zip(CASES, ANN):
     two_pass = (1.0 - R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)) ** 2
@@ -80,12 +80,12 @@ for (det, colr, name), (tx, ty) in zip(CASES, ANN):
     pa.plot(nu, two_pass, color=colr, lw=0.85, alpha=0.85, zorder=2)
     pa.fill_between(nu, received, wanted, where=wanted >= received,
                     color=colr, alpha=0.16, lw=0, zorder=1)
-    pa.plot(nu, received, color=colr, lw=1.45, zorder=4)
+    pa.plot(nu, received, color=colr, lw=1.4, zorder=4)
     pa.axvline(mu, color=colr, lw=0.7, ls=(0, (1.5, 2)), zorder=1)
     lab = ('%.1f' % mu).replace('-0.0', '0.0')
-    pa.text(tx, ty, name + '\n' + r'$\delta\lambda_{k\leftarrow j}=%s$ pm' % lab,
-            fontsize=5.5, color=colr, ha='center', va='center')
-pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.3, zorder=6)
+    pa.text(tx, ty, name + '\n' + r'$%s$ pm' % lab,
+            fontsize=6, color=colr, ha='center', va='center')
+pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.2, zorder=6)
 pa.set_xlim(-330, 560)
 pa.set_ylim(0.0, 1.12)
 pa.set_yticks([0, 0.5, 1.0])
@@ -93,10 +93,10 @@ pa.set_xticks([-200, 0, 200, 400])
 pa.set_xlabel(r'wavelength offset from $\lambda_{B,k}$ [pm]')
 pa.set_ylabel('normalized reflectance')
 roles = [Line2D([], [], color='0.3', lw=0.85, alpha=0.85),
-         Line2D([], [], color='0.12', ls=(0, (4, 2.5)), lw=1.3),
-         Line2D([], [], color='0.3', lw=1.45)]
+         Line2D([], [], color='0.12', ls=(0, (4, 2.5)), lw=1.2),
+         Line2D([], [], color='0.3', lw=1.4)]
 pa.legend(roles, [r'$(1-R_j)^2$', r'$R_k(\lambda)$', r'$A_k$'],
-          fontsize=4.7, loc='lower right', handlelength=1.2, borderaxespad=0.25,
+          fontsize=6, loc='lower right', handlelength=2.4, borderaxespad=0.25,
           handletextpad=0.5)
 
 
@@ -117,7 +117,7 @@ hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.C_THEORY, lw=1.35, label='Rule A, (8)')
+b.plot(D, bias, color=FS.C_THEORY, lw=1.4, label='Rule A, (8)')
 # the full two-pass model with an unrestricted Gaussian fit, as markers
 Dm = np.linspace(25.0, 625.0, 13)
 mod = []
@@ -153,7 +153,7 @@ b.set_yticks([-8, -4, 0])
 b.set_xlabel(r'pair detuning $\Delta\lambda_{jk}$ [pm]')
 b.set_ylabel(r'$\delta\lambda_{k\leftarrow j}$ [pm]')
 panel_title(b, 'b', 'Rule A as a placement criterion')
-b.legend(loc='upper right', bbox_to_anchor=(0.99, 0.58), fontsize=5.0,
+b.legend(loc='upper right', bbox_to_anchor=(0.99, 0.58), fontsize=6,
          handlelength=1.6, labelspacing=0.18, borderaxespad=0.0)
 
 ins = b.inset_axes([0.46, 0.05, 0.52, 0.46])
@@ -194,12 +194,12 @@ c.plot(dat['cent'], dat['binned'], 'o', color=FS.REFS[0], ms=4.5,
        label='mean, no refs')
 c.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.C_THEORY, lw=1.4,
        label='Rule B')
-c.plot(dat['cent'], dat['binned_r'], 's-', color=FS.REFS[2], ms=3.4, lw=1.0,
+c.plot(dat['cent'], dat['binned_r'], 's-', color=FS.REFS[2], ms=3.4, lw=1.2,
        mfc='none', label='mean, 2 refs')
 c.set_xlabel(r'position in the band $\nu_k$ [pm]')
 c.set_ylabel(r'mean error $\overline{\delta\lambda}(\nu_k)$ [pm]')
 panel_title(c, 'c', 'Rule B and two references')
-c.legend(fontsize=5.2, loc='upper left', handlelength=1.6, labelspacing=0.18,
+c.legend(fontsize=6, loc='upper left', handlelength=1.6, labelspacing=0.18,
          borderaxespad=0.3)
 
 fig.savefig('figs/fig_s26_laws_concept.pdf', bbox_inches='tight',

@@ -37,7 +37,7 @@ C_STEP = (ORANGE, SKY)  # intermediate correction steps
 REFS = {0: VERM, 1: ORANGE, 2: BLUE, 3: GREEN}   # number of reference gratings
 
 
-def apply(base=8.0):
+def apply(base=7.0):
     """Styl jak z Origina (decyzja kierownika, 31.08.2026): ramka osi z
     czterech stron, znaczniki glowne i pomocnicze do wewnatrz, krój
     bezszeryfowy, pogrubione opisy osi, grubsze linie, legenda w ramce.
@@ -52,7 +52,9 @@ def apply(base=8.0):
         'axes.labelweight': 'bold',
         'xtick.labelsize': base,
         'ytick.labelsize': base,
-        'legend.fontsize': base - 0.5,
+        'legend.fontsize': base - 1.0,
+        'legend.handlelength': 1.8,
+        'axes.grid': False,
         'axes.linewidth': 1.0,
         'xtick.direction': 'in',
         'ytick.direction': 'in',
@@ -68,7 +70,7 @@ def apply(base=8.0):
         'ytick.major.width': 1.0,
         'xtick.minor.width': 0.7,
         'ytick.minor.width': 0.7,
-        'lines.linewidth': 1.6,
+        'lines.linewidth': 1.4,
         'lines.markersize': 4.0,
         'axes.spines.top': True,
         'axes.spines.right': True,

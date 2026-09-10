@@ -251,7 +251,7 @@ ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 FS.letter(ax[1], 'b')
-ax[1].legend(fontsize=5.6, loc='upper right',
+ax[1].legend(fontsize=6, loc='upper right',
              ncol=1, frameon=True, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.18, borderaxespad=0.25)
 
@@ -264,9 +264,9 @@ xpm = cal['grid'] * PM / 1000.0
 snu = cal['sen_nu'] * PM / 1000.0
 r3 = cal['refs'][3]
 ax[2].axhline(0, color='0.6', lw=0.6)
-ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3, label='axis error')
+ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.2, label='axis error')
 ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='raw')
-ax[2].plot(xpm, r3['fit'], color=FS.GREEN, lw=1.0, ls='--', label='_nolegend_')
+ax[2].plot(xpm, r3['fit'], color=FS.GREEN, lw=1.2, ls='--', label='_nolegend_')
 ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color=FS.GREEN, ms=5.2, label='3 refs')
 ax[2].plot(snu, r3['res'], 'o', color=FS.REFS[3], ms=3.4, label='corrected')
 xh = 1.02 * BAND_HALF * PM / 1000.0
@@ -278,7 +278,7 @@ ax[2].set_yticks([-50, 0, 50])
 ax[2].set_xlabel('sweep position [nm]')
 ax[2].set_ylabel('wavelength error [pm]')
 FS.letter(ax[2], 'c')
-ax[2].legend(fontsize=5.1, loc='upper center', bbox_to_anchor=(0.5, 0.57),
+ax[2].legend(fontsize=6, loc='upper center', bbox_to_anchor=(0.5, 0.57),
              ncol=2, frameon=True, handlelength=1.0, columnspacing=0.7,
              labelspacing=0.16, borderaxespad=0.0, handletextpad=0.4)
 ax[2].grid(False)
@@ -322,11 +322,11 @@ ax[3].set_xlim(-2, 5 * DRIFT_RMS_PM + 2)
 ax[3].set_xticks([0, 20, 40, 60, 80])
 ax[3].axvline(DRIFT_RMS_PM, color='0.5', lw=0.8, ls=':')
 ax[3].text(DRIFT_RMS_PM + 1.2, 170, 'Case (c)', fontsize=5.3, color='0.35')
-ax[3].legend(fontsize=5.1, loc='lower right',
+ax[3].legend(fontsize=6, loc='lower right',
              ncol=2, frameon=True, handlelength=1.2, columnspacing=0.5,
              labelspacing=0.15)
 ax[3].grid(False, which='both')
-ax[3].grid(True, axis='y', which='major', color='0.9', linewidth=0.5)
+ax[3].grid(False)
 
 fig.subplots_adjust(left=0.065, right=0.99, top=0.85, bottom=0.23,
                     wspace=0.45)

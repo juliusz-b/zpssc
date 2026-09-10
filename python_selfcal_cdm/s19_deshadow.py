@@ -139,10 +139,10 @@ lam = nu * PM / 1000.0
 nrm = clean_b[kk].max()
 axb.plot(lam, clean_b[kk] / nrm, color=FS.C_TRUE, lw=2.6, alpha=0.9, label='$R_4$')
 axb.plot(lam, shad_b[kk] / nrm, color=FS.VERM, lw=1.4, label='$S_4$')
-step_cols = [FS.ORANGE, FS.SKY]
+step_cols = [FS.ORANGE, FS.BLUE]
 step_lab = ['$S_4/\\widehat T_1$', '$S_4/\\widehat T_1\\widehat T_2$']
 for st, col, lab in zip(steps_b[:-1], step_cols, step_lab):
-    axb.plot(lam, st / nrm, color=col, lw=1.0, label=lab)
+    axb.plot(lam, st / nrm, color=col, lw=1.2, label=lab)
 axb.plot(lam, corrected_b[kk] / nrm, color=FS.GREEN, lw=1.4, ls='--', label='$\\widehat S_4$')
 axb.axvline(p_true / 1000.0, color='0.3', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color=FS.VERM, ls=':', lw=0.8)
@@ -165,7 +165,7 @@ axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 FS.letter(axc, 'b')
 axc.legend(fontsize=4.8, loc='lower right',
            ncol=1, frameon=True, handlelength=1.1, columnspacing=0.5, borderaxespad=0.25)
-axc.grid(False, which='both', alpha=0.25)
+axc.grid(False, which='both')
 
 fig.subplots_adjust(left=0.13, right=0.99, top=0.90, bottom=0.22, wspace=0.42)
 fig.savefig('figs/fig_s19_deshadow.png', dpi=150, bbox_inches='tight')
