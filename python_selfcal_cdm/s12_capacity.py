@@ -300,12 +300,12 @@ ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#D55E00', label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#0072B2', label='randomized')
 ax[1].semilogx(Rs * 100, cap_uni_peel, 'v--', color='#D55E00', mfc='white', label='uniform + deshad.')
 ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#E69F00', label='randomized + deshad.')
-ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(0.75, 55.0), fontsize=5.2,
+ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(0.75, 52.5), fontsize=5.2,
                color='#D55E00', ha='left', va='center',
                arrowprops=dict(arrowstyle='-', color='#D55E00', lw=0.6, shrinkA=0, shrinkB=2))
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
               label='$R = 10\\%$')
-ax[1].set_ylim(0, 58)
+ax[1].set_ylim(0, 60)
 ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 FS.letter(ax[1], 'b')
