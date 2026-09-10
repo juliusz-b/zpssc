@@ -265,32 +265,45 @@ snu = cal['sen_nu'] * PM / 1000.0
 r3 = cal['refs'][3]
 ax[2].axhline(0, color='0.6', lw=0.6)
 ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3, label='axis error')
-ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='raw sensors')
+ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='raw')
 ax[2].plot(xpm, r3['fit'], color='#009E73', lw=1.0, ls='--', label='_nolegend_')
-ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color='#009E73', ms=5.2, label='3 references')
+ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color='#009E73', ms=5.2, label='3 refs')
 ax[2].plot(snu, r3['res'], 'o', color='#0072B2', ms=3.4, label='corrected')
 xh = 1.02 * BAND_HALF * PM / 1000.0
 ax[2].set_xlim(-xh, xh)
 lo = min(cal['smooth'].min(), cal['sen_err'].min(), r3['res'].min())
 hi = max(cal['smooth'].max(), cal['sen_err'].max(), r3['res'].max())
-ax[2].set_ylim(lo - 0.10 * (hi - lo), hi + 1.05 * (hi - lo))
+ax[2].set_ylim(lo - 0.10 * (hi - lo), hi + 2.05 * (hi - lo))
 ax[2].set_yticks([-50, 0, 50])
 ax[2].set_xlabel('sweep position [nm]')
 ax[2].set_ylabel('wavelength error [pm]')
 FS.letter(ax[2], 'c')
-ax[2].legend(fontsize=5.1, loc='upper left', ncol=1, frameon=True, handlelength=1.1,
-             labelspacing=0.16, borderaxespad=0.3, handletextpad=0.5)
+ax[2].legend(fontsize=5.1, loc='upper center', bbox_to_anchor=(0.5, 0.57),
+             ncol=2, frameon=True, handlelength=1.0, columnspacing=0.7,
+             labelspacing=0.16, borderaxespad=0.0, handletextpad=0.4)
 ax[2].grid(False)
-ins = ax[2].inset_axes([0.66, 0.65, 0.29, 0.26])
-ins.plot(TUNE_V, TUNE_WAVE, color='0.25', lw=0.9)
+# Show the nonlinear tuning curve alongside the existing quadratic-fit error.
+# Both use the same measured-curve representation as the calibration model.
+tune = ax[2].inset_axes([0.15, 0.70, 0.28, 0.20])
+tune.plot(TUNE_V, TUNE_L, color='#0072B2', lw=0.8)
+tune.set_xlim(0, 14)
+tune.set_ylim(1561.5, 1570.5)
+tune.set_xticks([0, 14])
+tune.set_yticks([1562, 1570])
+tune.ticklabel_format(axis='y', style='plain', useOffset=False)
+tune.set_title(r'$\lambda$ [nm]', fontsize=4.8, pad=1)
+ins = ax[2].inset_axes([0.68, 0.70, 0.28, 0.20])
+ins.plot(TUNE_V, TUNE_WAVE, color='0.25', lw=0.8)
 ins.axhline(0, color='0.6', lw=0.5)
 ins.set_xlim(0, 14)
-ins.set_xticks([0, 7, 14]); ins.set_yticks([-50, 0, 50]); ins.set_ylim(-70, 110)
-ins.tick_params(labelsize=4.8, length=1.8, pad=1.2)
-ins.set_xlabel('$V$ [V]', fontsize=4.8, labelpad=0.5)
-ins.set_ylabel('[pm]', fontsize=4.8, labelpad=0.5)
-for sp in ins.spines.values():
-    sp.set_linewidth(0.6)
+ins.set_xticks([0, 14]); ins.set_yticks([-50, 50]); ins.set_ylim(-70, 110)
+ins.set_title('Residual [pm]', fontsize=4.8, pad=1)
+for inset in (tune, ins):
+    inset.tick_params(labelsize=4.8, length=1.5, pad=0.8)
+    inset.minorticks_off()
+    inset.set_xlabel('Voltage [V]', fontsize=4.8, labelpad=0.5)
+    for sp in inset.spines.values():
+        sp.set_linewidth(0.6)
 
 # --- (d) -------------------------------------------------------------------
 styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
