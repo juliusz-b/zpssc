@@ -138,7 +138,7 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # This figure is included at 0.72 text width in the paper. Draw it at that
 # physical width so the 7 pt labels remain 7 pt after LaTeX placement.
-fig2, ax1 = plt.subplots(1, 1, figsize=(3.45, 2.3))
+fig2, ax1 = plt.subplots(1, 1, figsize=(3.45, 1.9))
 ax = [None, ax1]
 
 # (the former panel (a) with five gratings spaced two ways is superseded by
@@ -190,14 +190,14 @@ ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.0, ls=(0, (3, 1.5)),
 ax[1].plot(xnm, leak_g / 0.05, color='#D55E00', lw=1.1, label='$L_k$, Gold code')
 ax[1].plot(xnm, (wanted + leak_g) / 0.05, color='#D55E00', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, Gold code')
 ax[1].set_xlim(-0.5, 0.5)
-ax[1].set_ylim(-0.6, 2.2)
+ax[1].set_ylim(-0.35, 1.5)
 ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
 ax[1].grid(False, which='both', alpha=0.2)
 ax[1].legend(fontsize=5.0, loc='upper right', ncol=1, frameon=True,
              columnspacing=0.7, handlelength=1.4, labelspacing=0.2, borderaxespad=0.3)
 # inset: the tops of the three peaks and where their fitted centers sit
-ins = ax[1].inset_axes([0.035, 0.44, 0.34, 0.44])
+ins = ax[1].inset_axes([0.03, 0.06, 0.27, 0.42])
 zoom = 0.04
 for y_, col, ls in ((wanted, '#0072B2', '-'), (wanted + leak_m, '0.2', (0, (3, 1.5))), (wanted + leak_g, '#D55E00', (0, (3, 1.5)))):
     ins.plot(xnm, y_ / 0.05, color=col, lw=1.0, ls=ls)
@@ -210,7 +210,7 @@ ins.annotate('', xy=(c_g / 1000.0, 0.89), xytext=(c_true / 1000.0, 0.89),
              arrowprops=dict(arrowstyle='-|>', color='#D55E00', lw=0.7, mutation_scale=6))
 ins.text(0.5 * (c_true + c_g) / 1000.0, 0.875, '%+.0f pm' % (c_g - c_true), color='#D55E00', ha='center', va='top', fontsize=5.2)
 ins.set_xlim(c_true / 1000.0 - zoom, c_true / 1000.0 + zoom)
-ins.set_ylim(0.82, 1.32)
+ins.set_ylim(0.76, 1.32)
 ins.set_xticks([]); ins.set_yticks([])
 ins.text(0.03, 0.95, 'fitted centers', transform=ins.transAxes, ha='left', va='top', fontsize=5.4, color='0.35')
 ax[1].indicate_inset_zoom(ins, edgecolor='0.6', lw=0.6)
