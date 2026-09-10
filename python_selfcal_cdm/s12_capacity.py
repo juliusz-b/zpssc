@@ -230,8 +230,10 @@ else:
     Ks_cap = np.array([4, 8, 16, 32, 48, 64, 96])
 
 
+    CAP_TRIALS = 24   # layouts per point of the capacity curves (matches cap_trials in the cache)
+
     def capacity(R, mode, seed, **kw):
-        e = sweep(Ks_cap, R, mode, 8, seed, **kw)
+        e = sweep(Ks_cap, R, mode, CAP_TRIALS, seed, **kw)
         if e[0] > TARGET_PM:
             return 0.0
         if e[-1] <= TARGET_PM:
