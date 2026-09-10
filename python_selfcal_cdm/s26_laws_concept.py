@@ -173,16 +173,11 @@ for x0, colr, lab, det, verdict in EX:
              color='white', zorder=3, rotation=90)
     ins.text(x0, 1.35, det, ha='center', va='top', fontsize=4.6,
              color=('#B87F00' if colr == FS.ORANGE else colr))
-    if verdict:
-        ins.text(x0, 3.55, verdict, ha='center', va='bottom', fontsize=4.2,
-                 color=colr)
 ins.annotate('', xy=(9.6, 0.5), xytext=(0.4, 0.5),
              arrowprops=dict(arrowstyle='-|>', lw=0.7, color='0.4',
                              mutation_scale=6))
 ins.text(5.0, 0.1, 'from the laser', ha='center', va='top', fontsize=4.6,
          color='0.4')
-ins.text(5.0, 4.9, r'example: detuning from $k$',
-         ha='center', va='top', fontsize=4.8, color='0.25')
 
 # ---------------------------------------------------------------------------
 # (c) Rule B against the model: layouts, their mean, the closed form, and the
