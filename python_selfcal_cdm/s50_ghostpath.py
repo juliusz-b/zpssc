@@ -88,11 +88,11 @@ GHOST_LABELS = {2 * TC - TB: r'$2\tau_2{-}\tau_1$',
                 2 * TA - TC: r'$2\tau_3{-}\tau_2$',
                 2 * TA - TB: r'$2\tau_3{-}\tau_1$'}
 
-fig = plt.figure(figsize=(3.45, 5.0))
-ax = fig.add_axes([0.105, 0.665, 0.88, 0.295])
-cx = fig.add_axes([0.105, 0.365, 0.88, 0.205])
-arrivals = fig.add_axes([0.105, 0.582, 0.88, 0.05])
-dx = fig.add_axes([0.105, 0.08, 0.88, 0.205])
+fig = plt.figure(figsize=(3.5, 3.7))
+ax = fig.add_axes([0.10, 0.595, 0.88, 0.375])
+cx = fig.add_axes([0.115, 0.105, 0.385, 0.33])
+arrivals = fig.add_axes([0.115, 0.455, 0.385, 0.065])
+dx = fig.add_axes([0.605, 0.105, 0.385, 0.33])
 DIRECT, GHOST = FS.BLUE, FS.VERM
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
@@ -290,7 +290,7 @@ cx.tick_params(labelsize=6.2, length=2.4)
 cx.set_xlabel('Equivalent position (m)', fontsize=6.8, labelpad=1.5)
 cx.set_ylabel('Normalized correlation', fontsize=6.8, labelpad=1.5)
 
-zoom = cx.inset_axes([0.62, 0.44, 0.35, 0.43])
+zoom = cx.inset_axes([0.50, 0.46, 0.47, 0.44])
 late = (zaxis >= 46) & (zaxis <= 77)
 zoom.plot(zaxis[late], corr[late] / ref_meas, color='0.22', lw=0.8)
 for zpos in sorted(ghost_count):
@@ -360,16 +360,16 @@ dx.plot(nu8, ghost8[k8] / R8, color=COL['a'], lw=0.9, ls=':', label='ghost befor
 dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=COL['a'], lw=0.9, ls='--', label='ghost after deshadowing', zorder=3)
 print('panel (c): ghost peak / R before %.3f, after %.3f' % (ghost8[k8].max() / R8, ((corr8[k8] - corr8_0[k8]) / R8).max()))
 dx.set_xlim(-500, 500)
-dx.set_ylim(0, 1.12)
+dx.set_ylim(0, 1.5)
 dx.set_yticks([0, 0.5, 1.0])
 dx.tick_params(labelsize=6.2, length=2.4)
 dx.set_xlabel('wavelength offset (pm)', fontsize=6.8, labelpad=1.5)
 dx.set_ylabel('reflectance / $R$', fontsize=6.8, labelpad=1.5)
-dx.legend(fontsize=5.8, loc='upper left', frameon=True, handlelength=1.8, borderpad=0.4, labelspacing=0.25)
-dx.text(0.985, 0.95, '8 gratings, uniform 4 m, $R=10\%$', transform=dx.transAxes, ha='right', va='top', fontsize=5.8, color=GREY)
+dx.legend(fontsize=4.6, loc='upper left', frameon=True, handlelength=1.2, borderpad=0.3, labelspacing=0.2, borderaxespad=0.2)
+dx.text(0.975, 0.965, '8 gratings, 4 m, $R=10\%$', transform=dx.transAxes, ha='right', va='top', fontsize=4.8, color=GREY)
 
-for letter, ypos in (('a', 0.976), ('b', 0.644), ('c', 0.304)):
-    fig.text(0.028, ypos, letter, fontsize=9, fontweight='bold', va='bottom')
+for letter, xpos, ypos in (('a', 0.028, 0.975), ('b', 0.028, 0.525), ('c', 0.53, 0.525)):
+    fig.text(xpos, ypos, letter, fontsize=9, fontweight='bold', va='bottom')
 
 os.makedirs('figs', exist_ok=True)
 fig.savefig('figs/fig_s50_ghostpath.pdf')
