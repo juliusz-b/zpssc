@@ -315,9 +315,9 @@ ax[0].legend(handles0, labels0, fontsize=5.5, loc='lower right', ncol=2,
              labelspacing=0.16, borderaxespad=0.25)
 ax[1].legend(fontsize=5.8, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
-fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.09, hspace=0.42)
-plt.savefig('figs/fig_s12_capacity.png', dpi=140)
-plt.savefig('figs/fig_s12_capacity.pdf')
+fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.12, hspace=0.42)
+plt.savefig('figs/fig_s12_capacity.png', dpi=140, bbox_inches='tight', pad_inches=0.03)
+plt.savefig('figs/fig_s12_capacity.pdf', bbox_inches='tight', pad_inches=0.03)
 
 # ---------------------------------------------------------------------------
 # printed tables
