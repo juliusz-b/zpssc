@@ -131,7 +131,7 @@ fixed = np.array([rms_error(K, 0.10, 200 + K, corrected=True) for K in Ks])
 # figure
 # ---------------------------------------------------------------------------
 # two panels: the recursion itself lives in eqs. (19)-(20) of the paper
-fig, ax = plt.subplots(2, 1, figsize=(2.7, 3.6))
+fig, ax = plt.subplots(1, 2, figsize=(3.5, 1.85))
 
 # --- (a) one grating, the correction step by step ---------------------------
 axb = ax[0]
@@ -149,11 +149,11 @@ axb.axvline(p_shad / 1000.0, color='#D55E00', ls=':', lw=0.8)
 FS.dim_gap(axb, p_true / 1000.0, p_shad / 1000.0, 1.13,
            '%.0f pm' % abs(p_shad - p_true), color='#D55E00',
            tail=0.055, side='right')
-axb.set_xlim(-0.45, 0.45); axb.set_ylim(0, 1.62)
-axb.set_xlabel('wavelength offset [nm]'); axb.set_ylabel('readout / peak of $R_4$')
+axb.set_xlim(-0.45, 0.45); axb.set_ylim(0, 1.5)
+axb.set_xlabel('offset [nm]'); axb.set_ylabel('readout / peak of $R_4$')
 FS.letter(axb, 'a')
-axb.legend(fontsize=5.5, loc='upper left', ncol=1, frameon=True,
-           handlelength=1.4, columnspacing=0.7, labelspacing=0.2)
+axb.legend(fontsize=4.8, loc='upper left', ncol=1, frameon=True,
+           handlelength=1.1, columnspacing=0.5, labelspacing=0.15, borderaxespad=0.25)
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
@@ -163,11 +163,11 @@ axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 FS.letter(axc, 'b')
-axc.legend(fontsize=5.5, loc='lower right',
-           ncol=1, frameon=True, handlelength=1.4, columnspacing=0.65)
+axc.legend(fontsize=4.8, loc='lower right',
+           ncol=1, frameon=True, handlelength=1.1, columnspacing=0.5, borderaxespad=0.25)
 axc.grid(False, which='both', alpha=0.25)
 
-fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.10, hspace=0.42)
+fig.subplots_adjust(left=0.13, right=0.99, top=0.90, bottom=0.22, wspace=0.42)
 fig.savefig('figs/fig_s19_deshadow.png', dpi=150, bbox_inches='tight')
 fig.savefig('figs/fig_s19_deshadow.pdf', bbox_inches='tight')
 
