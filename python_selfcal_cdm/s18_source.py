@@ -212,7 +212,7 @@ fig, ax = plt.subplots(1, 4, figsize=(7.16, 2.05))
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
                    color='0.88', lw=0)
-ax[0].plot(t, nu_inst, color='#D55E00', lw=1.4)
+ax[0].plot(t, nu_inst, color=FS.C_THEORY, lw=1.4)
 ax[0].set_ylim(-0.18, 1.45)
 ax[0].set_xlim(0, 8)
 ax[0].set_xticks([0, 2, 4, 6, 8])
@@ -220,26 +220,26 @@ ax[0].set_yticks([0, 0.5, 1.0])
 ax[0].set_xlabel('time [chip periods]')
 ax[0].set_ylabel('wavelength shift [a.u.]')
 FS.letter(ax[0], 'a')
-ax[0].axhline(plateau, color='#D55E00', ls=':', lw=0.8)
+ax[0].axhline(plateau, color=FS.C_THEORY, ls=':', lw=0.8)
 ax[0].text(7.85, plateau + 0.06, 'Steady-state level', color='0.35', fontsize=5.5, ha='right')
 ax[0].grid(False)
 
 # --- (b) -------------------------------------------------------------------
-ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='$R_k(\\lambda)$, no chirp')
-ax[1].plot(g * PM / 1000.0, chirped, color='#D55E00', lw=1.4,
+ax[1].plot(g * PM / 1000.0, true_line, color=FS.BLUE, lw=1.4, label='$R_k(\\lambda)$, no chirp')
+ax[1].plot(g * PM / 1000.0, chirped, color=FS.VERM, lw=1.4,
            label='$S_k^{\\mathrm{ch}}$, chirped')
 nu_op = -0.62 * F
 _kd, _kp = C.chirp_kernel(DELTA_DEMO, skew=SKEW)          # the kernel actually used, drawn at the operating point
 kern = np.interp(g, nu_op + 0.30 * DELTA_DEMO + _kd, _kp, left=0.0, right=0.0)
 kern = kern / kern.max()
-ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#CC79A7', alpha=0.32,
+ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='0.78', alpha=0.6,
                    lw=0)
 ax[1].annotate(r'$p(\xi)$', xy=(nu_op * PM / 1000.0, 0.30),
-               xytext=(-0.52, 0.62), fontsize=7.4, color='#CC79A7',
+               xytext=(-0.52, 0.62), fontsize=7.4, color='0.45',
                ha='center', va='center',
-               arrowprops=dict(arrowstyle='-', color='#CC79A7', lw=0.6))
-ax[1].axvline(p_true / 1000.0, color='#0072B2', ls=':', lw=0.9)
-ax[1].axvline(p_chirp / 1000.0, color='#D55E00', ls=':', lw=0.9)
+               arrowprops=dict(arrowstyle='-', color='0.45', lw=0.6))
+ax[1].axvline(p_true / 1000.0, color=FS.BLUE, ls=':', lw=0.9)
+ax[1].axvline(p_chirp / 1000.0, color=FS.VERM, ls=':', lw=0.9)
 # 67 pm to piec procent szerokosci panelu, wiec groty ida na zewnatrz
 # linii wymiarowych i pokazuja do srodka, a liczba przenosi sie obok
 FS.dim_gap(ax[1], p_true / 1000.0, p_chirp / 1000.0, 1.10,
@@ -266,9 +266,9 @@ r3 = cal['refs'][3]
 ax[2].axhline(0, color='0.6', lw=0.6)
 ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3, label='axis error')
 ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='raw')
-ax[2].plot(xpm, r3['fit'], color='#009E73', lw=1.0, ls='--', label='_nolegend_')
-ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color='#009E73', ms=5.2, label='3 refs')
-ax[2].plot(snu, r3['res'], 'o', color='#0072B2', ms=3.4, label='corrected')
+ax[2].plot(xpm, r3['fit'], color=FS.GREEN, lw=1.0, ls='--', label='_nolegend_')
+ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color=FS.GREEN, ms=5.2, label='3 refs')
+ax[2].plot(snu, r3['res'], 'o', color=FS.REFS[3], ms=3.4, label='corrected')
 xh = 1.02 * BAND_HALF * PM / 1000.0
 ax[2].set_xlim(-xh, xh)
 lo = min(cal['smooth'].min(), cal['sen_err'].min(), r3['res'].min())
@@ -285,7 +285,7 @@ ax[2].grid(False)
 # Show the nonlinear tuning curve alongside the existing quadratic-fit error.
 # Both use the same measured-curve representation as the calibration model.
 tune = ax[2].inset_axes([0.15, 0.70, 0.28, 0.20])
-tune.plot(TUNE_V, TUNE_L, color='#0072B2', lw=0.8)
+tune.plot(TUNE_V, TUNE_L, color=FS.BLUE, lw=0.8)
 tune.set_xlim(0, 14)
 tune.set_ylim(1561.5, 1570.5)
 tune.set_xticks([0, 14])
@@ -306,8 +306,8 @@ for inset in (tune, ins):
         sp.set_linewidth(0.6)
 
 # --- (d) -------------------------------------------------------------------
-styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
-          2: ('^-', '#0072B2', '2 refs'), 3: ('d-', '#009E73', '3 refs')}
+styles = {0: ('o-', FS.VERM, 'no ref'), 1: ('s-', FS.ORANGE, '1 ref'),
+          2: ('^-', FS.BLUE, '2 refs'), 3: ('d-', FS.GREEN, '3 refs')}
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
     ax[3].plot(drift_rms_pm, dcurves[n], mk, color=col, lw=1.2, ms=3, label=lab)

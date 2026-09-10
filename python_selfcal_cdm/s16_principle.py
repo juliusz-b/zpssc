@@ -48,7 +48,7 @@ ax.set_xlim(0, 10.4); ax.set_ylim(0, 6.2)
 def box(x, y, w, h, t, fc='#eaf1fb', fs=7.6):
     ax.add_patch(FancyBboxPatch((x, y), w, h,
                                 boxstyle='round,pad=0.05,rounding_size=0.12',
-                                fc=fc, ec='#0072B2', lw=1.2))
+                                fc=fc, ec=FS.BLUE, lw=1.2))
     ax.text(x + w / 2, y + h / 2, t, ha='center', va='center', fontsize=fs)
 
 
@@ -62,10 +62,10 @@ box(0.15, 4.20, 2.55, 1.35, 'swept VCSEL,\ncode-modulated', fs=7.4)
 tt = np.linspace(0.35, 2.35, 300)
 bits = MSEQ[:16]
 cw = np.repeat(bits, len(tt) // 16 + 1)[:len(tt)]
-ax.plot(tt, 3.55 + 0.18 * cw, color='#0072B2', lw=0.9)
-ax.text(1.35, 3.15, 'code c(t)', ha='center', fontsize=7, color='#0072B2')
+ax.plot(tt, 3.55 + 0.18 * cw, color=FS.BLUE, lw=0.9)
+ax.text(1.35, 3.15, 'code c(t)', ha='center', fontsize=7, color=FS.BLUE)
 
-ax.add_patch(Circle((3.5, 4.85), 0.42, fc='#fdf3e7', ec='#0072B2', lw=1.2))
+ax.add_patch(Circle((3.5, 4.85), 0.42, fc='#fdf3e7', ec=FS.BLUE, lw=1.2))
 ax.text(3.5, 4.85, 'circ', ha='center', va='center', fontsize=7)
 arrow(2.72, 4.85, 3.05, 4.85)
 
@@ -73,7 +73,7 @@ arrow(2.72, 4.85, 3.05, 4.85)
 ax.plot([3.95, 10.2], [4.85, 4.85], color='#555', lw=1.6)
 zpos = [4.7, 5.9, 7.6, 8.5, 9.7]
 for i, z in enumerate(zpos):
-    ax.add_patch(Rectangle((z - 0.16, 4.62), 0.32, 0.46, fc='#D55E00',
+    ax.add_patch(Rectangle((z - 0.16, 4.62), 0.32, 0.46, fc=FS.VERM,
                            ec='#7b241c', hatch='///', lw=0.8))
     ax.text(z, 5.30, r'$z_%d$' % (i + 1), ha='center', fontsize=7)
 ax.annotate('', xy=(4.7, 4.35), xytext=(5.9, 4.35),
@@ -98,7 +98,7 @@ box(6.6, 0.35, 3.7, 1.0, 'delay-wavelength map  ->  peak fit  ->  $\\lambda_B$',
 
 ax.text(0.1, 1.3, 'one code on the fiber\nat a time: the sweep\nvisits wavelengths\n'
                   'in sequence, so gratings\nare separated by the\nAUTOCORRELATION\n'
-                  'side lobe', fontsize=7.2, va='center', color='#0072B2')
+                  'side lobe', fontsize=7.2, va='center', color=FS.BLUE)
 FS.letter(ax, 'a')
 # --- (b) despread map ------------------------------------------------------
 ax2 = fig.add_subplot(gs[0, 1])
@@ -184,11 +184,11 @@ c_g = C.gauss_fit_peak(nuc, wanted + leak_g) * PM
 print('leakage panel: fitted center moves by %.1f pm (m-sequence) and %.1f pm (Gold), K=%d, N=%d'
       % (c_m - c_true, c_g - c_true, Kc, NCH))
 ax[1].axhline(0, color='0.75', lw=0.6, zorder=1)
-ax[1].plot(xnm, wanted / 0.05, color='#0072B2', lw=1.5, label='$A_k$, spectrum of grating $k$')
+ax[1].plot(xnm, wanted / 0.05, color=FS.BLUE, lw=1.5, label='$A_k$, spectrum of grating $k$')
 ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=1.1, label='$L_k$, m-sequence')
 ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-sequence')
-ax[1].plot(xnm, leak_g / 0.05, color='#D55E00', lw=1.1, label='$L_k$, Gold code')
-ax[1].plot(xnm, (wanted + leak_g) / 0.05, color='#D55E00', lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, Gold code')
+ax[1].plot(xnm, leak_g / 0.05, color=FS.VERM, lw=1.1, label='$L_k$, Gold code')
+ax[1].plot(xnm, (wanted + leak_g) / 0.05, color=FS.VERM, lw=1.0, ls=(0, (3, 1.5)), label='$A_k+L_k$, Gold code')
 ax[1].set_xlim(-0.5, 0.5)
 ax[1].set_ylim(-0.35, 1.5)
 ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
@@ -199,16 +199,16 @@ ax[1].legend(fontsize=5.0, loc='upper right', ncol=1, frameon=True,
 # inset: the tops of the three peaks and where their fitted centers sit
 ins = ax[1].inset_axes([0.03, 0.06, 0.27, 0.42])
 zoom = 0.04
-for y_, col, ls in ((wanted, '#0072B2', '-'), (wanted + leak_m, '0.2', (0, (3, 1.5))), (wanted + leak_g, '#D55E00', (0, (3, 1.5)))):
+for y_, col, ls in ((wanted, FS.BLUE, '-'), (wanted + leak_m, '0.2', (0, (3, 1.5))), (wanted + leak_g, FS.VERM, (0, (3, 1.5)))):
     ins.plot(xnm, y_ / 0.05, color=col, lw=1.0, ls=ls)
-for cc, col in ((c_true, '#0072B2'), (c_m, '0.2'), (c_g, '#D55E00')):
+for cc, col in ((c_true, FS.BLUE), (c_m, '0.2'), (c_g, FS.VERM)):
     ins.axvline(cc / 1000.0, color=col, lw=0.7, ls=':')
 ins.annotate('', xy=(c_m / 1000.0, 0.96), xytext=(c_true / 1000.0, 0.96),
              arrowprops=dict(arrowstyle='-|>', color='0.2', lw=0.7, mutation_scale=6))
 ins.text(c_m / 1000.0 + 0.003, 0.96, '%+.0f pm' % (c_m - c_true), color='0.2', ha='left', va='center', fontsize=5.2)
 ins.annotate('', xy=(c_g / 1000.0, 0.89), xytext=(c_true / 1000.0, 0.89),
-             arrowprops=dict(arrowstyle='-|>', color='#D55E00', lw=0.7, mutation_scale=6))
-ins.text(0.5 * (c_true + c_g) / 1000.0, 0.875, '%+.0f pm' % (c_g - c_true), color='#D55E00', ha='center', va='top', fontsize=5.2)
+             arrowprops=dict(arrowstyle='-|>', color=FS.VERM, lw=0.7, mutation_scale=6))
+ins.text(0.5 * (c_true + c_g) / 1000.0, 0.875, '%+.0f pm' % (c_g - c_true), color=FS.VERM, ha='center', va='top', fontsize=5.2)
 ins.set_xlim(c_true / 1000.0 - zoom, c_true / 1000.0 + zoom)
 ins.set_ylim(0.76, 1.32)
 ins.set_xticks([]); ins.set_yticks([])

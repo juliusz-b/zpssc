@@ -117,7 +117,7 @@ hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.VERM, lw=1.35, label='Rule A, (8)')
+b.plot(D, bias, color=FS.C_THEORY, lw=1.35, label='Rule A, (8)')
 # the full two-pass model with an unrestricted Gaussian fit, as markers
 Dm = np.linspace(25.0, 625.0, 13)
 mod = []
@@ -126,7 +126,7 @@ for d in Dm:
     (amp, mu, sg_, base), _ = curve_fit(
         gaussian, nu, rec, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
     mod.append(mu)
-b.plot(Dm, mod, 's', ms=3.6, mfc='none', mec=FS.VERM, mew=0.9, ls='none',
+b.plot(Dm, mod, 's', ms=3.6, mfc='none', mec=FS.C_MEAS, mew=0.9, ls='none',
        label='full model')
 b.axhline(-EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
           label='tolerance $\\epsilon=1$ pm')
@@ -190,11 +190,11 @@ ins.text(5.0, 4.9, r'example: detuning from $k$',
 # ---------------------------------------------------------------------------
 dat = np.load('figs/s23_ruleB.npz')
 c.plot(dat['pos'], dat['err'], '.', ms=2, color='0.75', alpha=0.5)
-c.plot(dat['cent'], dat['binned'], 'o', color=FS.BLUE, ms=4.5,
+c.plot(dat['cent'], dat['binned'], 'o', color=FS.REFS[0], ms=4.5,
        label='mean, no refs')
-c.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.VERM, lw=1.4,
+c.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.C_THEORY, lw=1.4,
        label='Rule B')
-c.plot(dat['cent'], dat['binned_r'], 's-', color=FS.GREEN, ms=3.4, lw=1.0,
+c.plot(dat['cent'], dat['binned_r'], 's-', color=FS.REFS[2], ms=3.4, lw=1.0,
        mfc='none', label='mean, 2 refs')
 c.set_xlabel(r'position in the band $\nu_k$ [pm]')
 c.set_ylabel(r'mean error $\overline{\delta\lambda}(\nu_k)$ [pm]')

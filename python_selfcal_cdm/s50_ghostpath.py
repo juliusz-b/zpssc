@@ -93,7 +93,7 @@ ax = fig.add_axes([0.10, 0.595, 0.88, 0.375])
 cx = fig.add_axes([0.115, 0.105, 0.385, 0.33])
 arrivals = fig.add_axes([0.115, 0.455, 0.385, 0.065])
 dx = fig.add_axes([0.605, 0.105, 0.385, 0.33])
-DIRECT, GHOST = FS.BLUE, FS.VERM
+DIRECT, GHOST = FS.C_DIRECT, FS.C_GHOST
 
 LW_IN, LW_RET, LW_GH, LW_GHF = 2.2, 1.5, 1.4, 0.7
 
@@ -353,11 +353,11 @@ z8 = 4.0 * np.arange(1, K8 + 1)
 nu8, shapes8, meas8, corr8, ghost8 = spectral(z8)
 _, _, _, corr8_0, _ = spectral(z8, ghosts=False)
 k8 = K8 - 1
-dx.plot(nu8, shapes8[k8], color='0.6', lw=1.8, label='$R_8$', zorder=2)
-dx.plot(nu8, meas8[k8] / R8, color=COL['b'], lw=1.0, label='meas. $S_8$', zorder=3)
-dx.plot(nu8, corr8[k8] / R8, color=FS.BLUE, lw=1.0, label='deshad. $\widehat S_8$', zorder=4)
-dx.plot(nu8, ghost8[k8] / R8, color=COL['a'], lw=0.9, ls=':', label='ghost before deshad.', zorder=3)
-dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=COL['a'], lw=0.9, ls='--', label='ghost after deshad.', zorder=3)
+dx.plot(nu8, shapes8[k8], color=FS.C_TRUE, lw=1.8, label='$R_8$', zorder=2)
+dx.plot(nu8, meas8[k8] / R8, color=FS.C_MEAS, lw=1.0, label='meas. $S_8$', zorder=3)
+dx.plot(nu8, corr8[k8] / R8, color=FS.C_CORR, lw=1.0, label='deshad. $\widehat S_8$', zorder=4)
+dx.plot(nu8, ghost8[k8] / R8, color=FS.C_GHOST, lw=0.9, ls=':', label='ghost before deshad.', zorder=3)
+dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=FS.C_GHOST, lw=0.9, ls='--', label='ghost after deshad.', zorder=3)
 print('panel (c): ghost peak / R before %.3f, after %.3f' % (ghost8[k8].max() / R8, ((corr8[k8] - corr8_0[k8]) / R8).max()))
 dx.set_xlim(-500, 500)
 dx.set_ylim(0, 1.5)

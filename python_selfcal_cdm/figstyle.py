@@ -5,22 +5,36 @@ figure), so a 7 pt label on screen is a 7 pt label on paper. That holds only
 while the PDF width matches the width main.tex includes it at, which is worth
 checking after any layout change: pdfinfo gives the file width, and the ratio
 against the includegraphics width multiplies every font size on the figure. Palette is
-Okabe-Ito, colour-blind safe. Since 31.08.2026 the look follows Origin: boxed
+Paul Tol's vibrant set, colour-blind safe, with fixed roles (C_*) shared by all figures. Since 31.08.2026 the look follows Origin: boxed
 axes, ticks inside, sans-serif labels, framed legend. Panels lettered in bold
 lowercase.
 """
 import matplotlib.pyplot as plt
 
-# Okabe-Ito
-BLUE = '#0072B2'
-SKY = '#56B4E9'
-ORANGE = '#E69F00'
-VERM = '#D55E00'
-GREEN = '#009E73'
-PURPLE = '#CC79A7'
-YELLOW = '#F0E442'
+# Paul Tol "vibrant" palette (colour-blind safe, high contrast). The old
+# Okabe-Ito names are kept so that every script switches at once.
+BLUE = '#0077BB'
+SKY = '#33BBEE'
+ORANGE = '#EE7733'
+VERM = '#CC3311'
+GREEN = '#009988'
+PURPLE = '#EE3377'
+YELLOW = '#EE7733'
 GREY = '#4D4D4D'
-LGREY = '#AAAAAA'
+LGREY = '#BBBBBB'
+
+# Roles: the same quantity gets the same colour in every figure of the paper.
+C_TRUE = '#9A9A9A'      # isolated (true) spectrum R_k, drawn thick
+C_THEORY = '#222222'    # analytical rule or bound
+C_DIRECT = BLUE         # direct return A_k, direct paths, gratings on the delay axis
+C_MEAS = VERM           # measured or uncorrected, initial array, narrow first, uniform spacing, 4 m, R = 10 %
+C_CORR = GREEN          # corrected, deshadowed
+C_GOOD = BLUE           # randomized spacing, wide first, 40 m, R = 1 %, designed array
+C_GHOST = ORANGE        # ghosts and their paths
+C_LEAK = '#777777'      # code leakage
+C_SHADOW = PURPLE       # spectral shadowing
+C_STEP = (ORANGE, SKY)  # intermediate correction steps
+REFS = {0: VERM, 1: ORANGE, 2: BLUE, 3: GREEN}   # number of reference gratings
 
 
 def apply(base=8.0):
