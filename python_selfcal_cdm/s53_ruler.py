@@ -1,45 +1,22 @@
-"""s53_ruler.py - why gratings on a Golomb ruler never receive a ghost.
+"""Exact third-order ghost collisions for periodic codes.
 
-Replaces the TikZ drawing fig_ruler.tex. Blue squares mark gratings, grey
-dots mark third-order paths at delay tau_i - tau_j + tau_l, and orange
-crosses mark paths arriving at occupied bins. One marker represents one
-path, with coincident paths stacked vertically at the exact delay bin.
-The delay axis is in chips of the code, one bin per chip.
-
-  (a) Four gratings at uniform spacing {0, 1, 2, 3}: every ghost delay is
-      again a grid point, and from the third grating on the ghosts land on
-      gratings (crosses).
-  (b) The same four gratings on the Golomb ruler {0, 1, 4, 6}. The six
-      pairwise differences, drawn as brackets, each occur once, so no ghost
-      lands on a grating.
-  (c) The ruler with a code of N = 7 chips: every delay beyond 6 folds back
-      and six ghosts land on the gratings at 0, 1 and 4. Both N are real
-      m-sequence lengths.
+One marker per directed path. Coincident paths are stacked at the same bin.
+The compact pair-gap table preserves all six brackets from the earlier figure.
 """
-import os
-import numpy as np
+from pathlib import Path
+from collections import Counter
+import json
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
-from matplotlib.colors import to_rgb
+from matplotlib.lines import Line2D
 import figstyle as FS
 
-FS.apply()
-
+FS.apply(base=6.5)
+plt.rcParams.update({'pdf.fonttype': 42})
 UNIFORM = [0, 1, 2, 3]
 RULER = [0, 1, 4, 6]
-COL = [FS.ORANGE, FS.GREEN, FS.VERM, FS.BLUE]      # gratings 1..4 by position
-GREY = '0.45'
-
-
-def tint(col, w):
-    c = np.array(to_rgb(col)); g = np.array([0.78, 0.78, 0.78])
-    return tuple(w * c + (1 - w) * g)
-
-
-GH = [tint(c, 0.45) for c in COL]
-
+OUT = Path(__file__).resolve().parent / 'figs'
 
 def ghosts(marks):
     """[(delay, index of the first grating), ...] for every third-order path."""
@@ -53,82 +30,81 @@ def ghosts(marks):
     return out
 
 
-# Separate physical grating positions from the count of paths at each delay.
-from matplotlib.lines import Line2D
-
-fig = plt.figure(figsize=(3.45, 3.45))
-gs = fig.add_gridspec(3, 1, height_ratios=[1.0, 1.75, 1.0], hspace=0.54,
-                      left=0.06, right=0.98, bottom=0.09, top=0.84)
-ax, bx, cx = (fig.add_subplot(gs[i, 0]) for i in range(3))
-legend = [Line2D([], [], marker='s', ls='none', color=FS.BLUE, ms=4,
+fig = plt.figure(figsize=(3.45, 2.25))
+axes = [fig.add_axes([0.075, bottom, 0.905, 0.185])
+        for bottom in (0.66, 0.385, 0.11)]
+legend = [Line2D([], [], marker='s', ls='none', color=FS.BLUE, ms=3.8,
                  label='Grating'),
-          Line2D([], [], marker='o', ls='none', color='0.50', ms=3.2,
+          Line2D([], [], marker='o', ls='none', color='0.50', ms=2.5,
                  label='Ghost path'),
-          Line2D([], [], marker='x', ls='none', color=FS.VERM, ms=4,
+          Line2D([], [], marker='x', ls='none', color=FS.VERM, ms=3.4,
                  label='Collision')]
-fig.legend(handles=legend, loc='upper center', bbox_to_anchor=(0.52, 1.005),
-           ncol=3, frameon=False, fontsize=6.2, handlelength=0.8,
+fig.legend(handles=legend, loc='upper center', bbox_to_anchor=(0.53, 1.005),
+           ncol=3, frameon=False, fontsize=6.1, handlelength=0.8,
            handletextpad=0.4, columnspacing=0.9)
 
 
-def bins_panel(axis, marks, N, title, letter, brackets=False):
-    axis.set_xlim(-0.7, 14.7)
-    axis.set_ylim(-1.42, 1.77 if brackets else 0.28)
+def bins_panel(axis, marks, period, title, letter):
+    axis.set_xlim(-0.35, 14.35)
+    axis.set_ylim(-1.40, 0.20)
     axis.axis('off')
-    axis.text(-0.035, 1.10, letter, transform=axis.transAxes,
-              fontweight='bold', fontsize=9, va='bottom')
-    axis.text(0.04, 1.10, title, transform=axis.transAxes,
-              fontsize=6.9, fontweight='bold', va='bottom', color='0.22')
-    axis.plot([-0.35, N - 0.65], [0, 0], color='0.35', lw=0.85)
-    for m in range(N):
-        axis.plot([m, m], [0, -1.12], color='0.90', lw=0.45, zorder=0)
-        axis.text(m, -1.22, str(m), ha='center', va='top', fontsize=6.0,
-                  color='0.30')
-    for m in marks:
-        axis.plot(m, 0, 's', color=FS.BLUE, ms=4.3, zorder=4)
-    per_bin = {}
-    for delay, first in ghosts(marks):
-        per_bin.setdefault(delay % N, []).append((delay, first))
-    hits = 0
-    for delay, paths_here in sorted(per_bin.items()):
+    paths = ghosts(marks)
+    counts = Counter(delay % period for delay, _ in paths)
+    hits = sum(count for delay, count in counts.items() if delay in marks)
+    axis.text(-0.067, 1.07, letter, transform=axis.transAxes,
+              fontweight='bold', fontsize=8, va='bottom')
+    axis.text(0, 1.07, title, transform=axis.transAxes,
+              fontsize=6.3, va='bottom', color='0.20')
+    axis.text(1, 1.07, f'{hits}/{len(paths)} collide', transform=axis.transAxes,
+              fontsize=6.0, va='bottom', ha='right',
+              color=FS.VERM if hits else FS.BLUE)
+    axis.plot([-0.2, period - 0.7], [0, 0], color='0.35', lw=0.75)
+    for delay in range(7 if letter == 'a' else period):
+        axis.plot([delay, delay], [0, -1.03], color='0.9', lw=0.35, zorder=0)
+        axis.text(delay, -1.12, str(delay), ha='center', va='top',
+                  fontsize=5.5, color='0.3')
+    axis.plot(marks, [0]*len(marks), 's', color=FS.BLUE, ms=3.7, zorder=3)
+    for delay, count in sorted(counts.items()):
         collision = delay in marks
-        if collision:
-            hits += len(paths_here)
-        for j, _ in enumerate(paths_here):
-            axis.plot(delay, -0.25 - 0.17 * j,
-                      marker='x' if collision else 'o', ls='none',
-                      ms=3.3 if collision else 2.8, mew=0.95,
-                      color=FS.VERM if collision else '0.50', zorder=3)
-    if brackets:
-        pairs = sorted((marks[j] - marks[i], marks[i], marks[j])
-                       for i in range(len(marks)) for j in range(i + 1, len(marks)))
-        for k, (distance, x0, x1) in enumerate(pairs):
-            y = 0.28 + 0.24 * k
-            axis.plot([x0, x0, x1, x1], [0.10, y, y, 0.10],
-                      color='0.60', lw=0.6, zorder=1)
-            axis.text((x0 + x1) / 2, y, str(distance), fontsize=6.0,
-                      ha='center', va='center', color='0.25',
-                      bbox=dict(facecolor='white', edgecolor='none', pad=0.4))
-    score_y = 1.03 if brackets else -0.20
-    axis.text(10.2, score_y, '%d of 14 paths collide' % hits,
-              fontsize=6.2, color=FS.VERM if hits else FS.BLUE,
-              ha='center', va='center')
-    if N == 7:
-        axis.axvline(6.5, ymin=0.08, ymax=0.88, lw=0.7,
-                     color='0.65', ls=(0, (2, 2)))
-        axis.text(10.2, -0.59, 'Wrapped delays', ha='center', fontsize=5.8,
-                  color='0.40')
-        axis.text(10.2, -0.94, r'$7\to0,\quad8\to1,\quad11\to4$',
-                  ha='center', fontsize=6.0, color=FS.VERM)
-    return hits
+        for j in range(count):
+            axis.plot(delay, -0.23-0.15*j, marker='x' if collision else 'o',
+                      ls='none', ms=2.8 if collision else 2.3, mew=0.8,
+                      color=FS.VERM if collision else '0.5', zorder=3)
+    return dict(marks=marks, period=period, paths=paths,
+                counts=dict(sorted(counts.items())), collisions=hits)
 
 
-h_a = bins_panel(ax, UNIFORM, 15, 'Uniform spacing, $N=15$', 'a')
-h_b = bins_panel(bx, RULER, 15, 'Golomb ruler, $N=15$', 'b', brackets=True)
-h_c = bins_panel(cx, RULER, 7, 'Same ruler, $N=7$', 'c')
-fig.text(0.52, 0.022, 'Delay bin (chips)', ha='center', fontsize=7.0)
-print('ghosts on gratings: uniform %d, ruler %d, ruler with N=7 %d' % (h_a, h_b, h_c))
-os.makedirs('figs', exist_ok=True)
-fig.savefig('figs/fig_s53_ruler.pdf')
-fig.savefig('figs/fig_s53_ruler.png', dpi=300)
-print('saved figs/fig_s53_ruler.pdf')
+report = [bins_panel(axes[0], UNIFORM, 15, 'Uniform spacing, $N=15$', 'a'),
+          bins_panel(axes[1], RULER, 15, 'Golomb ruler, $N=15$', 'b'),
+          bins_panel(axes[2], RULER, 7, 'Same ruler, $N=7$', 'c')]
+
+# The unused right-hand portion of (a) holds the six pair separations of (b,c).
+# This retains the endpoint-to-distance mapping without six tall brackets.
+a = axes[0]
+a.text(10.6, -0.22, 'Pair gaps in (b,c)', ha='center', va='center',
+       fontsize=5.5, color='0.25', fontweight='bold')
+pairs = [(0, 1), (1, 4), (0, 4), (1, 6), (0, 6), (4, 6)]
+for row in range(3):
+    for col in range(2):
+        lo, hi = pairs[2*row+col]
+        a.text(8.8+3.5*col, -0.60-0.30*row,
+               f'({lo},{hi}): {hi-lo}', fontsize=5.4, color='0.35',
+               ha='center', va='center',
+               bbox=dict(facecolor='white', edgecolor='none', pad=0.5))
+
+c = axes[2]
+c.plot([6.5, 6.5], [0.12, -1.03], color='0.60', lw=0.65, ls=(0,(2,2)))
+c.text(10.6, -0.15, 'Wrapped delays', fontsize=5.6, color='0.30',
+       ha='center', va='top')
+c.text(10.6, -0.60, r'$7\to0,\quad8\to1,\quad11\to4$',
+       fontsize=6.0, color=FS.VERM, ha='center', va='center')
+fig.text(0.53, 0.023, 'Delay bin [chips]', ha='center', fontsize=6.5)
+
+assert [r['collisions'] for r in report] == [4, 0, 6]
+assert all(len(r['paths']) == 14 for r in report)
+assert sorted(hi-lo for lo,hi in pairs) == list(range(1,7))
+OUT.mkdir(exist_ok=True)
+fig.savefig(OUT/'fig_s53_ruler.pdf')
+fig.savefig(OUT/'fig_s53_ruler.png', dpi=300)
+(OUT/'s53_ruler_results.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+print('Collisions: 4, 0, 6 of 14 paths. All six pair gaps preserved.')
