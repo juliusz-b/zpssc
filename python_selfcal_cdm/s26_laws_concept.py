@@ -130,8 +130,10 @@ b.plot(Dm, mod, 's', ms=3.6, mfc='none', mec=FS.C_MEAS, mew=0.9, ls='none',
        label='full model')
 b.axhline(-EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
           label='tol. $\\epsilon=1$ pm')
-b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
-b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
+b.axvline(dlo, color=FS.VERM, lw=0.8, ls=(0, (2, 2)))
+b.axvline(dhi, color=FS.VERM, lw=0.8, ls=(0, (2, 2)))
+b.text(dlo + 7, -6.4, r'$\Delta\lambda_{\mathrm{lo}}$', rotation=90, ha='left', va='center', fontsize=6, color=FS.VERM)
+b.text(dhi - 7, -5.0, r'$\Delta\lambda_{\mathrm{hi}}$', rotation=90, ha='right', va='center', fontsize=6, color=FS.VERM)
 b.plot(DSTAR, bias.min(), 'o', color=FS.VERM, ms=3.5)
 b.text(150, -9.45, 'min. $-0.81R\\sigma$',
        fontsize=5.0, color=FS.VERM, va='bottom', ha='left')
