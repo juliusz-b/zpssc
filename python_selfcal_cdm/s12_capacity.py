@@ -245,6 +245,7 @@ else:
     cap_rnd = np.array([capacity(R, 'random', 500 + i * 37) for i, R in enumerate(Rs)])
     cap_uni = np.array([capacity(R, 'uniform', 900 + i * 37) for i, R in enumerate(Rs)])
     cap_peel = np.array([capacity(R, 'random', 500 + i * 37, peel=True) for i, R in enumerate(Rs)])
+    cap_uni_peel = np.array([capacity(R, 'uniform', 900 + i * 37, peel=True) for i, R in enumerate(Rs)])
 
     # code family check at a common operating point
     K_CHK, R_CHK = 32, 0.03
@@ -261,7 +262,7 @@ else:
                             peel=True) for t in range(8)])
     os.makedirs('out', exist_ok=True)
     band_full = np.array(TRIALS['full_rnd']); band_peel = np.array(TRIALS['peeled_rnd'])
-    np.savez(CACHE, band_full=band_full, band_peel=band_peel, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
+    np.savez(CACHE, band_full=band_full, band_peel=band_peel, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, cap_uni_peel=cap_uni_peel, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
 
 # ---------------------------------------------------------------------------
 # figure
@@ -297,7 +298,11 @@ ax[0].grid(False, which='both', alpha=0.25)
 
 ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#D55E00', label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#0072B2', label='randomized')
+ax[1].semilogx(Rs * 100, cap_uni_peel, 'v--', color='#D55E00', mfc='white', label='uniform + deshadowing')
 ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#E69F00', label='randomized + deshadowing')
+ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(6.5, 50.0), fontsize=5.2,
+               color='#D55E00', ha='left', va='center',
+               arrowprops=dict(arrowstyle='-', color='#D55E00', lw=0.6, shrinkA=0, shrinkB=2))
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
               label='gratings of the bench, $R = 10\\%$')
 ax[1].set_ylim(0, 58)
