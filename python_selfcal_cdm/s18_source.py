@@ -51,6 +51,24 @@ FS.apply()
 
 PM = C.PM_PER_GHZ
 F = C.FBG_FWHM_GHZ
+SKEW = 1.2                           # asymmetry of the chirp kernel (transient vs adiabatic part)
+
+
+def _kernel_std_factor(skew=SKEW):
+    """std of the skewed kernel divided by its Gaussian scale delta (0.790 for skew 1.2)"""
+    d, p = C.chirp_kernel(1.0, skew=skew)
+    m = float((p * d).sum())
+    return float(np.sqrt((p * (d - m) ** 2).sum()))
+
+
+KSTD = _kernel_std_factor()
+
+
+def delta_of(ratio):
+    """Gaussian scale of the kernel for a chirp span Delta_ch = ratio x FWHM, with Delta_ch = 2 std(xi)"""
+    return ratio * F / (2.0 * KSTD)
+
+
 # BAND_HALF (half of the measured tuning range) is set below from the tuning curve.
 
 # ---------------------------------------------------------------------------
@@ -86,12 +104,12 @@ centres = 0.5 * (edges[1:] + edges[:-1])
 # ---------------------------------------------------------------------------
 # (b) FM-to-AM on the grating flank
 # ---------------------------------------------------------------------------
-DELTA_DEMO = 0.15 * F                # excursion used for the illustration only
+DELTA_DEMO = delta_of(0.15)          # chirp span 0.15 FWHM for the illustration only
 ASYM = 0.30
 g = np.linspace(-2.6 * F, 2.6 * F, 1200)
 true_line = C.fbg_tanh(g, 0.0, F, n_side=ASYM)
 chirped = C.fmam_readout(g, 0.0, F, DELTA_DEMO, mean_off=0.30 * DELTA_DEMO,
-                         skew=1.2, shape='tanh', asym=ASYM)
+                         skew=SKEW, shape='tanh', asym=ASYM)
 chirped = chirped / chirped.max()
 p_true = C.gauss_fit_peak(g, true_line) * PM
 p_chirp = C.gauss_fit_peak(g, chirped) * PM
@@ -138,7 +156,7 @@ def chirp_shift(nb, asym, delta):
     """FM-to-AM shift of the fitted peak [pm] for a grating with side asymmetry asym; the chirp
     kernel has the same span and mean offset at every sweep position"""
     gg = np.linspace(nb - 5 * F, nb + 5 * F, 801)
-    a = C.fmam_readout(gg, nb, F, delta, mean_off=0.20 * delta, skew=1.2, shape='tanh', asym=asym)
+    a = C.fmam_readout(gg, nb, F, delta, mean_off=0.20 * delta, skew=SKEW, shape='tanh', asym=asym)
     b = C.fbg_tanh(gg, nb, F, n_side=asym)
     return (C.gauss_fit_peak(gg, a) - C.gauss_fit_peak(gg, b)) * PM
 
@@ -146,7 +164,7 @@ def chirp_shift(nb, asym, delta):
 def chirp_residual(ratio, nref, nsen=8, seed=3):
     """RMS sensor error after a polynomial through nref references, at chirp span ratio x FWHM"""
     rng = np.random.default_rng(seed)
-    delta = ratio * F / 2.0             # Delta_ch = 2 x std of the dwell distribution
+    delta = delta_of(ratio)             # Delta_ch = 2 x std of the skewed kernel
     ref_nu = (np.linspace(-0.9 * BAND_HALF, 0.9 * BAND_HALF, nref) if nref > 1
               else np.array([0.0]))
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
@@ -170,7 +188,7 @@ CAL_RATIO = 0.30                     # chirp span in FWHM for panel (c)
 
 def calibration(ratio=CAL_RATIO, nsen=8, seed=3):
     rng = np.random.default_rng(seed)
-    delta = ratio * F / 2.0
+    delta = delta_of(ratio)
     sen_nu = np.sort(rng.uniform(-BAND_HALF, BAND_HALF, nsen))
     sen_as = rng.uniform(-0.30, 0.30, nsen)
 
@@ -226,7 +244,9 @@ ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='$R_k(\\la
 ax[1].plot(g * PM / 1000.0, chirped, color='#D55E00', lw=1.4,
            label='$S_k^{\\mathrm{ch}}$, chirped source')
 nu_op = -0.62 * F
-kern = np.exp(-0.5 * ((g - nu_op) / (0.5 * DELTA_DEMO)) ** 2)
+_kd, _kp = C.chirp_kernel(DELTA_DEMO, skew=SKEW)          # the kernel actually used, drawn at the operating point
+kern = np.interp(g, nu_op + 0.30 * DELTA_DEMO + _kd, _kp, left=0.0, right=0.0)
+kern = kern / kern.max()
 ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='#CC79A7', alpha=0.32,
                    lw=0)
 ax[1].annotate(r'$p(\xi)$', xy=(nu_op * PM / 1000.0, 0.30),
@@ -296,7 +316,7 @@ ax[3].set_yscale('log')
 ax[3].set_xlabel(r'chirp span  $\Delta\lambda_{\mathrm{ch}}/\mathrm{FWHM}$')
 ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
 FS.letter(ax[3], 'd')
-ax[3].set_ylim(0.3, 400)
+ax[3].set_ylim(0.3, 2000)
 ax[3].legend(fontsize=5.2, loc='upper left',
              ncol=2, frameon=True, handlelength=1.2, columnspacing=0.5,
              labelspacing=0.15)
