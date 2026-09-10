@@ -184,22 +184,22 @@ c_g = C.gauss_fit_peak(nuc, wanted + leak_g) * PM
 print('leakage panel: fitted center moves by %.1f pm (m-sequence) and %.1f pm (Gold), K=%d, N=%d'
       % (c_m - c_true, c_g - c_true, Kc, NCH))
 ax[1].axhline(0, color='0.75', lw=0.6, zorder=1)
-ax[1].plot(xnm, wanted / 0.05, color=FS.BLUE, lw=1.4, label='$A_k$, spectrum of grating $k$')
-ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=1.2, label='$L_k$, m-sequence')
-ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.2, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-sequence')
-ax[1].plot(xnm, leak_g / 0.05, color=FS.VERM, lw=1.2, label='$L_k$, Gold code')
-ax[1].plot(xnm, (wanted + leak_g) / 0.05, color=FS.VERM, lw=1.2, ls=(0, (3, 1.5)), label='$A_k+L_k$, Gold code')
+ax[1].plot(xnm, wanted / 0.05, color=FS.BLUE, lw=1.6, label='$A_k$, spectrum of grating $k$')
+ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=0.9, ls=(0, (3, 1.5)), label='$L_k$, m-sequence')
+ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.4, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-sequence')
+ax[1].plot(xnm, leak_g / 0.05, color=FS.VERM, lw=0.9, ls=(0, (4, 1.5, 1, 1.5)), label='$L_k$, Gold code')
+ax[1].plot(xnm, (wanted + leak_g) / 0.05, color=FS.VERM, lw=1.4, ls=(0, (4, 1.5, 1, 1.5)), label='$A_k+L_k$, Gold code')
 ax[1].set_xlim(-0.5, 0.5)
 ax[1].set_ylim(-0.35, 1.5)
 ax[1].set_yticks([-0.5, 0, 0.5, 1.0])
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
 ax[1].grid(False, which='both')
 ax[1].legend(fontsize=6, loc='upper right', ncol=1, frameon=True,
-             columnspacing=0.7, handlelength=1.4, labelspacing=0.2, borderaxespad=0.3)
+             columnspacing=0.7, handlelength=2.4, labelspacing=0.2, borderaxespad=0.3)
 # inset: the tops of the three peaks and where their fitted centers sit
 ins = ax[1].inset_axes([0.03, 0.06, 0.27, 0.42])
 zoom = 0.04
-for y_, col, ls in ((wanted, FS.BLUE, '-'), (wanted + leak_m, '0.2', (0, (3, 1.5))), (wanted + leak_g, FS.VERM, (0, (3, 1.5)))):
+for y_, col, ls in ((wanted, FS.BLUE, '-'), (wanted + leak_m, '0.2', (0, (3, 1.5))), (wanted + leak_g, FS.VERM, (0, (4, 1.5, 1, 1.5)))):
     ins.plot(xnm, y_ / 0.05, color=col, lw=1.2, ls=ls)
 for cc, col in ((c_true, FS.BLUE), (c_m, '0.2'), (c_g, FS.VERM)):
     ins.axvline(cc / 1000.0, color=col, lw=0.7, ls=':')
