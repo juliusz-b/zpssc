@@ -283,14 +283,14 @@ arrivals.text(0, 2.50, 'Arrival times', fontsize=5.8, color='0.40',
                ha='left', va='bottom')
 cx.plot(zaxis[m], corr[m] / ref_meas, color='0.22', lw=0.95, zorder=3)
 cx.set_xlim(0, XMAX)
-cx.set_ylim(0, 1.12)
+cx.set_ylim(0, 1.4)
 cx.set_xticks([0, 20, 40, 60, 80])
 cx.set_yticks([0, 0.5, 1.0])
 cx.tick_params(labelsize=6.2, length=2.4)
 cx.set_xlabel('Equivalent position (m)', fontsize=6.8, labelpad=1.5)
 cx.set_ylabel('Normalized correlation', fontsize=6.8, labelpad=1.5)
 
-zoom = cx.inset_axes([0.50, 0.46, 0.47, 0.44])
+zoom = cx.inset_axes([0.585, 0.50, 0.40, 0.44])
 late = (zaxis >= 46) & (zaxis <= 77)
 zoom.plot(zaxis[late], corr[late] / ref_meas, color='0.22', lw=0.8)
 for zpos in sorted(ghost_count):
