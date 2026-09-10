@@ -1,52 +1,26 @@
-"""s18_source.py - where the source hurts: chirp of the code, and what it does
-on the edge of a grating.
+"""Illustrate source chirp and reference correction over a measured tuning curve.
 
-This is the explanatory figure for the term that gives the paper its name, and it
-was missing from the earlier draft. Three panels.
+(a) Qualitative code-induced waveform, in arbitrary units.
+(b) An isolated grating convolved with the power-weighted chirp distribution.
+(c) Three-reference correction for one assumed wavelength-table drift.
+(d) Sensor RMS error against the RMS wavelength-table drift, in pm.
 
-  (a) What "chirp of the code" means. Modulating the laser current does not only
-      switch the power; it moves the optical frequency. Two components appear:
-      an adiabatic shift that follows the instantaneous power, so the laser sits
-      at a different frequency during an "on" chip than during an "off" chip, and
-      a transient overshoot at every edge, following the derivative of the power.
-      The laser therefore does not probe a single optical frequency while the
-      code runs; it probes a distribution. The inset is that distribution, and it
-      is exactly the kernel p(delta) that the model integrates over. Everything
-      is drawn in units of the excursion Delta, because the excursion of the
-      BW10 VCSEL under code modulation has not been measured.
-
-  (b) Why the distribution matters. On the flank of a grating the reflectance
-      changes steeply with optical frequency, so averaging over the chirp
-      distribution is not the same as sampling at its mean: a skewed kernel on an
-      asymmetric flank returns a biased value. Summed across the sweep, the
-      recovered line is displaced. That is the FM-to-AM error.
-
-  (c) How the references calibrate. At one operating point (0.3 FWHM of
-      chirp, plus a drift of the lambda(V) table of +20 pm and 3 percent
-      gain) the axis error across the band, what each reference reads at
-      its own band position, and the polynomial through the readings: a
-      constant from one reference, a line from two, a parabola from three.
-      A single reference sits at the sweep centre. The panel spans the
-      whole 10-nm sweep: three references in the edge bands and the centre
-      band serve every band, because the axis error is smooth over the sweep.
-
-  (c) The calibration at one operating point (0.3 FWHM of chirp, drifted
-      lambda(V) table): the axis error across the measured tuning range, the raw
-      sensor readings, three references with the parabola through them and the
-      sensors after correction. Inset: the measured tuning curve minus its
-      quadratic fit, the part a second-order table would leave.
-  (d) How far the references get. The axis error is smooth over the sweep, so
-      temperature-stabilised references sample it and a low-order fit removes
-      it: one reference the offset, two the slope, three the curvature that the
-      nonlinear tuning curve puts into the drift. What survives scales with the
-      chirp span and with the spread of grating lineshapes.
+The drift pattern combines a wavelength offset, a fractional tuning-span
+change and a voltage offset. Panel (d) scales these three terms together,
+keeping chirp and all grating realizations fixed. Its x axis excludes chirp.
+The chirp span used in (b)-(d) is twice the actual standard deviation of
+the skewed kernel. The waveform in (a) is illustrative, not that kernel's
+measured time history.
 """
+from pathlib import Path
 import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import warnings; warnings.filterwarnings('ignore')
 import common as C
 import figstyle as FS
-FS.apply()
+FS.apply(base=7.5)
+OUT_DIR = Path(__file__).resolve().parent / "figs"
+OUT_DIR.mkdir(exist_ok=True)
 
 
 PM = C.PM_PER_GHZ
@@ -120,8 +94,8 @@ p_chirp = C.gauss_fit_peak(g, chirped) * PM
 # Measured tuning curve of a BW10-1550 HCG-VCSEL, 160 static points over 0-14 V
 # and 7.64 nm, represented by its quartic fit (residual 4 pm RMS). The curve is
 # far from linear: dlambda/dV runs from -0.10 to -1.00 nm/V. A quadratic fit
-# leaves a 14-pm RMS, 56-pm peak deviation that no polynomial through three
-# references can remove, so the per-step table must keep at least the quartic.
+# leaves a wavelength-dependent residual. A few reference points do not
+# generally recover that residual, so this example retains the quartic.
 TUNE_P4 = np.array([-7.14581756e-05, 1.94718096e-03, -4.51295135e-02, -9.75634596e-02, 1.56974137e+03])  # nm, V^4..V^0
 TUNE_V = np.linspace(0.0, 14.0, 2801)
 TUNE_L = np.polyval(TUNE_P4, TUNE_V)                       # nm, decreasing in V
@@ -219,13 +193,21 @@ cal = calibration()
 curves = {n: np.array([chirp_residual(r, n) for r in ratios]) for n in (0, 1, 2, 3)}
 drifts = np.array([0.0, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0])
 dcurves = {n: np.array([chirp_residual(CAL_RATIO, n, drift=d) for d in drifts]) for n in (0, 1, 2, 3)}
+# Use a uniform wavelength grid to define the RMS error of the calibration
+# table over the entire usable sweep. This is an axis relabelling only.
+DRIFT_GRID = np.linspace(-BAND_HALF, BAND_HALF, 1001)
+DRIFT_RMS_PM = float(np.sqrt(np.mean(axis_error(DRIFT_GRID) ** 2)))
+drift_rms_pm = drifts * DRIFT_RMS_PM
+
 
 # ---------------------------------------------------------------------------
 # figure
 # ---------------------------------------------------------------------------
 # The paper places this at full text width (7.16 in). Draw at the final
 # physical width so annotations remain legible after inclusion.
-fig, ax = plt.subplots(1, 4, figsize=(7.16, 1.95))
+plt.rcParams.update({'axes.labelsize': 7, 'xtick.labelsize': 6,
+                     'ytick.labelsize': 6, 'pdf.fonttype': 42})
+fig, ax = plt.subplots(1, 4, figsize=(7.16, 2.05))
 
 # --- (a) -------------------------------------------------------------------
 ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
@@ -233,20 +215,19 @@ ax[0].fill_between(t, -0.4, 1.6, where=drive > 0.5, step='post',
 ax[0].plot(t, nu_inst, color='#D55E00', lw=1.4)
 ax[0].set_ylim(-0.18, 1.45)
 ax[0].set_xlim(0, 8)
+ax[0].set_xticks([0, 2, 4, 6, 8])
+ax[0].set_yticks([0, 0.5, 1.0])
 ax[0].set_xlabel('time [chip periods]')
-ax[0].set_ylabel('code-induced shift  ' + r'$\delta\lambda/\Delta\lambda_{\mathrm{ch}}$')
+ax[0].set_ylabel('wavelength shift [a.u.]')
 FS.letter(ax[0], 'a')
 ax[0].axhline(plateau, color='#D55E00', ls=':', lw=0.8)
-ax[0].annotate('', xy=(1.62, 0.0), xytext=(1.62, 1.0),
-               arrowprops=dict(arrowstyle='<->', lw=0.9, color='#0072B2'))
-ax[0].text(1.72, 0.5, r'$\Delta\lambda_{\mathrm{ch}}$', color='#0072B2', fontsize=8.0, ha='left',
-           va='center')
-ax[0].grid(False, alpha=0.2)
+ax[0].text(7.85, plateau + 0.06, 'Steady-state level', color='0.35', fontsize=5.5, ha='right')
+ax[0].grid(False)
 
 # --- (b) -------------------------------------------------------------------
 ax[1].plot(g * PM / 1000.0, true_line, color='#0072B2', lw=1.4, label='$R_k(\\lambda)$, no chirp')
 ax[1].plot(g * PM / 1000.0, chirped, color='#D55E00', lw=1.4,
-           label='$S_k^{\\mathrm{ch}}$, chirped source')
+           label='$S_k^{\\mathrm{ch}}$, chirped')
 nu_op = -0.62 * F
 _kd, _kp = C.chirp_kernel(DELTA_DEMO, skew=SKEW)          # the kernel actually used, drawn at the operating point
 kern = np.interp(g, nu_op + 0.30 * DELTA_DEMO + _kd, _kp, left=0.0, right=0.0)
@@ -265,11 +246,12 @@ FS.dim_gap(ax[1], p_true / 1000.0, p_chirp / 1000.0, 1.10,
            '%.0f pm' % abs(p_chirp - p_true), color='0.2',
            tail=0.13, side='left')
 ax[1].set_ylim(0, 1.62)
+ax[1].set_yticks([0, 0.5, 1, 1.5])
 ax[1].set_xlim(-0.62, 0.62)
 ax[1].set_xlabel('wavelength offset [nm]')
 ax[1].set_ylabel('normalized reflectance')
 FS.letter(ax[1], 'b')
-ax[1].legend(fontsize=5.8, loc='upper right',
+ax[1].legend(fontsize=5.6, loc='upper right',
              ncol=1, frameon=True, handlelength=1.5, columnspacing=0.8,
              labelspacing=0.18, borderaxespad=0.25)
 
@@ -283,27 +265,28 @@ snu = cal['sen_nu'] * PM / 1000.0
 r3 = cal['refs'][3]
 ax[2].axhline(0, color='0.6', lw=0.6)
 ax[2].plot(xpm, cal['smooth'], color='0.25', lw=1.3, label='axis error')
-ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='sensors, raw')
+ax[2].plot(snu, cal['sen_err'], 'o', color=GREY, ms=3.4, mfc='white', mew=0.9, label='raw sensors')
 ax[2].plot(xpm, r3['fit'], color='#009E73', lw=1.0, ls='--', label='_nolegend_')
 ax[2].plot(r3['nu'] * PM / 1000.0, r3['rd'], 'd', color='#009E73', ms=5.2, label='3 references')
-ax[2].plot(snu, r3['res'], 'o', color='#0072B2', ms=3.4, label='sensors, corrected')
+ax[2].plot(snu, r3['res'], 'o', color='#0072B2', ms=3.4, label='corrected')
 xh = 1.02 * BAND_HALF * PM / 1000.0
 ax[2].set_xlim(-xh, xh)
 lo = min(cal['smooth'].min(), cal['sen_err'].min(), r3['res'].min())
 hi = max(cal['smooth'].max(), cal['sen_err'].max(), r3['res'].max())
 ax[2].set_ylim(lo - 0.10 * (hi - lo), hi + 1.05 * (hi - lo))
+ax[2].set_yticks([-50, 0, 50])
 ax[2].set_xlabel('sweep position [nm]')
-ax[2].set_ylabel('reported $-$ true [pm]')
+ax[2].set_ylabel('wavelength error [pm]')
 FS.letter(ax[2], 'c')
-ax[2].legend(fontsize=4.8, loc='upper left', ncol=1, frameon=True, handlelength=1.1,
+ax[2].legend(fontsize=5.1, loc='upper left', ncol=1, frameon=True, handlelength=1.1,
              labelspacing=0.16, borderaxespad=0.3, handletextpad=0.5)
 ax[2].grid(False)
-ins = ax[2].inset_axes([0.62, 0.63, 0.33, 0.29])
+ins = ax[2].inset_axes([0.66, 0.65, 0.29, 0.26])
 ins.plot(TUNE_V, TUNE_WAVE, color='0.25', lw=0.9)
 ins.axhline(0, color='0.6', lw=0.5)
 ins.set_xlim(0, 14)
 ins.set_xticks([0, 7, 14]); ins.set_yticks([-50, 0, 50]); ins.set_ylim(-70, 110)
-ins.tick_params(labelsize=4.6, length=1.8, pad=1.2)
+ins.tick_params(labelsize=4.8, length=1.8, pad=1.2)
 ins.set_xlabel('$V$ [V]', fontsize=4.8, labelpad=0.5)
 ins.set_ylabel('[pm]', fontsize=4.8, labelpad=0.5)
 for sp in ins.spines.values():
@@ -314,26 +297,41 @@ styles = {0: ('o-', '#D55E00', 'no ref'), 1: ('s-', '#E69F00', '1 ref'),
           2: ('^-', '#0072B2', '2 refs'), 3: ('d-', '#009E73', '3 refs')}
 for n in (0, 1, 2, 3):
     mk, col, lab = styles[n]
-    ax[3].plot(drifts, dcurves[n], mk, color=col, lw=1.2, ms=4, label=lab)
+    ax[3].plot(drift_rms_pm, dcurves[n], mk, color=col, lw=1.2, ms=3, label=lab)
 ax[3].axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 ax[3].set_yscale('log')
-ax[3].set_xlabel('table drift, multiples of (c)')
-ax[3].set_ylabel('residual $\\delta\\lambda_k$ [pm]')
+ax[3].set_xlabel('RMS calibration drift\n[pm]')
+ax[3].set_ylabel('sensor RMS error [pm]')
 FS.letter(ax[3], 'd')
-ax[3].set_ylim(0.01, 3000)
-ax[3].set_xlim(-0.1, 5.1)
-ax[3].legend(fontsize=5.2, loc='upper left',
+ax[3].set_ylim(0.01, 300)
+ax[3].set_yticks([0.01, 0.1, 1, 10, 100])
+ax[3].set_xlim(-2, 5 * DRIFT_RMS_PM + 2)
+ax[3].set_xticks([0, 20, 40, 60, 80])
+ax[3].axvline(DRIFT_RMS_PM, color='0.5', lw=0.8, ls=':')
+ax[3].text(DRIFT_RMS_PM + 1.2, 170, 'Case (c)', fontsize=5.3, color='0.35')
+ax[3].legend(fontsize=5.1, loc='lower right',
              ncol=2, frameon=True, handlelength=1.2, columnspacing=0.5,
              labelspacing=0.15)
-ax[3].grid(False, which='both', alpha=0.25)
+ax[3].grid(False, which='both')
+ax[3].grid(True, axis='y', which='major', color='0.9', linewidth=0.5)
 
-fig.subplots_adjust(left=0.065, right=0.99, top=0.87, bottom=0.17,
-                    wspace=0.40)
-fig.savefig('figs/fig_s18_source.png', dpi=150, bbox_inches='tight')
-fig.savefig('figs/fig_s18_source.pdf', bbox_inches='tight')
+fig.subplots_adjust(left=0.065, right=0.99, top=0.85, bottom=0.23,
+                    wspace=0.45)
+# Keep the PDF at its intended printed width instead of cropping labels out.
+# The explicit margins accommodate all four panels' labels and letters.
+fig.savefig(OUT_DIR / 'fig_s18_source.png', dpi=220)
+fig.savefig(OUT_DIR / 'fig_s18_source.pdf')
+np.savez(OUT_DIR / 's18_source_results.npz', drifts=drifts,
+         drift_rms_pm=drift_rms_pm, drift_rms_baseline_pm=DRIFT_RMS_PM,
+         dcurves=np.stack([dcurves[n] for n in range(4)]),
+         ratios=ratios, curves=np.stack([curves[n] for n in range(4)]),
+         calibration_sensor_errors=cal['sen_err'],
+         calibration_corrected=cal['refs'][3]['res'],
+         demo_shift_pm=p_chirp-p_true, kernel_std_factor=KSTD)
+print('Baseline RMS calibration drift: %.6f pm' % DRIFT_RMS_PM)
 
-print('illustration only: excursion %.2f x FWHM, asymmetry %.2f, apparent shift %.1f pm'
-      % (DELTA_DEMO / F, ASYM, p_chirp - p_true))
+print('illustration only: chirp span %.2f x FWHM, asymmetry %.2f, fitted shift %.1f pm'
+      % (2 * KSTD * DELTA_DEMO / F, ASYM, p_chirp - p_true))
 print('--- residual [pm] vs excursion and reference count ---')
 print('  Delta/FWHM ' + ''.join('%9.2f' % r for r in ratios))
 for n in (0, 1, 2, 3):
