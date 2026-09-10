@@ -197,7 +197,7 @@ c.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.VERM, lw=1.4,
 c.plot(dat['cent'], dat['binned_r'], 's-', color=FS.GREEN, ms=3.4, lw=1.0,
        mfc='none', label='mean, 2 refs')
 c.set_xlabel(r'position in the band $\nu_k$ [pm]')
-c.set_ylabel(r'mean bias $\overline{\delta\lambda}(\nu_k)$ [pm]')
+c.set_ylabel(r'mean error $\overline{\delta\lambda}(\nu_k)$ [pm]')
 panel_title(c, 'c', 'Rule B and two references')
 c.legend(fontsize=5.2, loc='upper left', handlelength=1.6, labelspacing=0.18,
          borderaxespad=0.3)
