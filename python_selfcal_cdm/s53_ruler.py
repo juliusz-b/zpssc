@@ -1,7 +1,7 @@
 """Exact third-order ghost collisions for periodic codes.
 
 One marker per directed path. Coincident paths are stacked at the same bin.
-The compact pair-gap table preserves all six brackets from the earlier figure.
+The three compact rows show direct returns, ghost multiplicity and wrapping.
 """
 from pathlib import Path
 from collections import Counter
@@ -59,7 +59,7 @@ def bins_panel(axis, marks, period, title, letter):
               fontsize=6.0, va='bottom', ha='right',
               color=FS.VERM if hits else FS.BLUE)
     axis.plot([-0.2, period - 0.7], [0, 0], color='0.35', lw=0.75)
-    for delay in range(7 if letter == 'a' else period):
+    for delay in range(period):
         axis.plot([delay, delay], [0, -1.03], color='0.9', lw=0.35, zorder=0)
         axis.text(delay, -1.12, str(delay), ha='center', va='top',
                   fontsize=5.5, color='0.3')
@@ -78,20 +78,6 @@ report = [bins_panel(axes[0], UNIFORM, 15, 'Uniform spacing, $N=15$', 'a'),
           bins_panel(axes[1], RULER, 15, 'Golomb ruler, $N=15$', 'b'),
           bins_panel(axes[2], RULER, 7, 'Same ruler, $N=7$', 'c')]
 
-# The unused right-hand portion of (a) holds the six pair separations of (b,c).
-# This retains the endpoint-to-distance mapping without six tall brackets.
-a = axes[0]
-a.text(10.6, -0.22, 'Pair gaps in (b,c)', ha='center', va='center',
-       fontsize=5.5, color='0.25', fontweight='bold')
-pairs = [(0, 1), (1, 4), (0, 4), (1, 6), (0, 6), (4, 6)]
-for row in range(3):
-    for col in range(2):
-        lo, hi = pairs[2*row+col]
-        a.text(8.8+3.5*col, -0.60-0.30*row,
-               f'({lo},{hi}): {hi-lo}', fontsize=5.4, color='0.35',
-               ha='center', va='center',
-               bbox=dict(facecolor='white', edgecolor='none', pad=0.5))
-
 c = axes[2]
 c.plot([6.5, 6.5], [0.12, -1.03], color='0.60', lw=0.65, ls=(0,(2,2)))
 c.text(10.6, -0.15, 'Wrapped delays', fontsize=5.6, color='0.30',
@@ -102,9 +88,8 @@ fig.text(0.53, 0.023, 'Delay bin [chips]', ha='center', fontsize=6.5)
 
 assert [r['collisions'] for r in report] == [4, 0, 6]
 assert all(len(r['paths']) == 14 for r in report)
-assert sorted(hi-lo for lo,hi in pairs) == list(range(1,7))
 OUT.mkdir(exist_ok=True)
 fig.savefig(OUT/'fig_s53_ruler.pdf')
 fig.savefig(OUT/'fig_s53_ruler.png', dpi=300)
 (OUT/'s53_ruler_results.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
-print('Collisions: 4, 0, 6 of 14 paths. All six pair gaps preserved.')
+print('Collisions: 4, 0, 6 of 14 paths.')
