@@ -129,7 +129,7 @@ for d in Dm:
 b.plot(Dm, mod, 's', ms=3.6, mfc='none', mec=FS.C_MEAS, mew=0.9, ls='none',
        label='full model')
 b.axhline(-EPS, color='0.35', lw=0.75, ls=(0, (4, 2)),
-          label='tolerance $\\epsilon=1$ pm')
+          label='tol. $\\epsilon=1$ pm')
 b.axvline(dlo, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.axvline(dhi, color=FS.VERM, lw=0.55, ls=(0, (2, 2)))
 b.plot(DSTAR, bias.min(), 'o', color=FS.VERM, ms=3.5)
