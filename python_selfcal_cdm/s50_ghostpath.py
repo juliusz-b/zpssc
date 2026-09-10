@@ -158,7 +158,7 @@ for i in range(1, len(ghost_path) - 1):
               GHOST, 1.45, ms=5.6, frac=0.65)
 ax.plot(ghost_path[1:-1, 0], ghost_path[1:-1, 1], 'o', color=GHOST,
          ms=3.0, mec='white', mew=0.5, zorder=6)
-ax.plot(ghost_path[-1, 0], 0, 'o', color=GHOST, ms=3.5, zorder=6)
+ax.plot(ghost_path[-1, 0], 0, 'o', color=GHOST, mfc='white', mew=1.0, ms=3.5, zorder=6)
 ax.text(ghost_path[-1, 0], -0.15, r'$\tau_g$', ha='center', va='top',
          fontsize=6.3, color=GHOST)
 ax.text(diagram_end - 0.18, 2.66, r'Ghost $3\to1\to2$', ha='right',
@@ -277,7 +277,7 @@ for seq, amp, zpos in P:
                        ha='center', va='bottom', fontsize=6.1)
     else:
         stack = ghost_count.get(zpos, 0)
-        arrivals.plot(zpos, 0.65 + 0.72 * stack, 'o', color=GHOST, ms=3.1)
+        arrivals.plot(zpos, 0.65 + 0.72 * stack, 'o', color=GHOST, mfc='white', mew=0.9, ms=3.1)
         ghost_count[zpos] = stack + 1
 arrivals.text(0, 2.50, 'Arrival times', fontsize=5.8, color='0.40',
                ha='left', va='bottom')
@@ -355,9 +355,9 @@ _, _, _, corr8_0, _ = spectral(z8, ghosts=False)
 k8 = K8 - 1
 dx.plot(nu8, shapes8[k8], color=FS.C_TRUE, lw=1.4, label='$R_8$', zorder=2)
 dx.plot(nu8, meas8[k8] / R8, color=FS.C_MEAS, lw=1.2, label='meas. $S_8$', zorder=3)
-dx.plot(nu8, corr8[k8] / R8, color=FS.C_CORR, lw=1.2, label='deshad. $\widehat S_8$', zorder=4)
+dx.plot(nu8, corr8[k8] / R8, color=FS.C_CORR, lw=1.2, ls=(0, (5, 2)), label='deshad. $\widehat S_8$', zorder=4)
 dx.plot(nu8, ghost8[k8] / R8, color=FS.C_GHOST, lw=0.9, ls=':', label='ghost before deshad.', zorder=3)
-dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=FS.C_GHOST, lw=0.9, ls='--', label='ghost after deshad.', zorder=3)
+dx.plot(nu8, (corr8[k8] - corr8_0[k8]) / R8, color=FS.C_GHOST, lw=0.9, ls=(0, (4, 1.5, 1, 1.5)), label='ghost after deshad.', zorder=3)
 print('panel (c): ghost peak / R before %.3f, after %.3f' % (ghost8[k8].max() / R8, ((corr8[k8] - corr8_0[k8]) / R8).max()))
 dx.set_xlim(-500, 500)
 dx.set_xticks([-400, -200, 0, 200, 400])

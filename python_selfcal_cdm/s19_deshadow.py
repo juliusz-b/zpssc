@@ -141,8 +141,8 @@ axb.plot(lam, clean_b[kk] / nrm, color=FS.C_TRUE, lw=2.6, alpha=0.9, label='$R_4
 axb.plot(lam, shad_b[kk] / nrm, color=FS.VERM, lw=1.4, label='$S_4$')
 step_cols = [FS.ORANGE, FS.BLUE]
 step_lab = ['$S_4/\\widehat T_1$', '$S_4/\\widehat T_1\\widehat T_2$']
-for st, col, lab in zip(steps_b[:-1], step_cols, step_lab):
-    axb.plot(lam, st / nrm, color=col, lw=1.2, label=lab)
+for st, col, lab, lsty in zip(steps_b[:-1], step_cols, step_lab, ((0, (4, 1.5, 1, 1.5)), (0, (1.2, 1.6)))):
+    axb.plot(lam, st / nrm, color=col, lw=1.2, ls=lsty, label=lab)
 axb.plot(lam, corrected_b[kk] / nrm, color=FS.GREEN, lw=1.4, ls='--', label='$\\widehat S_4$')
 axb.axvline(p_true / 1000.0, color='0.3', ls=':', lw=0.8)
 axb.axvline(p_shad / 1000.0, color=FS.VERM, ls=':', lw=0.8)
@@ -158,7 +158,7 @@ axb.legend(fontsize=4.8, loc='upper left', ncol=1, frameon=True,
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
 axc.semilogy(Ks, raw, 'o-', color=FS.VERM, label='uncorrected $S_k$')
-axc.semilogy(Ks, fixed, 's-', color=FS.GREEN, label='corrected $\\widehat S_k$')
+axc.semilogy(Ks, fixed, 's--', color=FS.GREEN, mfc='white', label='corrected $\\widehat S_k$')
 axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')

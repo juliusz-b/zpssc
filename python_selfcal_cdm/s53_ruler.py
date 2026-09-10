@@ -35,7 +35,7 @@ axes = [fig.add_axes([0.075, bottom, 0.905, 0.185])
         for bottom in (0.66, 0.385, 0.11)]
 legend = [Line2D([], [], marker='s', ls='none', color=FS.BLUE, ms=3.8,
                  label='Grating'),
-          Line2D([], [], marker='o', ls='none', color=FS.C_GHOST, ms=2.5,
+          Line2D([], [], marker='o', ls='none', color=FS.C_GHOST, ms=2.5, mfc='white', mew=0.8,
                  label='Ghost path'),
           Line2D([], [], marker='x', ls='none', color=FS.VERM, ms=3.4,
                  label='Collision')]
@@ -68,7 +68,7 @@ def bins_panel(axis, marks, period, title, letter):
         collision = delay in marks
         for j in range(count):
             axis.plot(delay, -0.23-0.15*j, marker='x' if collision else 'o',
-                      ls='none', ms=2.8 if collision else 2.3, mew=0.8,
+                      ls='none', ms=2.8 if collision else 2.3, mew=0.8, mfc=(FS.C_MEAS if collision else 'white'),
                       color=FS.C_MEAS if collision else FS.C_GHOST, zorder=3)
     return dict(marks=marks, period=period, paths=paths,
                 counts=dict(sorted(counts.items())), collisions=hits)

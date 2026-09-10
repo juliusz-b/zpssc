@@ -67,20 +67,20 @@ c = fig.add_subplot(gs0[0, 2])
 panel_title(pa, 'a', 'Rule A on the spectrum')
 nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
-CASES = ((0.0, FS.BLUE, 'co-tuned'), (DSTAR, FS.VERM, 'worst'),
-         (400.0, FS.GREEN, 'far'))
+CASES = ((0.0, FS.BLUE, 'co-tuned', '-'), (DSTAR, FS.VERM, 'worst', (0, (4, 1.5, 1, 1.5))),
+         (400.0, FS.GREEN, 'far', (0, (1.2, 1.6))))
 ANN = ((-185, 0.50), (250, 0.58), (450, 0.42))
 shifts = []
-for (det, colr, name), (tx, ty) in zip(CASES, ANN):
+for (det, colr, name, lsty), (tx, ty) in zip(CASES, ANN):
     two_pass = (1.0 - R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)) ** 2
     received = wanted * two_pass
     (amp, mu, sig_, base), _ = curve_fit(
         gaussian, nu, received, p0=[0.9, 0.0, SIG, 0.0], maxfev=20000)
     shifts.append(mu)
-    pa.plot(nu, two_pass, color=colr, lw=0.85, alpha=0.85, zorder=2)
+    pa.plot(nu, two_pass, color=colr, lw=0.85, alpha=0.85, ls=lsty, zorder=2)
     pa.fill_between(nu, received, wanted, where=wanted >= received,
                     color=colr, alpha=0.16, lw=0, zorder=1)
-    pa.plot(nu, received, color=colr, lw=1.4, zorder=4)
+    pa.plot(nu, received, color=colr, lw=1.4, ls=lsty, zorder=4)
     pa.axvline(mu, color=colr, lw=0.7, ls=(0, (1.5, 2)), zorder=1)
     lab = ('%.1f' % mu).replace('-0.0', '0.0')
     pa.text(tx, ty, name + '\n' + r'$%s$ pm' % lab,
