@@ -300,7 +300,7 @@ ax[1].semilogx(Rs * 100, cap_uni, 'o-', color='#D55E00', label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color='#0072B2', label='randomized')
 ax[1].semilogx(Rs * 100, cap_uni_peel, 'v--', color='#D55E00', mfc='white', label='uniform + deshadowing')
 ax[1].semilogx(Rs * 100, cap_peel, '^-', color='#E69F00', label='randomized + deshadowing')
-ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(6.5, 50.0), fontsize=5.2,
+ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(0.75, 55.0), fontsize=5.2,
                color='#D55E00', ha='left', va='center',
                arrowprops=dict(arrowstyle='-', color='#D55E00', lw=0.6, shrinkA=0, shrinkB=2))
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.0,
