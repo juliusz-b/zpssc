@@ -366,7 +366,6 @@ dx.tick_params(labelsize=6.2, length=2.4)
 dx.set_xlabel('wavelength offset (pm)', fontsize=6.8, labelpad=1.5)
 dx.set_ylabel('reflectance / $R$', fontsize=6.8, labelpad=1.5)
 dx.legend(fontsize=4.6, loc='upper left', frameon=True, handlelength=1.2, borderpad=0.3, labelspacing=0.2, borderaxespad=0.2)
-dx.text(0.975, 0.965, '8 gratings, 4 m, $R=10\%$', transform=dx.transAxes, ha='right', va='top', fontsize=4.8, color=GREY)
 
 for letter, xpos, ypos in (('a', 0.028, 0.975), ('b', 0.028, 0.525), ('c', 0.53, 0.525)):
     fig.text(xpos, ypos, letter, fontsize=9, fontweight='bold', va='bottom')
