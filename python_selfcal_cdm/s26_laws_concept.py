@@ -86,7 +86,7 @@ for (det, colr, name, lsty), (tx, ty) in zip(CASES, ANN):
     # leader lines to both curves of the case: the thin two-pass transmission and the thick return
     ARROW = {'co-tuned': ((-120.0, 0.90), (-60.0, 0.71)), 'worst': ((130.0, 0.81), (80.0, 0.62)), 'far': ((400.0, 0.81), (60.0, 0.85))}
     for xy in ARROW[name]:
-        pa.annotate('', xy=xy, xytext=(tx, ty), arrowprops=dict(arrowstyle='-', lw=0.5, color=colr, shrinkA=9, shrinkB=1))
+        pa.annotate('', xy=xy, xytext=(tx, ty), arrowprops=dict(arrowstyle='-', lw=0.6, ls=lsty, color=colr, shrinkA=9, shrinkB=1))
     pa.text(tx, ty, name + '\n' + r'$%s$ pm' % lab, fontsize=6, color=colr, ha='center', va='center',
             bbox=dict(boxstyle='square,pad=0.1', fc='white', ec='none'))
 pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.2, zorder=6)
