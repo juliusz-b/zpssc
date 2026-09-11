@@ -221,12 +221,13 @@ ax[0].set_xlabel('time [chip periods]')
 ax[0].set_ylabel('wavelength shift [a.u.]')
 FS.letter(ax[0], 'a')
 ax[0].axhline(plateau, color=FS.C_THEORY, ls=':', lw=0.8)
-ax[0].text(7.85, plateau + 0.06, 'Steady-state level', color='0.35', fontsize=5.5, ha='right')
+ax[0].annotate('Steady-state level', xy=(7.3, plateau), xytext=(7.85, 1.06), color='0.35', fontsize=5.5, ha='right', va='bottom',
+               arrowprops=dict(arrowstyle='-', color='0.5', lw=0.5, shrinkA=0, shrinkB=1))
 ax[0].grid(False)
 
 # --- (b) -------------------------------------------------------------------
-ax[1].plot(g * PM / 1000.0, true_line, color=FS.BLUE, lw=1.4, label='$R_k(\\lambda)$, no chirp')
-ax[1].plot(g * PM / 1000.0, chirped, color=FS.VERM, lw=1.4,
+ax[1].plot(g * PM / 1000.0, true_line, color=FS.C_TRUE, lw=2.4, label='$R_k(\\lambda)$, no chirp')
+ax[1].plot(g * PM / 1000.0, chirped, color=FS.C_MEAS, lw=1.2,
            label='$S_k^{\\mathrm{ch}}$, chirped')
 nu_op = -0.62 * F
 _kd, _kp = C.chirp_kernel(DELTA_DEMO, skew=SKEW)          # the kernel actually used, drawn at the operating point
