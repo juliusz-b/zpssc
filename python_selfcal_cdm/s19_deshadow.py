@@ -153,7 +153,7 @@ axb.set_xlim(-0.45, 0.45); axb.set_ylim(0, 1.5)
 axb.set_xlabel('offset [nm]'); axb.set_ylabel('readout / peak of $R_4$')
 FS.letter(axb, 'a')
 axb.legend(fontsize=4.8, loc='upper left', ncol=1, frameon=True,
-           handlelength=1.1, columnspacing=0.5, labelspacing=0.15, borderaxespad=0.25)
+           handlelength=2.4, columnspacing=0.5, labelspacing=0.15, borderaxespad=0.25)
 
 # --- (b) how far it gets -----------------------------------------------------
 axc = ax[1]
@@ -164,7 +164,7 @@ axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 FS.letter(axc, 'b')
 axc.legend(fontsize=4.8, loc='lower right',
-           ncol=1, frameon=True, handlelength=1.1, columnspacing=0.5, borderaxespad=0.25)
+           ncol=1, frameon=True, handlelength=2.4, columnspacing=0.5, borderaxespad=0.25)
 axc.grid(False, which='both')
 
 fig.subplots_adjust(left=0.13, right=0.99, top=0.90, bottom=0.22, wspace=0.42)

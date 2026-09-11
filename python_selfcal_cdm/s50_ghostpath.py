@@ -366,7 +366,7 @@ dx.set_yticks([0, 0.5, 1.0])
 dx.tick_params(length=2.4)
 dx.set_xlabel('wavelength offset (pm)', labelpad=1.5)
 dx.set_ylabel('reflectance / $R$', labelpad=1.5)
-dx.legend(fontsize=4.6, loc='upper left', frameon=True, handlelength=1.2, borderpad=0.3, labelspacing=0.2, borderaxespad=0.2)
+dx.legend(fontsize=4.6, loc='upper left', frameon=True, handlelength=2.4, borderpad=0.3, labelspacing=0.2, borderaxespad=0.2)
 
 for letter, xpos, ypos in (('a', 0.028, 0.975), ('b', 0.028, 0.525), ('c', 0.53, 0.525)):
     fig.text(xpos, ypos, letter, fontsize=9, fontweight='bold', va='bottom')

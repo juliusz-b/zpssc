@@ -126,7 +126,13 @@ _LCACHE = {}
 
 
 # ----------------------------------------------------------------------------- array
-def array_reflection_direct(lam, elements):
+def _in_window(e, lam, window_m):
+    """False when the grating is so far from the swept wavelengths that it neither reflects nor
+    attenuates (used for multi-band arrays, where most gratings are nanometres away)."""
+    return window_m is None or abs(e["lam_b"] - float(np.median(lam))) <= window_m
+
+
+def array_reflection_direct(lam, elements, window_m=None):
     """Field of the direct paths only (reflection of k through the transmissions of j < k, twice):
     the power-model picture without multiple reflections, for ablation against array_reflection."""
     order = np.argsort([e["z"] for e in elements])
@@ -140,6 +146,9 @@ def array_reflection_direct(lam, elements):
     ph_acc = np.ones_like(lam, dtype=complex)
     for e in elems:
         ph_acc = ph_acc * np.exp(-1j * beta_f * (e["z"] - zprev))       # same sign as T21/T11 of the cascade
+        if not _in_window(e, lam, window_m):
+            zprev = e["z"]
+            continue
         f11, f12, f21, f22 = grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman"))
         r_k, t_k = f21 / f11, 1.0 / f11
         r_tot = r_tot + ph_acc ** 2 * t_acc ** 2 * r_k
@@ -148,7 +157,7 @@ def array_reflection_direct(lam, elements):
     return r_tot
 
 
-def array_reflection(lam, elements, lead_m=0.0):
+def array_reflection(lam, elements, lead_m=0.0, window_m=None):
     """Total complex reflection of a serial array. elements: list of dict(z, lam_b, length, kappa0, apod).
     z in meters from the circulator (sorted). Includes all orders of multiple reflections."""
     order = np.argsort([e["z"] for e in elements])
@@ -169,7 +178,8 @@ def array_reflection(lam, elements, lead_m=0.0):
         d = e["z"] - zprev + (lead_m if zprev == 0.0 else 0.0)
         ph = np.exp(1j * beta_f * d)
         mul(ph, 0.0, 0.0, 1.0 / ph)                         # fiber section
-        mul(*grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman")))
+        if _in_window(e, lam, window_m):
+            mul(*grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman")))
         zprev = e["z"]
     return T21 / T11
 
@@ -267,7 +277,8 @@ def photocurrent(E_out, fs, resp=1.0, p_scale=1e-3, nep=0.5e-12, det_noise=True,
 
 
 def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,), spc=64, bias=0.033, amp=0.018,
-              rise_frac=0.25, linewidth_hz=30e6, thermal=None, det_noise=True, laser_params=None, out=None, verbose=False, ghosts=True, osr=4):
+              rise_frac=0.25, linewidth_hz=30e6, thermal=None, det_noise=True, laser_params=None, out=None, verbose=False, ghosts=True, osr=4,
+              window_pm=None):
     """Sweep the laser over x_pm (pm around LAM0) and return records det[seed, step, sample] plus metadata,
     in the layout of the VPI runs. sensors, refs: dict(z, det, R, g). The optical field is sampled at
     osr times the detector rate (chip_rate*spc) so that the chirp transients fit in the band, the
@@ -300,9 +311,10 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
             nu = C0 / lam_m + f_c + fk
             lam = C0 / nu
             refl = array_reflection if ghosts else array_reflection_direct
-            r = refl(lam, elems)
+            wm = None if window_pm is None else window_pm * 1e-12
+            r = refl(lam, elems, window_m=wm)
             if elems_r:
-                r = r + refl(lam, elems_r)
+                r = r + refl(lam, elems_r, window_m=wm)
             E_in = E_L * np.exp(1j * phase_walk(n, fs, linewidth_hz, rng))
             E_out = np.fft.ifft(np.fft.fft(E_in) * r)
             i_pd = photocurrent(E_out, fs, det_noise=det_noise, rng=rng)

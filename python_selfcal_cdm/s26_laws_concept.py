@@ -83,8 +83,10 @@ for (det, colr, name, lsty), (tx, ty) in zip(CASES, ANN):
     pa.plot(nu, received, color=colr, lw=1.4, ls=lsty, zorder=4)
     pa.axvline(mu, color=colr, lw=0.7, ls=(0, (1.5, 2)), zorder=1)
     lab = ('%.1f' % mu).replace('-0.0', '0.0')
-    pa.text(tx, ty, name + '\n' + r'$%s$ pm' % lab,
-            fontsize=6, color=colr, ha='center', va='center')
+    ARROW = {'co-tuned': (-40.0, 0.76), 'worst': (80.0, 0.62), 'far': (400.0, 0.81)}
+    pa.annotate(name + '\n' + r'$%s$ pm' % lab, xy=ARROW[name], xytext=(tx, ty),
+                fontsize=6, color=colr, ha='center', va='center',
+                arrowprops=dict(arrowstyle='-', lw=0.5, color=colr, shrinkA=9, shrinkB=1))
 pa.plot(nu, wanted, color='0.12', ls=(0, (4, 2.5)), lw=1.2, zorder=6)
 pa.set_xlim(-330, 560)
 pa.set_ylim(0.0, 1.12)
