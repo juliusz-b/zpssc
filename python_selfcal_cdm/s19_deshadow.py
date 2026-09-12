@@ -163,12 +163,27 @@ axc.axhline(10.0, color='0.3', ls='--', lw=0.8, label='10 pm target')
 axc.set_xlabel('gratings on the fiber, $K$')
 axc.set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
 FS.letter(axc, 'b')
-axc.legend(fontsize=4.8, loc='lower right',
+axc.set_ylim(0.5, 2000)
+axc.legend(fontsize=4.8, loc='upper left',
            ncol=1, frameon=True, handlelength=2.4, columnspacing=0.5, borderaxespad=0.25)
 axc.grid(False, which='both')
+# inset: gain of the correction for the last grating (from s56_peel_depth) at four reflectivities
+import os
+if os.path.exists('out/s56_peel_depth.npz'):
+    d = np.load('out/s56_peel_depth.npz')
+    ins = axc.inset_axes([0.53, 0.12, 0.45, 0.40])
+    ins.axhline(1.0, color='0.5', lw=0.6, ls='--')
+    for R, mk, col, lsty in zip(d['Rs'], 'sD^o', (FS.C_GOOD, FS.GREEN, FS.C_MEAS, FS.C_GHOST), ('-', (0, (4, 1.5)), (0, (1.2, 1.6)), (0, (4, 1.5, 1, 1.5)))):
+        g = d['raw'][list(d['Rs']).index(R)] / d['peel'][list(d['Rs']).index(R)]
+        ins.plot(d['Ks'], g, marker=mk, ls=lsty, color=col, ms=2.2, lw=0.8, mfc='white', mew=0.6, label='%g%%' % (100 * R))
+    ins.set_yscale('log'); ins.set_ylim(0.7, 100); ins.set_xlim(0, 52)
+    ins.set_xticks([0, 25, 50]); ins.set_yticks([1, 10, 100]); ins.set_yticklabels(['1', '10', '100'])
+    ins.tick_params(labelsize=4.5, length=1.5, pad=1)
+    ins.set_xlabel('$K$', fontsize=5, labelpad=0.5); ins.set_ylabel('raw / corrected', fontsize=5, labelpad=0.5)
+    ins.legend(fontsize=4, loc='upper right', handlelength=1.6, borderaxespad=0.15, labelspacing=0.05, handletextpad=0.4, frameon=False, ncol=2, columnspacing=0.6)
 
 fig.subplots_adjust(left=0.13, right=0.99, top=0.90, bottom=0.22, wspace=0.42)
-fig.savefig('figs/fig_s19_deshadow.png', dpi=150, bbox_inches='tight')
+fig.savefig('figs/fig_s19_deshadow.png', dpi=300, bbox_inches='tight')
 fig.savefig('figs/fig_s19_deshadow.pdf', bbox_inches='tight')
 
 print('panel (b): K=%d, R=%.2f, grating %d' % (K_B, R_B, kk + 1))

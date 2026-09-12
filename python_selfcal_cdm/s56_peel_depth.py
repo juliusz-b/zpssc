@@ -107,13 +107,17 @@ if __name__ == '__main__':
     fig, ax = plt.subplots(1, 2, figsize=(3.5, 1.9), layout='constrained')
     cols = {0.01: FS.C_GOOD, 0.03: FS.GREEN, 0.10: FS.C_MEAS, 0.20: FS.C_GHOST}
     mk = {0.01: 's', 0.03: '^', 0.10: 'o', 0.20: 'D'}
+    RAW, PL = {}, {}
     for R in Rs:
         raw = [last_error(K, R, 0.0, 'raw', NT, 100 + K) for K in Ks]
         pl = [last_error(K, R, 0.0, 'peel_R0', NT, 100 + K) for K in Ks]
+        RAW[R], PL[R] = raw, pl
         print('R=%3.0f%%  raw  %s' % (100 * R, np.round(raw, 1)))
         print('        peel %s' % np.round(pl, 1))
         ax[0].semilogy(Ks, raw, mk[R] + ':', color=cols[R], ms=3, lw=1.0, mfc='none')
         ax[0].semilogy(Ks, pl, mk[R] + '-', color=cols[R], ms=3, lw=1.3, label='$R=%g\\%%$' % (100 * R))
+    np.savez('out/s56_peel_depth.npz', Ks=np.array(Ks), Rs=np.array(Rs), raw=np.array([RAW[R] for R in Rs]), peel=np.array([PL[R] for R in Rs]))
+    print('saved out/s56_peel_depth.npz (last-grating errors for the inset of s19)')
     ax[0].plot([], [], ':', color=FS.C_THEORY, lw=1.0, label='raw'); ax[0].plot([], [], '-', color=FS.C_THEORY, lw=1.3, label='deshadowed')
     ax[0].axhline(10, color='.5', ls='--', lw=.7)
     ax[0].set(xlabel='Gratings on the fiber, $K$', ylabel='RMS error, last grating [pm]', ylim=(0.5, 3000))
