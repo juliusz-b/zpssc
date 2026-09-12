@@ -278,7 +278,7 @@ def photocurrent(E_out, fs, resp=1.0, p_scale=1e-3, nep=0.5e-12, det_noise=True,
 
 def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,), spc=64, bias=0.033, amp=0.018,
               rise_frac=0.25, linewidth_hz=30e6, thermal=None, det_noise=True, laser_params=None, out=None, verbose=False, ghosts=True, osr=4,
-              window_pm=None):
+              window_pm=None, nproc=1):
     """Sweep the laser over x_pm (pm around LAM0) and return records det[seed, step, sample] plus metadata,
     in the layout of the VPI runs. sensors, refs: dict(z, det, R, g). The optical field is sampled at
     osr times the detector rate (chip_rate*spc) so that the chirp transients fit in the band, the
@@ -305,22 +305,24 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
         if key not in _LCACHE:
             _LCACHE[key] = laser_record(I, fs, seed=seed, params=laser_params, thermal=thermal)
         E_L, f_c = _LCACHE[key]
-        rng = np.random.default_rng(seed * 7919)
-        for m, x in enumerate(x_pm):
-            lam_m = LAM0 + x * 1e-12
-            nu = C0 / lam_m + f_c + fk
-            lam = C0 / nu
-            refl = array_reflection if ghosts else array_reflection_direct
-            wm = None if window_pm is None else window_pm * 1e-12
-            r = refl(lam, elems, window_m=wm)
-            if elems_r:
-                r = r + refl(lam, elems_r, window_m=wm)
-            E_in = E_L * np.exp(1j * phase_walk(n, fs, linewidth_hz, rng))
-            E_out = np.fft.ifft(np.fft.fft(E_in) * r)
-            i_pd = photocurrent(E_out, fs, det_noise=det_noise, rng=rng)
-            det[si, m] = sosfilt(sos, np.tile(i_pd, 2))[n::osr]      # causal filter, periodic warm-up, decimation
-            if verbose and (m % 16 == 0 or m == x_pm.size - 1):
-                print("   seed %d step %d/%d" % (seed, m + 1, x_pm.size), flush=True)
+        wm = None if window_pm is None else window_pm * 1e-12
+        common = dict(E_L=E_L, f_c=f_c, fk=fk, elems=elems, elems_r=elems_r, ghosts=ghosts, wm=wm, fs=fs, n=n,
+                      linewidth_hz=linewidth_hz, det_noise=det_noise, sos=sos, osr=osr, seed=seed)
+        if nproc > 1:
+            # wavelength steps are independent: distribute them over processes, each step with its own
+            # (seed, step) generator so that the record does not depend on nproc
+            import multiprocessing as mp
+            chunks = [list(range(m0, x_pm.size, nproc)) for m0 in range(nproc)]
+            with mp.Pool(nproc) as pool:
+                for rows in pool.imap_unordered(_sweep_chunk, [(ms, x_pm[ms], common, True) for ms in chunks if ms]):
+                    for m, row in rows:
+                        det[si, m] = row
+        else:
+            rng = np.random.default_rng(seed * 7919)
+            for m, x in enumerate(x_pm):
+                det[si, m] = _step(m, x, common, rng)
+                if verbose and (m % 16 == 0 or m == x_pm.size - 1):
+                    print("   seed %d step %d/%d" % (seed, m + 1, x_pm.size), flush=True)
     meta = dict(z=np.array([s["z"] for s in sensors]), det_pm=np.array([s["det"] for s in sensors]), R=np.array([s["R"] for s in sensors]),
                 gtype=np.array([s["g"] for s in sensors]), zr=np.array([r["z"] for r in refs]), detr_pm=np.array([r["det"] for r in refs]),
                 Rr=np.array([r["R"] for r in refs]), code=code.astype(int), chip_rate=chip_rate, n_group=N_GROUP, lam0=LAM0,
@@ -328,6 +330,31 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
     if out:
         np.savez_compressed(out, det=det, **meta)
     return det, meta
+
+
+def _step(m, x, c, rng):
+    """Detector record of one wavelength step (x in pm from LAM0) with the given noise generator."""
+    lam_m = LAM0 + x * 1e-12
+    nu = C0 / lam_m + c["f_c"] + c["fk"]
+    lam = C0 / nu
+    refl = array_reflection if c["ghosts"] else array_reflection_direct
+    r = refl(lam, c["elems"], window_m=c["wm"])
+    if c["elems_r"]:
+        r = r + refl(lam, c["elems_r"], window_m=c["wm"])
+    E_in = c["E_L"] * np.exp(1j * phase_walk(c["n"], c["fs"], c["linewidth_hz"], rng))
+    E_out = np.fft.ifft(np.fft.fft(E_in) * r)
+    i_pd = photocurrent(E_out, c["fs"], det_noise=c["det_noise"], rng=rng)
+    return sosfilt(c["sos"], np.tile(i_pd, 2))[c["n"]::c["osr"]]      # causal filter, periodic warm-up, decimation
+
+
+def _sweep_chunk(args):
+    """Worker for run_array(nproc > 1): a list of steps, each with a (seed, step) seeded generator."""
+    ms, xs, c, _ = args
+    out = []
+    for m, x in zip(ms, xs):
+        rng = np.random.default_rng([int(c["seed"]), int(m)])
+        out.append((int(m), _step(m, x, c, rng)))
+    return out
 
 
 def _mls(nbits, taps=None):
