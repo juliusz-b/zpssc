@@ -129,6 +129,11 @@ if __name__ == '__main__':
             print('R=%4.0f%% K=%2d  max|e_full| %6.2f  max T %6.2f  max B %8.1f  B/e %5.2f  violations T %5.1f%%  B %5.1f%%'
                   % (100 * R, K, f.max(), tr.max(), an.max(), an.max() / f.max(), 100 * np.mean(f > tr * 1.0001 + 0.05), 100 * np.mean(f > an + 0.05)))
 
+    np.savez('out/s55_results.npz',
+             err=np.concatenate([res[(R, K)][0] for R in Rs for K in Ks]),
+             bound=np.concatenate([res[(R, K)][2] for R in Rs for K in Ks]),
+             R=np.concatenate([np.full(res[(R, K)][0].size, R) for R in Rs for K in Ks]),
+             K=np.concatenate([np.full(res[(R, K)][0].size, K) for R in Rs for K in Ks]))
     fig, ax = plt.subplots(1, 2, figsize=(3.5, 1.9), layout='constrained')
     cols = {0.01: FS.C_GOOD, 0.03: FS.GREEN, 0.10: FS.C_MEAS}
     mk = {0.01: 's', 0.03: '^', 0.10: 'o'}
