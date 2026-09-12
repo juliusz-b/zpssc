@@ -116,8 +116,8 @@ if __name__ == '__main__':
         ax[0].semilogy(Ks, pl, mk[R] + '-', color=cols[R], ms=3, lw=1.3, label='$R=%g\\%%$' % (100 * R))
     ax[0].plot([], [], ':', color=FS.C_THEORY, lw=1.0, label='raw'); ax[0].plot([], [], '-', color=FS.C_THEORY, lw=1.3, label='deshadowed')
     ax[0].axhline(10, color='.5', ls='--', lw=.7)
-    ax[0].set(xlabel='Gratings on the fiber, $K$', ylabel='RMS error, last grating [pm]')
-    ax[0].legend(fontsize=5, loc='upper left', handlelength=1.8, borderaxespad=0.3, labelspacing=0.15, ncol=2, columnspacing=0.8)
+    ax[0].set(xlabel='Gratings on the fiber, $K$', ylabel='RMS error, last grating [pm]', ylim=(0.5, 3000))
+    ax[0].legend(fontsize=5, loc='upper left', handlelength=2.4, borderaxespad=0.3, labelspacing=0.15, ncol=2, columnspacing=0.8)
     FS.letter(ax[0], 'a')
     spreads = [0.0, 0.1, 0.2, 0.3, 0.5]
     K = 16
@@ -127,9 +127,9 @@ if __name__ == '__main__':
         e_raw = [last_error(K, R, s, 'raw', NT, 300) for s in spreads]
         print('R=%3.0f%% spread %s: raw %s | peel(R0) %s | peel(fit) %s' % (100 * R, spreads, np.round(e_raw, 1), np.round(e_R0, 1), np.round(e_fit, 1)))
         ax[1].plot(np.array(spreads) * 100, e_R0, mk[R] + '-', color=cols[R], ms=3, lw=1.3, label='$R=%g\\%%$, nominal $R_0$' % (100 * R))
-        ax[1].plot(np.array(spreads) * 100, e_fit, mk[R] + '--', color=cols[R], ms=3, lw=1.0, mfc='none', label='$R=%g\\%%$, fitted' % (100 * R))
-    ax[1].set(xlabel='Reflectivity spread [%]', ylabel='RMS error, last of 16 [pm]')
-    ax[1].legend(fontsize=5, loc='upper left', handlelength=1.8, borderaxespad=0.3, labelspacing=0.15)
+        ax[1].plot(np.array(spreads) * 100, e_fit, mk[R] + '--', color=cols[R], ms=3, lw=1.0, mfc='none', label='$R=%g\\%%$, fitted $R_0$' % (100 * R))
+    ax[1].set(xlabel='Reflectivity spread [%]', ylabel='RMS error, last of 16 [pm]', ylim=(4, 36))
+    ax[1].legend(fontsize=5, loc='upper left', handlelength=2.4, borderaxespad=0.3, labelspacing=0.15)
     FS.letter(ax[1], 'b')
     fig.savefig('figs/fig_s56_peel_depth.pdf'); fig.savefig('figs/fig_s56_peel_depth.png', dpi=300)
     print('saved figs/fig_s56_peel_depth.pdf and .png')
