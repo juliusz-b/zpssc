@@ -310,9 +310,9 @@ FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both')
 # legend as a table: columns are the effects (filled = on, open = off) and the grating spacing, rows the curves
 from matplotlib.patches import Rectangle as _Rect
-tab = ax[0].inset_axes([0.45, 0.03, 0.54, 0.56]); tab.axis('off'); tab.set_xlim(0, 1); tab.set_ylim(0, 1)
+tab = ax[0].inset_axes([0.45, 0.03, 0.54, 0.50]); tab.axis('off'); tab.set_xlim(0, 1); tab.set_ylim(0, 1)
 tab.add_patch(_Rect((0, 0), 1, 1, transform=tab.transAxes, fc='white', ec='0.3', lw=0.6, zorder=0))
-COLS = [('shadow.', 0.30), ('ghosts', 0.44), ('leakage', 0.58), ('deshad.', 0.72), ('spacing', 0.89)]
+COLS = [('shadow.', 0.32), ('ghosts', 0.45), ('leakage', 0.58), ('deshad.', 0.71), ('spacing', 0.925)]
 ROWS = [('^', '--', FS.PURPLE, (1, 0, 0, 0), 'rand.'),
         ('v', '--', FS.C_GHOST, (0, 1, 0, 0), 'unif.'),
         ('X', ':', FS.C_GHOST, (0, 1, 0, 0), 'rand.'),
@@ -320,9 +320,9 @@ ROWS = [('^', '--', FS.PURPLE, (1, 0, 0, 0), 'rand.'),
         ('s', '-', FS.BLUE, (1, 1, 1, 0), 'rand.'),
         ('o', '-', FS.C_CORR, (1, 1, 1, 1), 'rand.'),
         (None, ':', '0.3', None, '%.0f pm target' % TARGET_PM)]
-_ys = np.linspace(0.66, 0.05, len(ROWS))
-for i, (lab, xc) in enumerate(COLS):   # horizontal headers, staggered in two rows so that narrow columns do not collide
-    tab.text(xc, 0.92 if i % 2 == 0 else 0.80, lab, ha='center', va='center', fontsize=4.6)
+_ys = np.linspace(0.92, 0.07, len(ROWS))
+for lab, xc in COLS:   # vertical column labels beside the dots, running along the column
+    tab.text(xc - (0.10 if lab == 'spacing' else 0.048), 0.5 * (_ys[0] + _ys[-2]), lab, ha='center', va='center', fontsize=4.6, rotation=90)
 for (mk, ls, col, on, sp), y in zip(ROWS, _ys):
     tab.plot([0.03, 0.19], [y, y], ls=ls, color=col, lw=1.1)
     if mk is not None:
