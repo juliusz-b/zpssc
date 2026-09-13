@@ -320,9 +320,9 @@ ROWS = [('^', '--', FS.PURPLE, (1, 0, 0, 0), 'rand.'),
         ('s', '-', FS.BLUE, (1, 1, 1, 0), 'rand.'),
         ('o', '-', FS.C_CORR, (1, 1, 1, 1), 'rand.'),
         (None, ':', '0.3', None, '%.0f pm target' % TARGET_PM)]
-_ys = np.linspace(0.62, 0.05, len(ROWS))
-for lab, xc in COLS:
-    tab.text(xc, 0.68, lab, ha='center', va='bottom', fontsize=4.6, rotation=90)
+_ys = np.linspace(0.66, 0.05, len(ROWS))
+for i, (lab, xc) in enumerate(COLS):   # horizontal headers, staggered in two rows so that narrow columns do not collide
+    tab.text(xc, 0.92 if i % 2 == 0 else 0.80, lab, ha='center', va='center', fontsize=4.6)
 for (mk, ls, col, on, sp), y in zip(ROWS, _ys):
     tab.plot([0.03, 0.19], [y, y], ls=ls, color=col, lw=1.1)
     if mk is not None:
