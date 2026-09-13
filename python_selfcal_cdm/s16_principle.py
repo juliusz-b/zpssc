@@ -138,7 +138,7 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # This figure is included at 0.72 text width in the paper. Draw it at that
 # physical width so the 7 pt labels remain 7 pt after LaTeX placement.
-fig2, (ax1, axb) = plt.subplots(2, 1, figsize=(3.5, 3.3), gridspec_kw=dict(height_ratios=[1.2, 1.0], hspace=0.45))
+fig2, (ax1, axb) = plt.subplots(1, 2, figsize=(3.5, 2.0), gridspec_kw=dict(width_ratios=[1.18, 1.0], wspace=0.42))
 ax = [None, ax1]
 
 # (the former panel (a) with five gratings spaced two ways is superseded by
@@ -184,21 +184,21 @@ c_g = C.gauss_fit_peak(nuc, wanted + leak_g) * PM
 print('leakage panel: fitted center moves by %.1f pm (m-sequence) and %.1f pm (Gold), K=%d, N=%d'
       % (c_m - c_true, c_g - c_true, Kc, NCH))
 ax[1].axhline(0, color='0.75', lw=0.6, zorder=1)
-ax[1].plot(xnm, wanted / 0.05, color=FS.BLUE, lw=1.6, label='$A_k$, spectrum of grating $k$')
-ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=0.9, ls=(0, (3, 1.5)), label='$L_k$, m-sequence')
-ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.4, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-sequence')
-ax[1].plot(xnm, leak_g / 0.05, color=FS.VERM, lw=0.9, ls=(0, (4, 1.5, 1, 1.5)), label='$L_k$, Gold code')
-ax[1].plot(xnm, (wanted + leak_g) / 0.05, color=FS.VERM, lw=1.4, ls=(0, (4, 1.5, 1, 1.5)), label='$A_k+L_k$, Gold code')
+ax[1].plot(xnm, wanted / 0.05, color=FS.BLUE, lw=1.6, label='$A_k$, grating $k$')
+ax[1].plot(xnm, leak_m / 0.05, color='0.45', lw=0.9, ls=(0, (3, 1.5)), label='$L_k$, m-seq.')
+ax[1].plot(xnm, (wanted + leak_m) / 0.05, color='0.2', lw=1.4, ls=(0, (3, 1.5)), label='$A_k+L_k$, m-seq.')
+ax[1].plot(xnm, leak_g / 0.05, color=FS.VERM, lw=0.9, ls=(0, (4, 1.5, 1, 1.5)), label='$L_k$, Gold')
+ax[1].plot(xnm, (wanted + leak_g) / 0.05, color=FS.VERM, lw=1.4, ls=(0, (4, 1.5, 1, 1.5)), label='$A_k+L_k$, Gold')
 ax[1].set_xlim(-0.5, 0.5)
-ax[1].set_ylim(-0.35, 1.95)
+ax[1].set_ylim(-0.35, 2.05)
 ax[1].set_yticks([0, 0.5, 1.0, 1.5])
 ax[1].set_xlabel('wavelength offset [nm]'); ax[1].set_ylabel('reflectance / $R$')
 ax[1].grid(False, which='both')
-ax[1].legend(fontsize=5.8, loc='upper center', ncol=2, frameon=True,
-             columnspacing=0.8, handlelength=2.0, labelspacing=0.2, borderaxespad=0.3, handletextpad=0.4)
+ax[1].legend(fontsize=5.2, loc='upper center', ncol=2, frameon=True,
+             columnspacing=0.6, handlelength=1.8, labelspacing=0.15, borderaxespad=0.25, handletextpad=0.35)
 FS.letter(ax[1], 'a')
 # inset: the tops of the three peaks and where their fitted centers sit
-ins = ax[1].inset_axes([0.03, 0.06, 0.27, 0.42])
+ins = ax[1].inset_axes([0.03, 0.05, 0.27, 0.34])
 zoom = 0.04
 for y_, col, ls in ((wanted, FS.BLUE, '-'), (wanted + leak_m, '0.2', (0, (3, 1.5))), (wanted + leak_g, FS.VERM, (0, (4, 1.5, 1, 1.5)))):
     ins.plot(xnm, y_ / 0.05, color=col, lw=1.2, ls=ls)
@@ -206,14 +206,14 @@ for cc, col in ((c_true, FS.BLUE), (c_m, '0.2'), (c_g, FS.VERM)):
     ins.axvline(cc / 1000.0, color=col, lw=0.7, ls=':')
 ins.annotate('', xy=(c_m / 1000.0, 0.96), xytext=(c_true / 1000.0, 0.96),
              arrowprops=dict(arrowstyle='-|>', color='0.2', lw=0.7, mutation_scale=6))
-ins.text(c_m / 1000.0 + 0.003, 0.96, '%+.0f pm' % (c_m - c_true), color='0.2', ha='left', va='center', fontsize=5.2)
+ins.text(c_m / 1000.0 + 0.002, 0.96, '%+.0f pm' % (c_m - c_true), color='0.2', ha='left', va='center', fontsize=4.6)
 ins.annotate('', xy=(c_g / 1000.0, 0.89), xytext=(c_true / 1000.0, 0.89),
              arrowprops=dict(arrowstyle='-|>', color=FS.VERM, lw=0.7, mutation_scale=6))
-ins.text(0.5 * (c_true + c_g) / 1000.0, 0.875, '%+.0f pm' % (c_g - c_true), color=FS.VERM, ha='center', va='top', fontsize=5.2)
+ins.text(0.5 * (c_true + c_g) / 1000.0, 0.875, '%+.0f pm' % (c_g - c_true), color=FS.VERM, ha='center', va='top', fontsize=4.6)
 ins.set_xlim(c_true / 1000.0 - zoom, c_true / 1000.0 + zoom)
 ins.set_ylim(0.76, 1.32)
 ins.set_xticks([]); ins.set_yticks([])
-ins.text(0.03, 0.95, 'fitted centers', transform=ins.transAxes, ha='left', va='top', fontsize=5.4, color='0.35')
+ins.text(0.03, 0.95, 'fitted centers', transform=ins.transAxes, ha='left', va='top', fontsize=4.8, color='0.35')
 ax[1].indicate_inset_zoom(ins, edgecolor='0.6', lw=0.6)
 
 # (b) Rule B against the model: layouts, their mean, the closed form, and the mean after two
@@ -226,14 +226,15 @@ axb.plot(dat['cent'], dat['binned_r'], 's-', color=FS.REFS[2], ms=3.2, lw=1.2, m
 REF_PM = 0.9 * 25.0 * 8.0   # the two references of s23_theory sit at +-0.9 W, W = 25 GHz = 200 pm
 for xr, lab, ha in ((-REF_PM, 'Ref. 1', 'left'), (REF_PM, 'Ref. 2', 'right')):
     axb.axvline(xr, color=FS.REFS[2], lw=0.7, ls=(0, (2, 2)), zorder=0)
-    axb.text(xr + (5 if ha == 'left' else -5), 7.0, lab, rotation=90, ha=ha, va='top', fontsize=5.5, color=FS.REFS[2])
+    axb.text(xr + (5 if ha == 'left' else -5), 7.5, lab, rotation=90, ha=ha, va='top', fontsize=5.2, color=FS.REFS[2])
 axb.set_xlabel(r'position in the band $\nu_k$ [pm]')
 axb.set_ylabel(r'mean error $\overline{\delta\lambda}(\nu_k)$ [pm]')
 axb.grid(False, which='both')
 FS.letter(axb, 'b')
-axb.legend(fontsize=6, loc='lower right', handlelength=1.6, labelspacing=0.18, borderaxespad=0.3)
+axb.set_xticks([-200, 0, 200])
+axb.legend(fontsize=5.2, loc='lower right', handlelength=1.5, labelspacing=0.15, borderaxespad=0.25, handletextpad=0.35)
 
-fig2.subplots_adjust(left=0.13, right=0.98, top=0.96, bottom=0.11)
+fig2.subplots_adjust(left=0.11, right=0.99, top=0.92, bottom=0.19)
 fig2.savefig('figs/fig_s16_mechanisms.png', dpi=300, bbox_inches='tight')
 fig2.savefig('figs/fig_s16_mechanisms.pdf', bbox_inches='tight')
 
