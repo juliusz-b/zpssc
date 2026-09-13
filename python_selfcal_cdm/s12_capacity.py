@@ -280,10 +280,6 @@ ax[0].semilogy(Ks, cl(only_ghost), 'X:', color=FS.C_GHOST, lw=1.2,
                label='ghosts $\\tau_g$, randomized')
 ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.2,
                label='leakage $L_k$ + noise')
-ax[0].fill_between(Ks, cl(np.percentile(band_full, 10, axis=1)), cl(np.percentile(band_full, 90, axis=1)),
-                   color=FS.BLUE, alpha=0.18, lw=0)
-ax[0].fill_between(Ks, cl(np.percentile(band_peel, 10, axis=1)), cl(np.percentile(band_peel, 90, axis=1)),
-                   color=FS.C_CORR, alpha=0.18, lw=0)
 ax[0].semilogy(Ks, cl(full_rnd), 's-', color=FS.BLUE, lw=1.4, label='full, randomized')
 ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color=FS.C_CORR, lw=1.4,
                label='full + deshad. $\\widehat S_k$')
@@ -312,9 +308,30 @@ ax[1].set_xlabel('grating reflectivity $R$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both')
-ax[0].legend(handles0, labels0, fontsize=6, loc='lower right', ncol=2,
-             frameon=True, handlelength=1.5, columnspacing=0.7,
-             labelspacing=0.16, borderaxespad=0.25)
+# legend as a table: which mechanism acts in each curve (filled = on, open = off)
+from matplotlib.patches import Rectangle as _Rect
+tab = ax[0].inset_axes([0.33, 0.03, 0.66, 0.56]); tab.axis('off'); tab.set_xlim(0, 1); tab.set_ylim(0, 1)
+tab.add_patch(_Rect((0, 0), 1, 1, transform=tab.transAxes, fc='white', ec='0.3', lw=0.6, zorder=0))
+COLS = [('$A_k$', 0.665), ('$\\tau_g$', 0.765), ('$L_k$', 0.865), ('$\\widehat S_k$', 0.955)]
+ROWS = [('^', '--', FS.PURPLE, 'shadowing', (1, 0, 0, 0)),
+        ('v', '--', FS.C_GHOST, 'ghosts, uniform', (0, 1, 0, 0)),
+        ('X', ':', FS.C_GHOST, 'ghosts, randomized', (0, 1, 0, 0)),
+        ('d', '--', '0.55', 'leakage + noise', (0, 0, 1, 0)),
+        ('s', '-', FS.BLUE, 'all, randomized', (1, 1, 1, 0)),
+        ('o', '-', FS.C_CORR, 'all + deshadowing', (1, 1, 1, 1)),
+        (None, ':', '0.3', '%.0f pm target' % TARGET_PM, None)]
+_n = len(ROWS) + 1
+_ys = np.linspace(1 - 0.5 / _n, 0.5 / _n, _n)
+for lab, xc in COLS:
+    tab.text(xc, _ys[0], lab, ha='center', va='center', fontsize=5.5)
+for (mk, ls, col, name, on), y in zip(ROWS, _ys[1:]):
+    tab.plot([0.03, 0.15], [y, y], ls=ls, color=col, lw=1.1)
+    if mk is not None:
+        tab.plot(0.09, y, marker=mk, color=col, ms=3.5, ls='none')
+    tab.text(0.19, y, name, ha='left', va='center', fontsize=5.5)
+    if on is not None:
+        for (lab, xc), o in zip(COLS, on):
+            tab.plot(xc, y, 'o', ms=2.6, color='0.15', mfc=('0.15' if o else 'white'), mew=0.6, ls='none')
 ax[1].legend(fontsize=6, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
 fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.12, hspace=0.42)
