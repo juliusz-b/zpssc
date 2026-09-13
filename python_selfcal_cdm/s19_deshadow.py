@@ -150,7 +150,7 @@ FS.dim_gap(axb, p_true / 1000.0, p_shad / 1000.0, 1.13,
            '%.0f pm' % abs(p_shad - p_true), color=FS.VERM,
            tail=0.055, side='right')
 axb.set_xlim(-0.45, 0.45); axb.set_ylim(0, 1.5)
-axb.set_xlabel('offset [nm]'); axb.set_ylabel('readout / peak of $R_4$')
+axb.set_xlabel('offset [nm]'); axb.set_ylabel('spectrum / peak of $R_4$')
 FS.letter(axb, 'a')
 axb.legend(fontsize=4.8, loc='upper left', ncol=1, frameon=True,
            handlelength=2.4, columnspacing=0.5, labelspacing=0.15, borderaxespad=0.25)
