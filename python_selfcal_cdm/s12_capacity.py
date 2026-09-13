@@ -310,9 +310,9 @@ FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both')
 # legend as a table: columns are the effects (filled = on, open = off) and the grating spacing, rows the curves
 from matplotlib.patches import Rectangle as _Rect
-tab = ax[0].inset_axes([0.31, 0.03, 0.68, 0.56]); tab.axis('off'); tab.set_xlim(0, 1); tab.set_ylim(0, 1)
+tab = ax[0].inset_axes([0.45, 0.03, 0.54, 0.56]); tab.axis('off'); tab.set_xlim(0, 1); tab.set_ylim(0, 1)
 tab.add_patch(_Rect((0, 0), 1, 1, transform=tab.transAxes, fc='white', ec='0.3', lw=0.6, zorder=0))
-COLS = [('shadow.', 0.30), ('ghosts', 0.45), ('leakage', 0.60), ('deshad.', 0.75), ('spacing', 0.91)]
+COLS = [('shadow.', 0.30), ('ghosts', 0.44), ('leakage', 0.58), ('deshad.', 0.72), ('spacing', 0.89)]
 ROWS = [('^', '--', FS.PURPLE, (1, 0, 0, 0), 'rand.'),
         ('v', '--', FS.C_GHOST, (0, 1, 0, 0), 'unif.'),
         ('X', ':', FS.C_GHOST, (0, 1, 0, 0), 'rand.'),
@@ -320,24 +320,23 @@ ROWS = [('^', '--', FS.PURPLE, (1, 0, 0, 0), 'rand.'),
         ('s', '-', FS.BLUE, (1, 1, 1, 0), 'rand.'),
         ('o', '-', FS.C_CORR, (1, 1, 1, 1), 'rand.'),
         (None, ':', '0.3', None, '%.0f pm target' % TARGET_PM)]
-_n = len(ROWS) + 1
-_ys = np.linspace(1 - 0.5 / _n, 0.5 / _n, _n)
+_ys = np.linspace(0.62, 0.05, len(ROWS))
 for lab, xc in COLS:
-    tab.text(xc, _ys[0], lab, ha='center', va='center', fontsize=5)
-for (mk, ls, col, on, sp), y in zip(ROWS, _ys[1:]):
-    tab.plot([0.03, 0.17], [y, y], ls=ls, color=col, lw=1.1)
+    tab.text(xc, 0.68, lab, ha='center', va='bottom', fontsize=4.6, rotation=90)
+for (mk, ls, col, on, sp), y in zip(ROWS, _ys):
+    tab.plot([0.03, 0.19], [y, y], ls=ls, color=col, lw=1.1)
     if mk is not None:
-        tab.plot(0.10, y, marker=mk, color=col, ms=3.5, ls='none')
+        tab.plot(0.11, y, marker=mk, color=col, ms=3.0, ls='none')
     if on is None:
-        tab.text(0.22, y, sp, ha='left', va='center', fontsize=5)
+        tab.text(0.24, y, sp, ha='left', va='center', fontsize=5)
         continue
     for (lab, xc), o in zip(COLS[:4], on):
-        tab.plot(xc, y, 'o', ms=2.6, color='0.15', mfc=('0.15' if o else 'white'), mew=0.6, ls='none')
+        tab.plot(xc, y, 'o', ms=2.3, color='0.15', mfc=('0.15' if o else 'white'), mew=0.6, ls='none')
     tab.text(COLS[4][1], y, sp, ha='center', va='center', fontsize=5)
 ax[1].legend(fontsize=6, loc='lower left', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
 fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.12, hspace=0.42)
-plt.savefig('figs/fig_s12_capacity.png', dpi=140, bbox_inches='tight', pad_inches=0.03)
+plt.savefig('figs/fig_s12_capacity.png', dpi=300, bbox_inches='tight', pad_inches=0.03)
 plt.savefig('figs/fig_s12_capacity.pdf', bbox_inches='tight', pad_inches=0.03)
 
 # ---------------------------------------------------------------------------
