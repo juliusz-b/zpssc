@@ -41,8 +41,8 @@ LAM_M = 0.0                                  # the wavelength step shown in (b),
 A = R * np.exp(-0.5 * ((LAM_M - DET) / SIG) ** 2)   # A_k(lambda_m)
 code = C._mls01(7).astype(float)             # N = 127 chips, 0/1
 
-fig = plt.figure(figsize=(7.1, 3.45), layout='constrained')
-gs = fig.add_gridspec(2, 3, width_ratios=[1.55, 1.0, 1.0], height_ratios=[1.3, 1.0])
+fig = plt.figure(figsize=(7.1, 3.1), layout='constrained')
+gs = fig.add_gridspec(2, 3, width_ratios=[1.55, 1.0, 1.0], height_ratios=[1.0, 1.0])
 axa = fig.add_subplot(gs[0, 0]); axb = fig.add_subplot(gs[0, 1]); axc = fig.add_subplot(gs[0, 2])
 axd = fig.add_subplot(gs[1, 0]); axe = fig.add_subplot(gs[1, 1]); axf = fig.add_subplot(gs[1, 2])
 
@@ -67,18 +67,18 @@ for k in range(K):
     y = YF + 0.6 + 0.25 * k
     ax.annotate('', xy=(xk, y), xytext=(3.12, y), arrowprops=dict(arrowstyle='<->', color=COLS[k], lw=0.8, mutation_scale=5, shrinkA=0, shrinkB=0))
     ax.text(xk + 0.14, y, '$z_%d$' % (k + 1), ha='left', va='center', fontsize=6.5, color=COLS[k])
-ax.text(3.3, 2.58, 'round trip $\\tau_k=2n_gz_k/c$', fontsize=6.5, ha='left', va='center', color='0.25')
-ax.text(3.3, 2.26, 'FBG$k$ is read through the gratings before it', fontsize=6, ha='left', va='center', color='0.4')
+ax.text(3.3, 2.42, 'round trip $\\tau_k=2n_gz_k/c$', fontsize=6.5, ha='left', va='center', color='0.25')
+ax.text(3.3, 2.08, 'FBG$k$ is read through the gratings before it', fontsize=6, ha='left', va='center', color='0.4')
 # inset: measured VCSEL tuning curve, the four steps of (c) marked on it
-axi = ax.inset_axes([0.60, 0.02, 0.39, 0.34])
+axi = ax.inset_axes([0.60, 0.04, 0.38, 0.28])
 axi.plot(D.TUNE_V, D.TUNE_L, color='0.35', lw=1.0)
 V4 = np.array([3.0, 5.0, 7.0, 9.0])
 axi.plot(V4, np.polyval(D.TUNE_P4, V4), 'o', color=FS.PURPLE, ms=2.8, mec='white', mew=0.4, zorder=5)
 for i, v in enumerate(V4):
-    axi.text(v - 0.4, np.polyval(D.TUNE_P4, v) - 0.6, '$\\lambda_%d$' % (i + 1), fontsize=5.8, color=FS.PURPLE, ha='right', va='top')
+    axi.text(v - 0.4, np.polyval(D.TUNE_P4, v) - 0.6, '$\\lambda_%d$' % (i + 1), fontsize=5.2, color=FS.PURPLE, ha='right', va='top')
 axi.set_xlim(0, 14); axi.set_ylim(1561.5, 1571.5)
 axi.set_xticks([0, 7, 14]); axi.set_yticks([1562, 1566, 1570])
-axi.tick_params(labelsize=5.5, length=2, pad=1)
+axi.tick_params(labelsize=5, length=1.5, pad=1)
 axi.set_xlabel('$V_{\\mathrm{HCG}}$ [V]', fontsize=5.5, labelpad=0.5); axi.set_ylabel('$\\lambda$ [nm]', fontsize=5.5, labelpad=0.5)
 axi.text(0.96, 0.92, 'VCSEL tuning', transform=axi.transAxes, fontsize=5.2, ha='right', va='top', color='0.35')
 FS.letter(ax, 'a')
