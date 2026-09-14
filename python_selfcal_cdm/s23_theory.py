@@ -155,7 +155,7 @@ nu_fine = np.linspace(-W, W, 300)
 lawB_fine = pref * (np.exp(-(W - nu_fine) ** 2 / (4 * SIG ** 2)) -
                     np.exp(-(W + nu_fine) ** 2 / (4 * SIG ** 2))) * PM
 # Rule B panel data, consumed by s26_laws_concept.py (Fig. 3c of the paper)
-np.savez('figs/s23_ruleB.npz', pos=pos * PM, err=err, cent=cent * PM,
+np.savez('figs/s23_ruleB.npz', pos=pos * PM, err=err, pos_r=pos_r * PM, err_r=err_r, cent=cent * PM,
          binned=binned, binned_r=binned_r, nu_fine=nu_fine * PM,
          lawB_fine=lawB_fine, rms_raw=rms_raw, rms_ref=rms_ref)
 

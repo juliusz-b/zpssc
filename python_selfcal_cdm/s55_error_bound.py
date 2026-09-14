@@ -74,7 +74,7 @@ def ghosts(K, nub, R, bins, tcum):
         out[target[i]] += g
         k = target[i]
         direct_peak = R * np.interp(nub[k], nu, tcum[k])
-        ratio[k] += g.max() / direct_peak
+        ratio[k] += np.interp(nub[k], nu, g) / direct_peak   # ghost amplitude at the measured Bragg wavelength
     return out, ratio
 
 

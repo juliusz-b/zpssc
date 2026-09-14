@@ -220,6 +220,8 @@ ax[1].indicate_inset_zoom(ins, edgecolor='0.6', lw=0.6)
 # references. Data computed by s23_theory.py (figs/s23_ruleB.npz). Formerly panel (c) of s26.
 dat = np.load('figs/s23_ruleB.npz')
 axb.plot(dat['pos'], dat['err'], '.', ms=2, color='0.75', alpha=0.5)
+if 'err_r' in dat.files:   # individual layouts after the two-reference correction
+    axb.plot(dat['pos_r'], dat['err_r'], '.', ms=2, color=FS.SKY, alpha=0.45)
 axb.plot(dat['cent'], dat['binned'], 'o', color=FS.REFS[0], ms=4.0, label='mean, no refs')
 axb.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.C_THEORY, lw=1.4, label='Rule B')
 axb.plot(dat['cent'], dat['binned_r'], 's-', color=FS.REFS[2], ms=3.2, lw=1.2, mfc='none', label='mean, 2 refs')
