@@ -53,7 +53,7 @@ def gaussian(x, amp, centre, width, baseline):
     return baseline + amp * np.exp(-0.5 * ((x - centre) / width) ** 2)
 
 
-fig = plt.figure(figsize=(3.5, 2.05))
+fig = plt.figure(figsize=(3.5, 1.9))
 gs0 = fig.add_gridspec(1, 2, width_ratios=[1.25, 1.0], wspace=0.40,
                        left=0.10, right=0.995, bottom=0.19, top=0.90)
 pa = fig.add_subplot(gs0[0, 0])

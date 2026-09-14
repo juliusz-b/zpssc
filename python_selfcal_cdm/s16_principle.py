@@ -138,7 +138,7 @@ fig.savefig('figs/fig_s16_principle.png', dpi=150, bbox_inches='tight')
 # ===========================================================================
 # This figure is included at 0.72 text width in the paper. Draw it at that
 # physical width so the 7 pt labels remain 7 pt after LaTeX placement.
-fig2, (ax1, axb) = plt.subplots(1, 2, figsize=(3.5, 2.0), gridspec_kw=dict(width_ratios=[1.18, 1.0], wspace=0.42))
+fig2, (ax1, axb) = plt.subplots(1, 2, figsize=(3.5, 1.85), gridspec_kw=dict(width_ratios=[1.18, 1.0], wspace=0.42))
 ax = [None, ax1]
 
 # (the former panel (a) with five gratings spaced two ways is superseded by

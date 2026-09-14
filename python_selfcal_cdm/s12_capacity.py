@@ -271,7 +271,7 @@ else:
 # ---------------------------------------------------------------------------
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(2, 1, figsize=(3.5, 3.6))
+fig, ax = plt.subplots(2, 1, figsize=(3.5, 3.3))
 ax[0].semilogy(Ks, cl(only_shadow), '^--', color=FS.PURPLE, lw=1.2,
                label='shadowing $A_k$')
 ax[0].semilogy(Ks, cl(only_ghost_uni), 'v--', color=FS.C_GHOST, lw=1.2,

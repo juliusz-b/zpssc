@@ -131,7 +131,7 @@ fixed = np.array([rms_error(K, 0.10, 200 + K, corrected=True) for K in Ks])
 # figure
 # ---------------------------------------------------------------------------
 # two panels: the recursion itself lives in eqs. (19)-(20) of the paper
-fig, ax = plt.subplots(1, 2, figsize=(3.5, 1.85))
+fig, ax = plt.subplots(1, 2, figsize=(3.5, 1.7))
 
 # --- (a) one grating, the correction step by step ---------------------------
 axb = ax[0]
