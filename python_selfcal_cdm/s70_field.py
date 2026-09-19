@@ -62,9 +62,10 @@ def gauss_apod(x, s=0.30):
 
 WINDOWS = {"blackman": blackman, "hann": hann, "hamming": hamming, "tukey": tukey, "gauss": gauss_apod,
            "uniform": lambda x: np.ones_like(x)}
+DEFAULT_APOD = "tukey"        # profile of the grating types without an explicit apod (the bl* names are kept for the record cache)
 
 
-def grating_matrix(lam, lam_b, length, kappa0, apod="blackman", sections=40):
+def grating_matrix(lam, lam_b, length, kappa0, apod=None, sections=40):
     """Transfer matrix [R_in; S_in] = F [R_out; S_out] of one grating for every wavelength in lam.
     Returns F as arrays (f11, f12, f21, f22), each of lam.shape."""
     beta = 2 * np.pi * N_EFF / lam
@@ -72,7 +73,7 @@ def grating_matrix(lam, lam_b, length, kappa0, apod="blackman", sections=40):
     sigma = beta - np.pi / period                       # detuning from the Bragg condition
     dz = length / sections
     x = (np.arange(sections) + 0.5) / sections - 0.5
-    w = WINDOWS[apod](x)
+    w = WINDOWS[apod or DEFAULT_APOD](x)
     f11 = np.ones_like(lam, dtype=complex); f12 = np.zeros_like(f11); f21 = np.zeros_like(f11); f22 = np.ones_like(f11)
     for m in range(sections):
         k = kappa0 * w[m]
@@ -125,7 +126,7 @@ def calibrate(gtype, R, lam_b=LAM0):
     if key in _CAL:
         return _CAL[key]
     g = GRATINGS[gtype]
-    apod = g.get("apod", "blackman")
+    apod = g.get("apod", DEFAULT_APOD)
     lam = lam_b + np.linspace(-800e-12, 800e-12, 1601)
 
     def peak_and_fwhm(length, kappa0):
@@ -144,7 +145,7 @@ def calibrate(gtype, R, lam_b=LAM0):
                 hi = mid
         kappa0 = 0.5 * (lo + hi)
         pk, fw = peak_and_fwhm(length, kappa0)
-        if g.get("apod", "blackman") == "uniform":
+        if g.get("apod", DEFAULT_APOD) == "uniform":
             break
         length = length * fw / g["fwhm"]             # FWHM scales roughly as 1/length
     _CAL[key] = (length, kappa0, pk, fw)
@@ -169,9 +170,9 @@ def _grating_cache(lam, reuse=True):
     cache = {}
 
     def get(e):
-        key = (round(float(e["lam_b"]), 15), float(e["length"]), float(e["kappa0"]), e.get("apod", "blackman"))
+        key = (round(float(e["lam_b"]), 15), float(e["length"]), float(e["kappa0"]), e.get("apod", DEFAULT_APOD))
         if not reuse or key not in cache:
-            f = grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman"))
+            f = grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", DEFAULT_APOD))
             if not reuse:
                 return f
             cache[key] = f
@@ -341,10 +342,10 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
     elems, elems_r = [], []
     for s in sensors:
         L, k0, _, _ = calibrate(s["g"], s["R"])
-        elems.append(dict(z=s["z"], lam_b=LAM0 + s["det"] * 1e-12, length=L, kappa0=k0, apod=GRATINGS[s["g"]].get("apod", "blackman")))
+        elems.append(dict(z=s["z"], lam_b=LAM0 + s["det"] * 1e-12, length=L, kappa0=k0, apod=GRATINGS[s["g"]].get("apod", DEFAULT_APOD)))
     for r in refs:
         L, k0, _, _ = calibrate(r["g"], r["R"])
-        elems_r.append(dict(z=r["z"], lam_b=LAM0 + r["det"] * 1e-12, length=L, kappa0=k0, apod=GRATINGS[r["g"]].get("apod", "blackman")))
+        elems_r.append(dict(z=r["z"], lam_b=LAM0 + r["det"] * 1e-12, length=L, kappa0=k0, apod=GRATINGS[r["g"]].get("apod", DEFAULT_APOD)))
     I = drive_current(code, spc * osr, bias, amp, rise_frac)
     fk = np.fft.fftfreq(n, 1.0 / fs)
     sos = bessel(4, rx_bw if rx_bw else 0.75 * chip_rate, fs=fs, norm="mag", output="sos")   # receiver low-pass, 0.75 B unless given
