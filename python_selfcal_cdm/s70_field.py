@@ -38,6 +38,32 @@ def blackman(x):
     return (1.0 + 1.19 * np.cos(2 * np.pi * x) + 0.19 * np.cos(4 * np.pi * x)) / 2.38
 
 
+def hann(x):
+    return 0.5 * (1.0 + np.cos(2 * np.pi * x))
+
+
+def hamming(x):
+    return (0.54 + 0.46 * np.cos(2 * np.pi * x)) / 1.0
+
+
+def tukey(x, alpha=0.8):
+    """Cosine taper over the outer alpha/2 of each end, flat in the middle (alpha = 1 is Hann, 0 is uniform)."""
+    u = np.abs(x) - (0.5 - 0.5 * alpha)
+    w = np.ones_like(x)
+    m = u > 0
+    w[m] = 0.5 * (1.0 + np.cos(np.pi * u[m] / (0.5 * alpha)))
+    return w
+
+
+def gauss_apod(x, s=0.30):
+    """Truncated Gaussian, s = standard deviation in units of the grating length."""
+    return np.exp(-0.5 * (x / s) ** 2)
+
+
+WINDOWS = {"blackman": blackman, "hann": hann, "hamming": hamming, "tukey": tukey, "gauss": gauss_apod,
+           "uniform": lambda x: np.ones_like(x)}
+
+
 def grating_matrix(lam, lam_b, length, kappa0, apod="blackman", sections=40):
     """Transfer matrix [R_in; S_in] = F [R_out; S_out] of one grating for every wavelength in lam.
     Returns F as arrays (f11, f12, f21, f22), each of lam.shape."""
@@ -46,7 +72,7 @@ def grating_matrix(lam, lam_b, length, kappa0, apod="blackman", sections=40):
     sigma = beta - np.pi / period                       # detuning from the Bragg condition
     dz = length / sections
     x = (np.arange(sections) + 0.5) / sections - 0.5
-    w = blackman(x) if apod == "blackman" else np.ones(sections)
+    w = WINDOWS[apod](x)
     f11 = np.ones_like(lam, dtype=complex); f12 = np.zeros_like(f11); f21 = np.zeros_like(f11); f22 = np.ones_like(f11)
     for m in range(sections):
         k = kappa0 * w[m]
@@ -85,6 +111,10 @@ GRATINGS = {
     "bl282": dict(length=4.1e-3, fwhm=282.0),
     "bl304": dict(length=3.8e-3, fwhm=304.0),
     "bl325": dict(length=3.6e-3, fwhm=325.0),
+    "hn250": dict(length=3.5e-3, fwhm=250.0, apod="hann"),        # Hann, sidelobes about -31 dB
+    "hm250": dict(length=3.5e-3, fwhm=250.0, apod="hamming"),     # Hamming, about -43 dB
+    "tk250": dict(length=3.5e-3, fwhm=250.0, apod="tukey"),       # cosine taper (alpha 0.8), about -21 dB
+    "ga250": dict(length=4.0e-3, fwhm=250.0, apod="gauss"),       # truncated Gaussian, sigma = 0.3 L, about -25 dB
 }
 
 
