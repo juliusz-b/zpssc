@@ -278,7 +278,7 @@ def photocurrent(E_out, fs, resp=1.0, p_scale=1e-3, nep=0.5e-12, det_noise=True,
 
 def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,), spc=64, bias=0.033, amp=0.018,
               rise_frac=0.25, linewidth_hz=30e6, thermal=None, det_noise=True, laser_params=None, out=None, verbose=False, ghosts=True, osr=4,
-              window_pm=None, nproc=1):
+              window_pm=None, nproc=1, rx_bw=None):
     """Sweep the laser over x_pm (pm around LAM0) and return records det[seed, step, sample] plus metadata,
     in the layout of the VPI runs. sensors, refs: dict(z, det, R, g). The optical field is sampled at
     osr times the detector rate (chip_rate*spc) so that the chirp transients fit in the band, the
@@ -298,7 +298,7 @@ def run_array(sensors, refs=(), code=None, chip_rate=25e6, x_pm=None, seeds=(1,)
         elems_r.append(dict(z=r["z"], lam_b=LAM0 + r["det"] * 1e-12, length=L, kappa0=k0, apod=GRATINGS[r["g"]].get("apod", "blackman")))
     I = drive_current(code, spc * osr, bias, amp, rise_frac)
     fk = np.fft.fftfreq(n, 1.0 / fs)
-    sos = bessel(4, 0.75 * chip_rate, fs=fs, norm="mag", output="sos")
+    sos = bessel(4, rx_bw if rx_bw else 0.75 * chip_rate, fs=fs, norm="mag", output="sos")   # receiver low-pass, 0.75 B unless given
     det = np.zeros((len(seeds), x_pm.size, n_det), np.float32)
     for si, seed in enumerate(seeds):
         key = (seed, bias, amp, rise_frac, fs, osr, code.size, int(code.sum()), str(laser_params), str(thermal))
