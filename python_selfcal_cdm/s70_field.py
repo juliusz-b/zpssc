@@ -132,7 +132,24 @@ def _in_window(e, lam, window_m):
     return window_m is None or abs(e["lam_b"] - float(np.median(lam))) <= window_m
 
 
-def array_reflection_direct(lam, elements, window_m=None):
+def _grating_cache(lam, reuse=True):
+    """Transfer matrices of the distinct gratings of one call: identical gratings (same lam_b, length,
+    kappa0, apodization) are computed once and reused, which is exact and removes most of the cost
+    of uniform arrays."""
+    cache = {}
+
+    def get(e):
+        key = (round(float(e["lam_b"]), 15), float(e["length"]), float(e["kappa0"]), e.get("apod", "blackman"))
+        if not reuse or key not in cache:
+            f = grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman"))
+            if not reuse:
+                return f
+            cache[key] = f
+        return cache[key]
+    return get
+
+
+def array_reflection_direct(lam, elements, window_m=None, reuse=True):
     """Field of the direct paths only (reflection of k through the transmissions of j < k, twice):
     the power-model picture without multiple reflections, for ablation against array_reflection."""
     order = np.argsort([e["z"] for e in elements])
@@ -144,12 +161,13 @@ def array_reflection_direct(lam, elements, window_m=None):
     t_acc = np.ones_like(lam, dtype=complex)
     zprev = 0.0
     ph_acc = np.ones_like(lam, dtype=complex)
+    gm = _grating_cache(lam, reuse)
     for e in elems:
         ph_acc = ph_acc * np.exp(-1j * beta_f * (e["z"] - zprev))       # same sign as T21/T11 of the cascade
         if not _in_window(e, lam, window_m):
             zprev = e["z"]
             continue
-        f11, f12, f21, f22 = grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman"))
+        f11, f12, f21, f22 = gm(e)
         r_k, t_k = f21 / f11, 1.0 / f11
         r_tot = r_tot + ph_acc ** 2 * t_acc ** 2 * r_k
         t_acc = t_acc * t_k
@@ -157,7 +175,7 @@ def array_reflection_direct(lam, elements, window_m=None):
     return r_tot
 
 
-def array_reflection(lam, elements, lead_m=0.0, window_m=None):
+def array_reflection(lam, elements, lead_m=0.0, window_m=None, reuse=True):
     """Total complex reflection of a serial array. elements: list of dict(z, lam_b, length, kappa0, apod).
     z in meters from the circulator (sorted). Includes all orders of multiple reflections."""
     order = np.argsort([e["z"] for e in elements])
@@ -174,12 +192,13 @@ def array_reflection(lam, elements, lead_m=0.0, window_m=None):
         T11, T12, T21, T22 = n11, n12, n21, n22
 
     zprev = 0.0
+    gm = _grating_cache(lam, reuse)
     for e in elems:
         d = e["z"] - zprev + (lead_m if zprev == 0.0 else 0.0)
         ph = np.exp(1j * beta_f * d)
         mul(ph, 0.0, 0.0, 1.0 / ph)                         # fiber section
         if _in_window(e, lam, window_m):
-            mul(*grating_matrix(lam, e["lam_b"], e["length"], e["kappa0"], apod=e.get("apod", "blackman")))
+            mul(*gm(e))
         zprev = e["z"]
     return T21 / T11
 
