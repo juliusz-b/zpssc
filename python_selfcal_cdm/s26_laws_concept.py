@@ -120,7 +120,7 @@ hlo = brentq(half_fn, 1.0, DSTAR)
 hhi = brentq(half_fn, DSTAR, 700.0)
 
 b.axvspan(dlo, dhi, color=FS.VERM, alpha=0.13, lw=0)
-b.plot(D, bias, color=FS.C_THEORY, lw=1.4, label='Rule A')
+b.plot(D, bias, color=FS.C_THEORY, lw=1.4, label='shadowing shift')
 # the full two-pass model with an unrestricted Gaussian fit, as markers
 Dm = np.linspace(25.0, 625.0, 13)
 mod = []

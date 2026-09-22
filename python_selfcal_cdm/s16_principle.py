@@ -223,7 +223,7 @@ axb.plot(dat['pos'], dat['err'], '.', ms=2, color='0.75', alpha=0.5)
 if 'err_r' in dat.files:   # individual layouts after the two-reference correction
     axb.plot(dat['pos_r'], dat['err_r'], '.', ms=2, color=FS.SKY, alpha=0.45)
 axb.plot(dat['cent'], dat['binned'], 'o', color=FS.REFS[0], ms=4.0, label='mean, no refs')
-axb.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.C_THEORY, lw=1.4, label='Rule B')
+axb.plot(dat['nu_fine'], dat['lawB_fine'], '-', color=FS.C_THEORY, lw=1.4, label='leakage shift')
 axb.plot(dat['cent'], dat['binned_r'], 's-', color=FS.REFS[2], ms=3.2, lw=1.2, mfc='none', label='mean, 2 refs')
 REF_PM = 0.9 * 25.0 * 8.0   # the two references of s23_theory sit at +-0.9 W, W = 25 GHz = 200 pm
 for xr, lab, ha in ((-REF_PM, 'Ref. 1', 'left'), (REF_PM, 'Ref. 2', 'right')):
