@@ -302,9 +302,9 @@ ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xy
                color=FS.VERM, ha='left', va='center',
                arrowprops=dict(arrowstyle='-', color=FS.VERM, lw=0.6, shrinkA=0, shrinkB=2))
 ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.2,
-              label='$R = 10\\%$')
+              label='$R_0 = 10\\%$')
 ax[1].set_ylim(0, 60)
-ax[1].set_xlabel('grating reflectivity $R$ [%]')
+ax[1].set_xlabel('grating reflectivity $R_0$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both')
