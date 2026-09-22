@@ -114,7 +114,7 @@ def _ghost_matrix(K, nub, R, bins, tcum, chunk=40000):
     a, b, c = np.meshgrid(idx, idx, idx, indexing='ij')
     m = (b < a) & (b < c)
     a, b, c = a[m], b[m], c[m]
-    gbin = bins[a] - bins[b] + bins[c]
+    gbin = (bins[a] - bins[b] + bins[c]) % N_CHIPS      # periodic correlation: a ghost one code period late lands on the same lag
     order = np.argsort(bins)
     pos = np.searchsorted(bins[order], gbin)
     pos = np.clip(pos, 0, K - 1)
@@ -248,6 +248,7 @@ else:
     cap_uni = np.array([capacity(R, 'uniform', 900 + i * 37) for i, R in enumerate(Rs)])
     cap_peel = np.array([capacity(R, 'random', 500 + i * 37, peel=True) for i, R in enumerate(Rs)])
     cap_uni_peel = np.array([capacity(R, 'uniform', 900 + i * 37, peel=True) for i, R in enumerate(Rs)])
+    cap_peel_noleak = np.array([capacity(R, 'random', 500 + i * 37, peel=True, with_leak=False) for i, R in enumerate(Rs)])   # leakage removed, detector noise kept
 
     # code family check at a common operating point
     K_CHK, R_CHK = 32, 0.03
@@ -264,7 +265,7 @@ else:
                             peel=True) for t in range(8)])
     os.makedirs('out', exist_ok=True)
     band_full = np.array(TRIALS['full_rnd']); band_peel = np.array(TRIALS['peeled_rnd'])
-    np.savez(CACHE, band_full=band_full, band_peel=band_peel, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, cap_uni_peel=cap_uni_peel, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
+    np.savez(CACHE, band_full=band_full, band_peel=band_peel, Ks=Ks, NT=NT, R_A=R_A, full_rnd=full_rnd, full_uni=full_uni, only_shadow=only_shadow, only_ghost=only_ghost, only_ghost_uni=only_ghost_uni, only_leak=only_leak, peeled_rnd=peeled_rnd, Rs=Rs, Ks_cap=Ks_cap, cap_rnd=cap_rnd, cap_uni=cap_uni, cap_peel=cap_peel, cap_uni_peel=cap_uni_peel, cap_peel_noleak=cap_peel_noleak, K_CHK=K_CHK, R_CHK=R_CHK, e_mseq=e_mseq, e_gold=e_gold, bench=bench, bench_ns=bench_ns, bench_pl=bench_pl)
 
 # ---------------------------------------------------------------------------
 # figure
@@ -296,14 +297,9 @@ ax[0].grid(False, which='both')
 
 ax[1].semilogx(Rs * 100, cap_uni, 'o-', color=FS.VERM, label='uniform')
 ax[1].semilogx(Rs * 100, cap_rnd, 's-', color=FS.BLUE, label='randomized')
-ax[1].semilogx(Rs * 100, cap_uni_peel, 'v--', color=FS.VERM, mfc='white', label='uniform + deshad.')
-ax[1].semilogx(Rs * 100, cap_peel, '^--', color=FS.C_GOOD, mfc='white', label='randomized + deshad.')
-ax[1].annotate('ghost and leakage\nerrors cancel', xy=(3.0, cap_uni_peel[4]), xytext=(0.75, 52.5), fontsize=5.2,
-               color=FS.VERM, ha='left', va='center',
-               arrowprops=dict(arrowstyle='-', color=FS.VERM, lw=0.6, shrinkA=0, shrinkB=2))
-ax[1].axvline(0.10 * 100, color='0.5', ls=':', lw=1.2,
-              label='$R_0 = 10\\%$')
-ax[1].set_ylim(0, 60)
+ax[1].semilogx(Rs * 100, cap_peel, '^--', color=FS.C_GOOD, mfc='white', label='rand. + deshad.')
+ax[1].semilogx(Rs * 100, cap_peel_noleak, 'v-', color=FS.C_GOOD, label='rand. + deshad., no leakage')
+ax[1].set_ylim(0, max(60, 1.08 * float(np.max(cap_peel_noleak))))
 ax[1].set_xlabel('grating reflectivity $R_0$ [%]')
 ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
 FS.letter(ax[1], 'b')
@@ -333,7 +329,7 @@ for (mk, ls, col, on, sp), y in zip(ROWS, _ys):
     for (lab, xc), o in zip(COLS[:4], on):
         tab.plot(xc, y, 'o', ms=2.3, color='0.15', mfc=('0.15' if o else 'white'), mew=0.6, ls='none')
     tab.text(COLS[4][1], y, sp, ha='center', va='center', fontsize=5)
-ax[1].legend(fontsize=6, loc='lower left', frameon=True,
+ax[1].legend(fontsize=6, loc='upper right', frameon=True,
              handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
 fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.12, hspace=0.42)
 plt.savefig('figs/fig_s12_capacity.png', dpi=300, bbox_inches='tight', pad_inches=0.03)
