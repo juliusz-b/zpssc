@@ -230,8 +230,8 @@ REF_PM = 0.9 * 25.0 * 8.0   # the two references of s23_theory sit at +-0.9 W, W
 for xr, lab, ha in ((-REF_PM, 'Ref. 1', 'left'), (REF_PM, 'Ref. 2', 'right')):
     axb.axvline(xr, color=FS.REFS[2], lw=0.7, ls=(0, (2, 2)), zorder=0)
     axb.text(xr + (5 if ha == 'left' else -5), 7.5, lab, rotation=90, ha=ha, va='top', fontsize=5.2, color=FS.REFS[2])
-axb.set_xlabel(r'position in the band $\nu_k$ [pm]')
-axb.set_ylabel(r'mean error $\overline{\delta\lambda}(\nu_k)$ [pm]')
+axb.set_xlabel(r'position in the band $y_k$ [pm]')
+axb.set_ylabel(r'mean error $\overline{\delta\lambda}(y_k)$ [pm]')
 axb.grid(False, which='both')
 FS.letter(axb, 'b')
 axb.set_xticks([-200, 0, 200])

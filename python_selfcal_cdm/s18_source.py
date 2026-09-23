@@ -228,7 +228,7 @@ ax[0].grid(False)
 # --- (b) -------------------------------------------------------------------
 ax[1].plot(g * PM / 1000.0, true_line, color=FS.C_TRUE, lw=2.4, label='$R_k(\\lambda)$, no chirp')
 ax[1].plot(g * PM / 1000.0, chirped, color=FS.C_MEAS, lw=1.2,
-           label='$S_k^{\\mathrm{ch}}$, chirped')
+           label='chirped')
 nu_op = -0.62 * F
 _kd, _kp = C.chirp_kernel(DELTA_DEMO, skew=SKEW)          # the kernel actually used, drawn at the operating point
 kern = np.interp(g, nu_op + 0.30 * DELTA_DEMO + _kd, _kp, left=0.0, right=0.0)
