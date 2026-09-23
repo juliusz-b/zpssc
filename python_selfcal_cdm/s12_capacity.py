@@ -293,6 +293,14 @@ ax[1].semilogx(Rs * 100, cap_rnd, 's-', color=FS.BLUE, lw=1.2, ms=MS)
 ax[1].semilogx(Rs * 100, cap_peel, 'o-', color=FS.C_CORR, lw=1.2, ms=MS)
 ax[1].semilogx(Rs * 100, cap_peel_noleak, 'o--', color=FS.C_CORR, mfc='white', lw=1.2, ms=MS,
                label='all + deshadowing, leakage removed')
+# reference: ghost limit from the worst-case bound of the paper. About K^3/(3N) third-order paths land in
+# every delay bin, each R0^2 of the direct return, and a relative line of height a shifts the fitted peak
+# by at most 0.86 a sigma. Setting 0.86 sigma K^3 R0^2 / (3N) = target gives K = [3 N target / (0.86 sigma R0^2)]^(1/3),
+# capped by the N-1 delay bins. Checked 23.09.2026: without ghosts the count exceeds this at every R0 tested.
+_Rd = np.logspace(np.log10(2e-4), np.log10(0.45), 300)
+_sig_pm = 250.0 / 2.355
+_Kg = (3.0 * N_CHIPS * TARGET_PM / (0.86 * _sig_pm * _Rd ** 2)) ** (1.0 / 3.0)
+ax[1].semilogx(_Rd * 100, np.minimum(_Kg, N_CHIPS - 1), '-.', color='0.3', lw=0.9, label='ghost limit, capped at $N-1$')
 ax[1].set_ylim(0, max(60, 1.08 * float(np.max(cap_peel_noleak))))
 ax[1].set_xlabel('reflectivity $R_0$ [%]')
 ax[1].set_ylabel('largest $K$ at %.0f pm' % TARGET_PM)
