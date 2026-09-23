@@ -38,15 +38,24 @@ ZPSSC is a simulation toolkit for fiber Bragg grating (FBG) sensor networks inte
 
 ## Spis treści
 
+- [Jak to działa](#jak-to-działa)
 - [Szybki start](#szybki-start)
 - [Struktura repozytorium](#struktura-repozytorium)
 - [Symulator MATLAB](#symulator-matlab)
 - [Badanie symulacyjne w Pythonie](#badanie-symulacyjne-w-pythonie)
-- [Główne wyniki](#główne-wyniki)
 - [Etapy projektu](#etapy-projektu)
 - [Cytowanie](#cytowanie)
 - [Licencja i finansowanie](#licencja-i-finansowanie)
 - [Kontakt](#kontakt)
+
+## Jak to działa
+
+Wszystkie siatki w tablicy mają tę samą nominalną długość fali Bragga, więc ich widma nakładają się. Rozróżnia je tylko opóźnienie echa. Laser VCSEL jest modulowany bezpośrednio sekwencją kodową, a fotodetektor widzi sumę opóźnionych kopii kodu odbitych od kolejnych siatek. Korelacja z wzorcem kodu rozdziela echa w dziedzinie opóźnienia, a wysokość każdego piku to reflektancja danej siatki przy bieżącej długości fali lasera. Powolne przestrajanie lasera krok po kroku odtwarza widmo każdej siatki osobno.
+
+<p align="center">
+  <img src="python_selfcal_cdm/figs/fig_s24_storyboard.png" alt="Jeden okres kodu: nadany kod, echa z trzech siatek, suma na fotodetektorze, wynik korelacji" width="900"><br>
+  <em>Jeden okres kodu. Trzy siatki na 16, 45 i 73 m odbijają opóźnione kopie kodu, fotodetektor widzi ich sumę z szumem, a korelacja zwraca trzy piki na pozycjach siatek. Oś opóźnienia jest zarazem osią odległości.</em>
+</p>
 
 ## Szybki start
 
@@ -125,17 +134,38 @@ Tor symulacji: generacja kodu, modulacja źródła, widma siatek, odbicia (w tym
 | `scripts/Zadanie_PINvsAPD.m` | Fotodioda PIN vs APD |
 | `scripts/Zadanie_TDMvsCDM_Ghosty.m` | Odporność TDM i CDM na sygnały duchowe |
 
-Figury z tych skryptów są w `results/WP2/` i `results/WP3/`.
+### Co pokazał symulator
 
-## Badanie symulacyjne w Pythonie
+**Podłoga błędu to listki boczne kodu, nie szum detektora.** Korelacja liczona bez szumu i z szumem NEP 15 pW/√Hz niemal się pokrywa. Sam szum detektora (zielona krzywa na dolnym panelu) jest o rząd mniejszy od listków. To tłumaczy, czemu żadna z ośmiu sprawdzonych metod odszumiania (falki, TVD, Savitzky-Golay i inne) nie poprawiła wyniku.
 
-Folder `python_selfcal_cdm/` to osobny, samowystarczalny zestaw skryptów napisany pod artykuł o interrogatorze CDM z zamiatanym VCSEL-em. Sprzęt jest sparametryzowany zgodnie z makietą projektu (siatki FBGS DTG o szerokości 250 pm i reflektancji 10 %, VCSEL HCG 1550 nm, stanowisko temperaturowe Peltier). Każdy skrypt `sN_*.py` odpowiada jednej figurze lub jednej tabeli i zapisuje wynik do `figs/` lub `out/`. Wspólna fizyka i estymatory są w `common.py`, a `test_selfcal.py` sprawdza granice korelacyjne kodów, estymatory, algebrę opóźnień ghostów i wzory toru akwizycji.
+<p align="center">
+  <img src="results/WP2/benchmark/noise_vs_sidelobes.png" alt="Korelacja bez szumu i z szumem oraz zoom na podłogę" width="900">
+</p>
 
-Tematy skryptów: rodziny kodów i podłoga listków, rozplot nakładających się siatek, rezyduum po korekcie referencjami, chirp i konwersja FM-AM, cieniowanie widmowe i jego odwracanie, pojemność tablicy vs reflektancja i rozstaw siatek, hybryda CDM-WDM, długość kodu jako zmienna projektowa, budżet błędu od źródła do estymaty, próbkowanie ekwiwalentne i wymagania na ADC. Szczegółowy opis plików i wyników: [`python_selfcal_cdm/README.md`](python_selfcal_cdm/README.md).
+**Dłuższy kod obniża podłogę.** Przy p = 8 (kod 255 chipów) pik widma siatki ledwo wystaje ponad tło listków, przy p = 10 (1023 chipy) tło spada i pik jest czysty. MAE spada z 410 do 218 pm już przy estymatorze centroidu.
 
-## Główne wyniki
+<p align="center">
+  <img src="results/WP2/benchmark/spectrum_reconstruction_p8_vs_p10.png" alt="Odtworzone widma pięciu siatek dla p=8 i p=10" width="900">
+</p>
 
-Symulator MATLAB (WP2, WP3):
+**Analiza wrażliwości.** Z pięciu parametrów największy wpływ na błąd ma długość kodu, potem gradient temperaturowy wzdłuż tablicy. Głębokość modulacji siatki, liczba siatek i NEP fotodetektora zmieniają MAE o kilkadziesiąt pikometrów, długość kodu o ponad 400.
+
+<p align="center">
+  <img src="results/WP3/sensitivity/sensitivity_all.png" alt="Analiza wrażliwości: sześć paneli" width="900">
+</p>
+
+**Optymalizacja i estymator piku.** Optymalizacja GA/PSO pięciu parametrów (Δn_eff, p, próbki na chip, liczba długości fal, rozłożenie spektralne siatek) zbija MAE z 391 do 56 pm dla 5 siatek. Zamiana centroidu na dopasowanie Gaussa daje kolejny skok do 21,6 pm. Odbicia wielokrotne prawie nie ruszają wyniku w CDM, w TDM zmieniają MAE nawet o 77 pm.
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="results/WP3/optimization/gauss_vs_centroid_optimization.png" alt="Parametry domyślne vs optymalizacja z centroidem vs z dopasowaniem Gaussa" width="450"></td>
+    <td align="center"><img src="results/WP2/benchmark/tdm_vs_cdm_ghosty.png" alt="TDM vs CDM: MAE vs reflektancja i wpływ odbić wielokrotnych" width="450"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Domyślne 391 pm, po optymalizacji 56 pm, z dopasowaniem Gaussa 21,6 pm (N_s = 5).</em></td>
+    <td align="center"><em>Model 1 i 3 odbić: w CDM różnica do kilkunastu pm, w TDM do 77 pm przy R = 30 %.</em></td>
+  </tr>
+</table>
 
 | Wynik | Wartość |
 |-------|---------|
@@ -144,18 +174,64 @@ Symulator MATLAB (WP2, WP3):
 | MAE po optymalizacji, dopasowanie Gaussa (N_s = 5 / 10) | 21,6 pm / 49,7 pm |
 | Kasami vs Gold (ten sam p) | Kasami lepszy o 27 % |
 | Wydłużenie kodu z p = 8 do p = 10 | MAE 5,3 razy mniejsze |
-| Degradacja od odbić wielokrotnych | < 0,5 % w CDM, > 10 % w TDM |
 | Ranking wrażliwości | p ≫ gradient temperaturowy ≫ pozostałe |
 
-Wnioski, które zmieniły kierunek prac: podłoga błędu w CDM to deterministyczne listki boczne korelacji, nie szum detektora, więc żadna z ośmiu sprawdzonych metod odszumiania nie poprawiła wyniku. Rozłożenie spektralne siatek okazało się parametrem projektowym równie ważnym jak długość kodu.
+Pozostałe figury: `results/WP2/benchmark/` i `results/WP3/`.
 
-Badanie w Pythonie (artykuł):
+## Badanie symulacyjne w Pythonie
+
+Folder `python_selfcal_cdm/` to osobny, samowystarczalny zestaw skryptów napisany pod artykuł o interrogatorze CDM z zamiatanym VCSEL-em. Sprzęt jest sparametryzowany zgodnie z makietą projektu (siatki FBGS DTG o szerokości 250 pm i reflektancji 10 %, VCSEL HCG 1550 nm, stanowisko temperaturowe Peltier). Każdy skrypt `sN_*.py` odpowiada jednej figurze lub jednej tabeli i zapisuje wynik do `figs/` lub `out/`. Wspólna fizyka i estymatory są w `common.py`, a `test_selfcal.py` sprawdza granice korelacyjne kodów, estymatory, algebrę opóźnień ghostów i wzory toru akwizycji. Szczegółowy opis plików: [`python_selfcal_cdm/README.md`](python_selfcal_cdm/README.md).
+
+### Cieniowanie widmowe i pojemność tablicy
+
+Każda siatka jest czytana przez siatki przed nią, więc jej widmo jest zniekształcone iloczynem ich transmisji. Przy R = 10 % już czwarta siatka w rzędzie ma pik przesunięty o 22 pm. Cieniowanie da się odwrócić rekurencyjnie, od pierwszej siatki w głąb, bo transmisja każdej wynika z jej własnego zmierzonego widma. Po korekcie makieta z trzech siatek schodzi do 0,6 pm, a liczba siatek mieszcząca się w progu 10 pm rośnie z 4 do 17.
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="python_selfcal_cdm/figs/fig_s19_deshadow.png" alt="Odcieniowanie: widmo czwartej siatki przed i po korekcie, błąd vs liczba siatek" width="450"></td>
+    <td align="center"><img src="python_selfcal_cdm/figs/fig_s12_capacity.png" alt="Pojemność tablicy: błąd vs liczba siatek z rozkładem na mechanizmy, największe K vs reflektancja" width="450"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>(a) Widmo czwartej siatki surowe, po kolejnych korektach i odtworzone. (b) Błąd RMS vs liczba siatek bez korekty i z korektą.</em></td>
+    <td align="center"><em>(a) Rozkład błędu na mechanizmy: cieniowanie, ghosty, przeciek kodowy z szumem. (b) Największa tablica mieszcząca się w 10 pm vs reflektancja.</em></td>
+  </tr>
+</table>
+
+### Rodzina kodu i rozstaw siatek
+
+W architekturze zamiatanej nadawany jest jeden kod naraz, więc liczy się autokorelacja, nie korelacja wzajemna. Zwykła m-sekwencja z listkiem 1/N wygrywa z kodami Gold (listek 17/N): 6,5 wobec 28,1 pm przy 32 siatkach. Pary Golaya znoszą listek całkowicie kosztem dwóch akwizycji. Sygnały duchowe trzeciego rzędu trafiają w opóźnienia będące kombinacjami pozycji siatek. Przy rozstawie równomiernym każdy ghost mieszczący się w tablicy ląduje w zajętym binie, rozstaw wg linijki Golomba nie daje ani jednej kolizji, o ile okres kodu jest dłuższy niż rozpiętość tablicy.
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="python_selfcal_cdm/figs/fig_s14_codes.png" alt="Błąd RMS vs liczba siatek dla m-sekwencji, Gold, Kasami i par Golaya" width="450"></td>
+    <td align="center"><img src="python_selfcal_cdm/figs/fig_s53_ruler.png" alt="Kolizje ghostów: rozstaw równomierny, linijka Golomba, za krótki kod" width="450"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Błąd RMS vs liczba siatek dla czterech rodzin kodów. Tylko m-sekwencja i para Golaya mieszczą się w 10 pm do K = 48.</em></td>
+    <td align="center"><em>Biny opóźnienia zajęte przez siatki i ghosty: rozstaw równomierny (4 kolizje), linijka Golomba (0), ta sama linijka przy za krótkim kodzie (6, ghosty zawijają się modulo N).</em></td>
+  </tr>
+</table>
+
+### Hybryda CDM-WDM i budżet błędu
+
+Podział tablicy na pasma długości fali resetuje mechanizmy błędu: 32 siatki w jednym paśmie dają 60,1 pm, te same 32 siatki w czterech pasmach po 8 dają 22,1 pm, tyle samo co samotne 8 siatek. Budżet błędu od źródła do estymaty pokazuje, co dominuje w makiecie jak zakupiona (cieniowanie 8,1 pm i chirp lasera 4,8 pm, razem 9,9 pm) i co zostaje w tablicy zaprojektowanej wg reguł z tego badania (3,3 pm, dominują rozdzielczość binu i przeciek kodowy).
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="python_selfcal_cdm/figs/fig_s21_cdmwdm.png" alt="Hybryda CDM-WDM: adresowanie pasmo x bin opóźnienia i błąd dla trzech konfiguracji" width="400"></td>
+    <td align="center"><img src="python_selfcal_cdm/figs/fig_s15_budget.png" alt="Budżet błędu: makieta jak zakupiona vs tablica zaprojektowana" width="500"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>(a) Siatki adresowane parą pasmo i bin opóźnienia. (b) Jedno pasmo K = 32, cztery pasma po 8, jedno pasmo K = 8.</em></td>
+    <td align="center"><em>Udział ośmiu mechanizmów w błędzie RMS długości fali Bragga. Czerwone: makieta (K = 3, R = 10 %, N = 127). Niebieskie: tablica zaprojektowana (K = 32, R = 1 %, N = 511, po odcieniowaniu).</em></td>
+  </tr>
+</table>
 
 | Wynik | Wartość |
 |-------|---------|
 | Cieniowanie widmowe przy R = 10 %, 3 siatki / 96 siatek | 8,1 pm / 179 pm |
 | Sekwencyjne odcieniowanie, makieta 3 siatek | 0,6 pm |
-| Pojemność przy R = 10 % (błąd poniżej progu) bez i z odcieniowaniem | 4 / 17 siatek |
+| Pojemność przy R = 10 % (błąd poniżej 10 pm) bez i z odcieniowaniem | 4 / 17 siatek |
 | Rozstaw równomierny vs losowy, K = 32 | 45,0 pm vs 10,4 pm |
 | m-sekwencja vs Gold w architekturze zamiatanej, K = 32 | 6,5 pm vs 28,1 pm |
 | Budżet błędu: makieta jak zakupiona / tablica zaprojektowana | 9,9 pm / 3,3 pm |
@@ -171,6 +247,13 @@ Wartości pochodzą z symulacji i wymagają potwierdzenia na makiecie (WP4).
 | WP2 | Symulator sieci czujnikowej: tor sygnałowy, odbicia wielokrotne, model temperaturowy, benchmark kodów i odszumiania | zakończony |
 | WP3 | Analiza wrażliwości, optymalizacja GA/PSO, porównanie przed i po, reguły projektowe interrogatora CDM | zakończony |
 | WP4 | Makieta pomiarowa: sterownik VCSEL, tor APD i akwizycja, stanowisko temperaturowe, walidacja modelu na siatkach FBGS | w trakcie (2026–2027) |
+
+Makieta WP4 ma trzy siatki FBGS DTG o tej samej długości fali, każdą na osobnym stopniu Peltiera. Dwie służą za referencje o znanej, stabilizowanej temperaturze, trzecia jest czujnikiem. Źródłem jest przestrajany VCSEL HCG modulowany bezpośrednio kodem, odbiornikiem światłowodowa APD InGaAs, a rozplot i kalibrację wykonuje mikrokontroler STM32H7.
+
+<p align="center">
+  <img src="python_selfcal_cdm/figs/fig_setup_experiment.png" alt="Schemat stanowiska: VCSEL, cyrkulator, trzy siatki na stopniach Peltiera, APD, STM32" width="900"><br>
+  <em>Schemat stanowiska pomiarowego. Szara gałąź MZI (k-clock) jest opcjonalna i służy do linearyzacji osi długości fali.</em>
+</p>
 
 Chronologia zmian w kodzie: [`CHANGELOG.md`](CHANGELOG.md). Literatura, na której oparto WP1: [`docs/BIBLIOGRAFIA.md`](docs/BIBLIOGRAFIA.md).
 
