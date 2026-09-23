@@ -272,61 +272,36 @@ else:
 # ---------------------------------------------------------------------------
 FLOOR = 0.2   # plotting floor: curves below this are not resolvable anyway
 cl = lambda a: np.maximum(a, FLOOR)
-fig, ax = plt.subplots(2, 1, figsize=(3.5, 3.3))
-ax[0].semilogy(Ks, cl(only_shadow), '^--', color=FS.PURPLE, lw=1.2,
-               label='shadowing $A_k$')
-ax[0].semilogy(Ks, cl(only_ghost), 'X:', color=FS.C_GHOST, lw=1.2,
-               label='ghosts $\\tau_g$')
-ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.2,
-               label='leakage $L_k$ + noise')
-ax[0].semilogy(Ks, cl(full_rnd), 's-', color=FS.BLUE, lw=1.4, label='full')
-ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color=FS.C_CORR, lw=1.4,
-               label='full + deshad. $\\widehat S_k$')
-ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.2,
-              label='%.0f pm target' % TARGET_PM)
-# os schodzi ponizej podlogi, zeby znaczniki punktow docietych byly cale
-ax[0].axhline(FLOOR, color='0.75', lw=0.6)
-ax[0].set_ylim(0.02, 400)
-ax[0].set_xlabel('gratings on the fiber, $K$')
-ax[0].set_ylabel('RMS $\\delta\\lambda_k$ [pm]')
+# (a) and (b) side by side in one column, one legend below both panels. Line styles are shared:
+# blue squares = all effects, green circles = all effects + deshadowing, open green = + leakage removed.
+fig, ax = plt.subplots(1, 2, figsize=(3.5, 2.2))
+MS = 3.0
+ax[0].semilogy(Ks, cl(only_shadow), '^--', color=FS.PURPLE, lw=1.0, ms=MS, label='shadowing only')
+ax[0].semilogy(Ks, cl(only_ghost), 'X:', color=FS.C_GHOST, lw=1.0, ms=MS, label='ghosts only')
+ax[0].semilogy(Ks, cl(only_leak), 'd--', color='0.55', lw=1.0, ms=MS, label='leakage and noise only')
+ax[0].semilogy(Ks, cl(full_rnd), 's-', color=FS.BLUE, lw=1.2, ms=MS, label='all effects')
+ax[0].semilogy(Ks, cl(peeled_rnd), 'o-', color=FS.C_CORR, lw=1.2, ms=MS, label='all + deshadowing')
+ax[0].axhline(TARGET_PM, color='0.3', ls=':', lw=1.0, label='%.0f-pm target' % TARGET_PM)
+ax[0].axhline(FLOOR, color='0.75', lw=0.5)
+ax[0].set_ylim(0.1, 400); ax[0].set_xlim(0, 100)
+ax[0].set_xlabel('gratings, $K$')
+ax[0].set_ylabel('RMS error [pm]')
 FS.letter(ax[0], 'a')
-handles0, labels0 = ax[0].get_legend_handles_labels()
 ax[0].grid(False, which='both')
 
-ax[1].semilogx(Rs * 100, cap_rnd, 's-', color=FS.BLUE, label='randomized')
-ax[1].semilogx(Rs * 100, cap_peel, '^--', color=FS.C_GOOD, mfc='white', label='rand. + deshad.')
-ax[1].semilogx(Rs * 100, cap_peel_noleak, 'v-', color=FS.C_GOOD, label='rand. + deshad., no leakage')
+ax[1].semilogx(Rs * 100, cap_rnd, 's-', color=FS.BLUE, lw=1.2, ms=MS)
+ax[1].semilogx(Rs * 100, cap_peel, 'o-', color=FS.C_CORR, lw=1.2, ms=MS)
+ax[1].semilogx(Rs * 100, cap_peel_noleak, 'o--', color=FS.C_CORR, mfc='white', lw=1.2, ms=MS,
+               label='all + deshadowing, leakage removed')
 ax[1].set_ylim(0, max(60, 1.08 * float(np.max(cap_peel_noleak))))
-ax[1].set_xlabel('grating reflectivity $R_0$ [%]')
-ax[1].set_ylabel('largest $K$ at the %.0f pm target' % TARGET_PM)
+ax[1].set_xlabel('reflectivity $R_0$ [%]')
+ax[1].set_ylabel('largest $K$ at %.0f pm' % TARGET_PM)
 FS.letter(ax[1], 'b')
 ax[1].grid(False, which='both')
-# legend as a table: columns are the effects (filled = on, open = off) and the grating spacing, rows the curves
-from matplotlib.patches import Rectangle as _Rect
-tab = ax[0].inset_axes([0.55, 0.03, 0.44, 0.46]); tab.axis('off'); tab.set_xlim(0, 1); tab.set_ylim(0, 1)
-tab.add_patch(_Rect((0, 0), 1, 1, transform=tab.transAxes, fc='white', ec='0.3', lw=0.6, zorder=0))
-COLS = [('shadow.', 0.36), ('ghosts', 0.53), ('leakage', 0.70), ('deshad.', 0.87)]
-ROWS = [('^', '--', FS.PURPLE, (1, 0, 0, 0), 'rand.'),
-        ('X', ':', FS.C_GHOST, (0, 1, 0, 0), 'rand.'),
-        ('d', '--', '0.55', (0, 0, 1, 0), 'rand.'),
-        ('s', '-', FS.BLUE, (1, 1, 1, 0), 'rand.'),
-        ('o', '-', FS.C_CORR, (1, 1, 1, 1), 'rand.'),
-        (None, ':', '0.3', None, '%.0f pm target' % TARGET_PM)]
-_ys = np.linspace(0.92, 0.07, len(ROWS))
-for lab, xc in COLS:   # vertical column labels beside the dots, running along the column
-    tab.text(xc - 0.055, 0.5 * (_ys[0] + _ys[-2]), lab, ha='center', va='center', fontsize=4.6, rotation=90)
-for (mk, ls, col, on, sp), y in zip(ROWS, _ys):
-    tab.plot([0.03, 0.19], [y, y], ls=ls, color=col, lw=1.1)
-    if mk is not None:
-        tab.plot(0.11, y, marker=mk, color=col, ms=3.0, ls='none')
-    if on is None:
-        tab.text(0.24, y, sp, ha='left', va='center', fontsize=5)
-        continue
-    for (lab, xc), o in zip(COLS, on):
-        tab.plot(xc, y, 'o', ms=2.3, color='0.15', mfc=('0.15' if o else 'white'), mew=0.6, ls='none')
-ax[1].legend(fontsize=6, loc='upper right', frameon=True,
-             handlelength=1.6, labelspacing=0.18, borderaxespad=0.25)
-fig.subplots_adjust(left=0.19, right=0.98, top=0.95, bottom=0.12, hspace=0.42)
+h0, l0 = ax[0].get_legend_handles_labels(); h1, l1 = ax[1].get_legend_handles_labels()
+fig.legend(h0 + h1, l0 + l1, loc='lower center', ncol=2, fontsize=5.6, frameon=True, handlelength=2.0,
+           columnspacing=1.0, labelspacing=0.2, borderaxespad=0.2, bbox_to_anchor=(0.5, 0.0))
+fig.subplots_adjust(left=0.13, right=0.99, top=0.93, bottom=0.355, wspace=0.45)
 plt.savefig('figs/fig_s12_capacity.png', dpi=300, bbox_inches='tight', pad_inches=0.03)
 plt.savefig('figs/fig_s12_capacity.pdf', bbox_inches='tight', pad_inches=0.03)
 
