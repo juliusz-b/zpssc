@@ -236,7 +236,7 @@ kern = kern / kern.max()
 ax[1].fill_between(g * PM / 1000.0, 0, 0.34 * kern, color='0.78', alpha=0.6,
                    lw=0)
 ax[1].annotate(r'$p(\xi)$', xy=(nu_op * PM / 1000.0, 0.30),
-               xytext=(-0.52, 0.62), fontsize=7.4, color='0.45',
+               xytext=(-0.38, 0.66), fontsize=7.4, color='0.45',
                ha='center', va='center',
                arrowprops=dict(arrowstyle='-', color='0.45', lw=0.6))
 ax[1].axvline(p_true / 1000.0, color=FS.BLUE, ls=':', lw=0.9)

@@ -13,7 +13,7 @@ import sys
 import numpy as np
 import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle, Circle, FancyBboxPatch
+from matplotlib.patches import Arc, Rectangle, Circle, FancyBboxPatch
 import common as C
 
 
@@ -54,23 +54,28 @@ def block(x, y, w, h, t, fc='#F2F2F2'):
 YF = 3.55                                    # fiber line
 block(0.1, YF - 0.45, 1.6, 0.9, 'VCSEL')
 block(0.1, 0.55, 1.6, 0.9, 'PD')
-ax.add_patch(Circle((2.7, YF), 0.42, fc='white', ec='0.25', lw=0.8)); ax.text(2.7, YF, 'circ.', ha='center', va='center', fontsize=6.2)
-ax.plot([1.7, 2.28], [YF, YF], color='0.2', lw=1.3)
+ax.add_patch(Circle((2.7, YF), 0.42, fc='white', ec='0.25', lw=0.8))
+_ra = 0.24
+ax.add_patch(Arc((2.7, YF), 2 * _ra, 2 * _ra, angle=0, theta1=-70, theta2=180, color='0.2', lw=0.9))
+_a1, _a0 = np.deg2rad(-70), np.deg2rad(-50)
+ax.annotate('', xy=(2.7 + _ra * np.cos(_a1), YF + _ra * np.sin(_a1)), xytext=(2.7 + _ra * np.cos(_a0), YF + _ra * np.sin(_a0)),
+            arrowprops=dict(arrowstyle='-|>', color='0.2', lw=0.9, mutation_scale=6, shrinkA=0, shrinkB=0))
+ax.plot([1.74, 2.28], [YF, YF], color='0.2', lw=1.3)
 ax.plot([2.7, 2.7, 1.95], [YF - 0.42, 1.0, 1.0], color='0.2', lw=1.3)
-ax.annotate('', xy=(1.72, 1.0), xytext=(2.2, 1.0), arrowprops=dict(arrowstyle='-|>', color='0.2', lw=1.1, mutation_scale=8))
-ax.plot([3.12, 9.9], [YF, YF], color='0.2', lw=1.8)
+ax.annotate('', xy=(1.74, 1.0), xytext=(2.2, 1.0), arrowprops=dict(arrowstyle='-|>', color='0.2', lw=1.3, mutation_scale=8))
+ax.plot([3.12, 9.9], [YF, YF], color='0.2', lw=1.3)
 x0, scale = 3.5, (9.65 - 3.5) / Z.max()
 for k in range(K):
     xk = x0 + Z[k] * scale
-    ax.add_patch(Rectangle((xk - 0.25, YF - 0.42), 0.5, 0.84, fc=COLS[k], ec='none'))
+    ax.add_patch(Rectangle((xk - 0.25, YF - 0.42), 0.5, 0.84, fc=COLS[k], ec='none', zorder=3))
     ax.text(xk, YF - 0.5, 'FBG%d' % (k + 1), ha='center', va='top', fontsize=6, color=COLS[k])
     y = YF + 0.6 + 0.25 * k
     ax.annotate('', xy=(xk, y), xytext=(3.12, y), arrowprops=dict(arrowstyle='<->', color=COLS[k], lw=0.8, mutation_scale=5, shrinkA=0, shrinkB=0))
-    ax.text(xk + 0.14, y, '$z_%d$' % (k + 1), ha='left', va='center', fontsize=6.5, color=COLS[k])
+    ax.text(xk + 0.14, y + 0.02, '$z_%d$' % (k + 1), ha='left', va='center_baseline', fontsize=6.5, color=COLS[k])
 ax.text(3.3, 2.42, 'round trip $\\tau_k=2n_gz_k/c$', fontsize=6.5, ha='left', va='center', color='0.25')
-ax.text(3.3, 2.08, 'FBG$k$ is read through the gratings before it', fontsize=6, ha='left', va='center', color='0.4')
+ax.text(3.3, 2.12, 'FBG$k$ is read through the gratings before it', fontsize=6, ha='left', va='center', color='0.4')
 # inset: measured VCSEL tuning curve, the four steps of (c) marked on it
-axi = ax.inset_axes([0.60, 0.04, 0.38, 0.28])
+axi = ax.inset_axes([0.62, 0.04, 0.36, 0.26])
 axi.plot(D.TUNE_V, D.TUNE_L, color='0.35', lw=1.0)
 V4 = np.array([3.0, 5.0, 7.0, 9.0])
 axi.plot(V4, np.polyval(D.TUNE_P4, V4), 'o', color=FS.PURPLE, ms=2.8, mec='white', mew=0.4, zorder=5)

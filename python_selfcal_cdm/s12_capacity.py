@@ -227,7 +227,7 @@ else:
     # (b) capacity vs reflectivity
     # ---------------------------------------------------------------------------
     Rs = np.array([0.0003, 0.001, 0.003, 0.01, 0.03, 0.05, 0.10, 0.20, 0.30])
-    Ks_cap = np.array([4, 8, 16, 32, 48, 64, 96])
+    Ks_cap = np.array([4, 8, 16, 32, 48, 64, 96, 112, 126])
 
 
     CAP_TRIALS = 24   # layouts per point of the capacity curves (matches cap_trials in the cache)

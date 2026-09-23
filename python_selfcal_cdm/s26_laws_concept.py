@@ -68,7 +68,7 @@ nu = np.linspace(-330, 560, 1800)
 wanted = np.exp(-0.5 * (nu / SIG) ** 2)
 CASES = ((0.0, FS.BLUE, 'co-tuned', '-'), (DSTAR, FS.VERM, 'worst', (0, (4, 1.5, 1, 1.5))),
          (400.0, FS.GREEN, 'far', (0, (1.2, 1.6))))
-ANN = ((-225, 0.72), (300, 0.62), (470, 0.30))
+ANN = ((-195, 0.70), (300, 0.62), (435, 0.30))
 shifts = []
 for (det, colr, name, lsty), (tx, ty) in zip(CASES, ANN):
     two_pass = (1.0 - R * np.exp(-0.5 * ((nu - det) / SIG) ** 2)) ** 2
@@ -158,8 +158,8 @@ b.set_yticks([-8, -4, 0])
 b.set_xlabel(r'pair detuning $\Delta\lambda_{jk}$ [pm]')
 b.set_ylabel(r'$\delta\lambda_{k\leftarrow j}$ [pm]')
 panel_title(b, 'b', 'Rule A as a placement criterion')
-b.legend(loc='upper right', bbox_to_anchor=(0.99, 0.56), fontsize=5.5,
-         handlelength=1.6, labelspacing=0.15, borderaxespad=0.0, handletextpad=0.4)
+b.legend(loc='upper right', bbox_to_anchor=(0.99, 0.585), fontsize=5.0,
+         handlelength=1.4, labelspacing=0.15, borderaxespad=0.0, handletextpad=0.4)
 
 ins = b.inset_axes([0.40, 0.03, 0.59, 0.50])
 ins.set_xlim(0, 10)

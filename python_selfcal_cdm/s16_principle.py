@@ -206,10 +206,11 @@ for cc, col in ((c_true, FS.BLUE), (c_m, '0.2'), (c_g, FS.VERM)):
     ins.axvline(cc / 1000.0, color=col, lw=0.7, ls=':')
 ins.annotate('', xy=(c_m / 1000.0, 0.96), xytext=(c_true / 1000.0, 0.96),
              arrowprops=dict(arrowstyle='-|>', color='0.2', lw=0.7, mutation_scale=6))
-ins.text(c_m / 1000.0 + 0.002, 0.96, '%+.0f pm' % (c_m - c_true), color='0.2', ha='left', va='center', fontsize=4.6)
 ins.annotate('', xy=(c_g / 1000.0, 0.89), xytext=(c_true / 1000.0, 0.89),
              arrowprops=dict(arrowstyle='-|>', color=FS.VERM, lw=0.7, mutation_scale=6))
-ins.text(0.5 * (c_true + c_g) / 1000.0, 0.875, '%+.0f pm' % (c_g - c_true), color=FS.VERM, ha='center', va='top', fontsize=4.6)
+ax[1].text(0.97, 0.66, 'fitted center shift', transform=ax[1].transAxes, ha='right', va='top', fontsize=5.0, color='0.35')
+ax[1].text(0.97, 0.58, ('m-seq.: %+.0f pm' % (c_m - c_true)).replace('-', '\u2212'), transform=ax[1].transAxes, ha='right', va='top', fontsize=5.0, color='0.2')
+ax[1].text(0.97, 0.50, ('Gold: %+.0f pm' % (c_g - c_true)).replace('-', '\u2212'), transform=ax[1].transAxes, ha='right', va='top', fontsize=5.0, color=FS.VERM)
 ins.set_xlim(c_true / 1000.0 - zoom, c_true / 1000.0 + zoom)
 ins.set_ylim(0.76, 1.32)
 ins.set_xticks([]); ins.set_yticks([])
