@@ -19,21 +19,21 @@
 
 ---
 
-Repozytorium zawiera dwa powiązane narzędzia:
+Wiele siatek Bragga na jednym włóknie, wszystkie o tej samej długości fali, odczytywane jednym tanim laserem VCSEL modulowanym sekwencją kodową. Korelacja rozdziela siatki po opóźnieniu, przestrajanie lasera odtwarza widmo każdej z nich. To repozytorium zawiera:
 
-- **Symulator MATLAB** (`src/`, `scripts/`): pełny tor sieci czujnikowej z siatkami Bragga adresowanymi kodami rozpraszającymi. Generacja kodów, widma siatek, odbicia wielokrotne, szum fotodetektora, korelacja i estymacja długości fali Bragga. Na tym symulatorze wykonano analizę wrażliwości i optymalizację parametrów sieci (WP2, WP3).
-- **Badanie symulacyjne w Pythonie** (`python_selfcal_cdm/`): lekkie, odtwarzalne skrypty do artykułu o samokalibrującej interrogacji CDM z tanim, bezpośrednio modulowanym i przestrajanym laserem VCSEL. Reguły projektowe, budżet błędu, pojemność tablicy siatek, rodziny kodów, tor akwizycji.
+- **Symulator MATLAB** (`src/`, `scripts/`): pełny tor od kodu przez siatki, odbicia wielokrotne i szum fotodetektora do estymacji długości fali Bragga. Na nim wykonano analizę wrażliwości i optymalizację parametrów sieci.
+- **Badanie symulacyjne w Pythonie** (`python_selfcal_cdm/`): skrypty do artykułu o samokalibrującej interrogacji CDM. Reguły projektowe, budżet błędu, pojemność tablicy siatek, rodziny kodów, tor akwizycji.
 
 <details>
 <summary><strong>English summary</strong></summary>
 
-ZPSSC is a simulation toolkit for fiber Bragg grating (FBG) sensor networks interrogated with code-division multiplexing (CDM). The MATLAB part models the whole chain (spreading codes, grating spectra, multiple reflections, detector noise, correlation, Bragg-wavelength estimation) and was used for sensitivity analysis and parameter optimization. The Python part is a reproducible simulation study of a self-calibrating CDM interrogator built around a directly modulated, swept VCSEL: design rules, error budget, array capacity, code families and the acquisition chain. Code and comments in `python_selfcal_cdm/` are in English. The work is funded by the Polish Ministry of Science and Higher Education under the Pearls of Science programme, grant PN/01/0321/2022.
+ZPSSC is a simulation toolkit for fiber Bragg grating (FBG) sensor networks interrogated with code-division multiplexing (CDM). All gratings share one nominal Bragg wavelength and are told apart by the delay of their echo. The MATLAB part models the whole chain (spreading codes, grating spectra, multiple reflections, detector noise, correlation, Bragg-wavelength estimation) and was used for sensitivity analysis and parameter optimization. The Python part is a reproducible simulation study of a self-calibrating CDM interrogator built around a directly modulated, swept VCSEL. Code and comments in `python_selfcal_cdm/` are in English. Funded by the Polish Ministry of Science and Higher Education, Pearls of Science programme, grant PN/01/0321/2022.
 
 </details>
 
 <p align="center">
   <img src="python_selfcal_cdm/figs/fig_s_fig1_principle.png" alt="Zasada interrogacji CDM z zamiatanym VCSEL-em" width="900"><br>
-  <em>Zasada działania: (a) tor optyczny i krzywa strojenia VCSEL, (b) nakładające się widma siatek, (c) krok strojenia i modulacja kodem, (d) echa z siatek, (e) korelacja w dziedzinie opóźnienia, (f) odtworzone widmo jednej siatki.</em>
+  <em>(a) Tor optyczny i krzywa strojenia VCSEL. (b) Nakładające się widma siatek. (c) Krok strojenia i modulacja kodem. (d) Echa z siatek. (e) Korelacja w dziedzinie opóźnienia. (f) Odtworzone widmo jednej siatki.</em>
 </p>
 
 ## Spis treści
@@ -50,11 +50,11 @@ ZPSSC is a simulation toolkit for fiber Bragg grating (FBG) sensor networks inte
 
 ## Jak to działa
 
-Wszystkie siatki w tablicy mają tę samą nominalną długość fali Bragga, więc ich widma nakładają się. Rozróżnia je tylko opóźnienie echa. Laser VCSEL jest modulowany bezpośrednio sekwencją kodową, a fotodetektor widzi sumę opóźnionych kopii kodu odbitych od kolejnych siatek. Korelacja z wzorcem kodu rozdziela echa w dziedzinie opóźnienia, a wysokość każdego piku to reflektancja danej siatki przy bieżącej długości fali lasera. Powolne przestrajanie lasera krok po kroku odtwarza widmo każdej siatki osobno.
+Laser jest modulowany bezpośrednio sekwencją kodową. Każda siatka odbija opóźnioną kopię kodu, fotodetektor widzi ich sumę. Korelacja z wzorcem kodu daje pik na opóźnieniu każdej siatki, a wysokość piku to reflektancja siatki przy bieżącej długości fali lasera. Powolne przestrajanie lasera krok po kroku odtwarza widmo każdej siatki osobno, choć widma nakładają się na osi długości fali.
 
 <p align="center">
   <img src="python_selfcal_cdm/figs/fig_s24_storyboard.png" alt="Jeden okres kodu: nadany kod, echa z trzech siatek, suma na fotodetektorze, wynik korelacji" width="900"><br>
-  <em>Jeden okres kodu. Trzy siatki na 16, 45 i 73 m odbijają opóźnione kopie kodu, fotodetektor widzi ich sumę z szumem, a korelacja zwraca trzy piki na pozycjach siatek. Oś opóźnienia jest zarazem osią odległości.</em>
+  <em>Jeden okres kodu. Siatki na 16, 45 i 73 m odbijają opóźnione kopie kodu, fotodetektor widzi sumę z szumem, korelacja zwraca trzy piki na pozycjach siatek.</em>
 </p>
 
 ## Szybki start
@@ -66,16 +66,17 @@ Wymagany MATLAB R2025b lub nowszy oraz Signal Processing Toolbox i Communication
 ```matlab
 AddAllSubfolders;                 % dodaje src/ i scripts/ do ścieżki
 
-params = defaultParams();         % 5 siatek, kod Kasami p=8, NEP 15 pW/sqrt(Hz)
+params = defaultParams();         % 5 siatek co 20 m, kod Kasami p=8, NEP 15 pW/sqrt(Hz)
 params.show_plots = true;
 out = runSimulation(params);
-fprintf('MAE = %.1f pm\n', out.MAE);
+fprintf('MAE = %.1f pm\n', out.MAE);       % średni błąd długości fali Bragga
+disp(out.lB_errors * 1000);                % błąd każdej siatki [pm]
 
 out_gauss = runSimulationGauss(params);   % estymacja piku dopasowaniem Gaussa
 fprintf('MAE (Gauss) = %.1f pm\n', out_gauss.MAE);
 ```
 
-Parametry symulacji przekazuje się w jednej strukturze. Pola opisane są w nagłówku `src/system/runSimulation.m`, wartości domyślne w `src/system/defaultParams.m`.
+Parametry symulacji przekazuje się w jednej strukturze. Pola opisane są w nagłówku `src/system/runSimulation.m`, wartości domyślne w `src/system/defaultParams.m`. Struktura `out` zawiera też przebiegi pośrednie: dane w kanale, wynik korelacji i odtworzone widma.
 
 ### Python
 
@@ -97,8 +98,8 @@ python s12_capacity.py            # przykładowy skrypt, figury trafiają do fig
 │   ├── opt_source/         # źródło optyczne: siatka długości fal, model lasera
 │   ├── signal/             # szum, korelacja, filtracja, odszumianie, SIC, PSNR
 │   ├── system/             # defaultParams, runSimulation, runSimulationGauss, funkcje celu do optymalizacji
-│   └── plots/              # wykresy pomocnicze
-├── scripts/                # skrypty demonstracyjne i badawcze (WP2, WP3)
+│   └── plots/              # wykresy pomocnicze, wspólny styl figur (figStyle)
+├── scripts/                # skrypty demonstracyjne i badawcze (WP2, WP3), README_Figures
 ├── tests/                  # modele VCSEL i próby transmisji (robocze)
 ├── results/                # figury z symulatora MATLAB (pliki .mat i .fig nie są wersjonowane)
 ├── python_selfcal_cdm/     # badanie symulacyjne (Python), własne README
@@ -107,7 +108,7 @@ python s12_capacity.py            # przykładowy skrypt, figury trafiają do fig
 │   ├── s*_*.py             # skrypty numerowane, każdy generuje jedną figurę lub tabelę
 │   ├── figs/               # wygenerowane figury (PDF + PNG)
 │   └── out/                # wyniki liczbowe (.npz, .txt)
-├── docs/                   # logo programu, bibliografia
+├── docs/                   # logo programu, figury do README, bibliografia
 ├── CHANGELOG.md            # historia zmian
 └── CITATION.cff            # metadane do cytowania
 ```
@@ -115,6 +116,11 @@ python s12_capacity.py            # przykładowy skrypt, figury trafiają do fig
 ## Symulator MATLAB
 
 Tor symulacji: generacja kodu, modulacja źródła, widma siatek, odbicia (w tym wielokrotne z parametrem `fbg.max_bounces`), sumowanie na fotodetektorze, szum, korelacja z wzorcem kodu i estymacja długości fali Bragga dla każdej siatki. Przesunięcia temperaturowe zadaje wektor `fbg.lambda_shifts`. Widma siatek liczy domyślnie analityczny model tanh, kilka tysięcy razy szybszy od pełnego rozwiązania.
+
+<p align="center">
+  <img src="docs/figures/fig_simulator_output.png" alt="Wynik symulacji: korelacja wzdłuż włókna z pięcioma siatkami i odtworzone widmo jednej siatki" width="900"><br>
+  <em>Co zwraca symulator. (a) Korelacja wzdłuż włókna dla pięciu siatek co 20 m, z szumem detektora NEP 15 pW/√Hz. (b) Widmo siatki FBG3 odtworzone z 16 kroków strojenia lasera: przy kodzie 255 chipów tło listków sięga połowy piku, przy 1023 chipach spada do jednej czwartej.</em>
+</p>
 
 | Skrypt | Co robi |
 |--------|---------|
@@ -133,99 +139,39 @@ Tor symulacji: generacja kodu, modulacja źródła, widma siatek, odbicia (w tym
 | `scripts/Zadanie_DFE_test.m` | Korektor decyzyjny DFE w torze |
 | `scripts/Zadanie_PINvsAPD.m` | Fotodioda PIN vs APD |
 | `scripts/Zadanie_TDMvsCDM_Ghosty.m` | Odporność TDM i CDM na sygnały duchowe |
+| `scripts/README_Figures.m` | Przerysowuje figury z tego README z zapisanych wyników |
 
 ### Co pokazał symulator
 
-**Podłoga błędu to listki boczne kodu, nie szum detektora.** Korelacja liczona bez szumu i z szumem NEP 15 pW/√Hz niemal się pokrywa. Sam szum detektora (zielona krzywa na dolnym panelu) jest o rząd mniejszy od listków. To tłumaczy, czemu żadna z ośmiu sprawdzonych metod odszumiania (falki, TVD, Savitzky-Golay i inne) nie poprawiła wyniku.
+**Długość kodu jest gałką numer jeden.** Z pięciu przeskanowanych parametrów wydłużenie kodu z 15 do 1023 chipów zmienia błąd o ponad 400 pm, gradient temperaturowy o 200 pm, a głębokość modulacji siatki, liczba siatek i szum detektora po kilkadziesiąt. Podłoga błędu to deterministyczne listki boczne korelacji, nie szum detektora, więc żadna z ośmiu sprawdzonych metod odszumiania nie pomogła.
 
 <p align="center">
-  <img src="results/WP2/benchmark/noise_vs_sidelobes.png" alt="Korelacja bez szumu i z szumem oraz zoom na podłogę" width="900">
+  <img src="docs/figures/fig_sensitivity.png" alt="Analiza wrażliwości: MAE vs długość kodu i ranking pięciu parametrów" width="900"><br>
+  <em>(a) Średni błąd długości fali Bragga w funkcji wykładnika długości kodu. (b) Zakres zmian błędu przy przemiataniu każdego parametru z osobna.</em>
 </p>
 
-**Dłuższy kod obniża podłogę.** Przy p = 8 (kod 255 chipów) pik widma siatki ledwo wystaje ponad tło listków, przy p = 10 (1023 chipy) tło spada i pik jest czysty. MAE spada z 410 do 218 pm już przy estymatorze centroidu.
+**Optymalizacja i lepszy estymator.** Optymalizacja GA/PSO pięciu parametrów (Δn_eff, p, próbki na chip, liczba długości fal, rozłożenie spektralne siatek) zbija błąd z 391 do 56 pm dla 5 siatek. Zamiana centroidu na dopasowanie krzywej Gaussa daje kolejny skok do 21,6 pm. We wszystkich wariantach optimum wypadło przy p = 10 i 16 długościach fal.
 
 <p align="center">
-  <img src="results/WP2/benchmark/spectrum_reconstruction_p8_vs_p10.png" alt="Odtworzone widma pięciu siatek dla p=8 i p=10" width="900">
+  <img src="docs/figures/fig_optimization.png" alt="MAE: parametry domyślne, po optymalizacji z centroidem, po optymalizacji z dopasowaniem Gaussa" width="560"><br>
+  <em>Średni błąd dla 5 i 10 siatek: parametry domyślne, po optymalizacji z estymatorem centroidu, po optymalizacji z dopasowaniem Gaussa.</em>
 </p>
-
-**Analiza wrażliwości.** Z pięciu parametrów największy wpływ na błąd ma długość kodu, potem gradient temperaturowy wzdłuż tablicy. Głębokość modulacji siatki, liczba siatek i NEP fotodetektora zmieniają MAE o kilkadziesiąt pikometrów, długość kodu o ponad 400.
-
-<p align="center">
-  <img src="results/WP3/sensitivity/sensitivity_all.png" alt="Analiza wrażliwości: sześć paneli" width="900">
-</p>
-
-**Optymalizacja i estymator piku.** Optymalizacja GA/PSO pięciu parametrów (Δn_eff, p, próbki na chip, liczba długości fal, rozłożenie spektralne siatek) zbija MAE z 391 do 56 pm dla 5 siatek. Zamiana centroidu na dopasowanie Gaussa daje kolejny skok do 21,6 pm. Odbicia wielokrotne prawie nie ruszają wyniku w CDM, w TDM zmieniają MAE nawet o 77 pm.
-
-<table align="center">
-  <tr>
-    <td align="center"><img src="results/WP3/optimization/gauss_vs_centroid_optimization.png" alt="Parametry domyślne vs optymalizacja z centroidem vs z dopasowaniem Gaussa" width="450"></td>
-    <td align="center"><img src="results/WP2/benchmark/tdm_vs_cdm_ghosty.png" alt="TDM vs CDM: MAE vs reflektancja i wpływ odbić wielokrotnych" width="450"></td>
-  </tr>
-  <tr>
-    <td align="center"><em>Domyślne 391 pm, po optymalizacji 56 pm, z dopasowaniem Gaussa 21,6 pm (N_s = 5).</em></td>
-    <td align="center"><em>Model 1 i 3 odbić: w CDM różnica do kilkunastu pm, w TDM do 77 pm przy R = 30 %.</em></td>
-  </tr>
-</table>
 
 | Wynik | Wartość |
 |-------|---------|
-| MAE detekcji λ_B, parametry domyślne (N_s = 5, p = 8) | 391 pm |
-| MAE po optymalizacji, estymator centroidu (N_s = 5 / 10) | 56 pm / 93 pm |
+| MAE, parametry domyślne (N_s = 5, p = 8) | 391 pm |
+| MAE po optymalizacji, centroid (N_s = 5 / 10) | 56 pm / 93 pm |
 | MAE po optymalizacji, dopasowanie Gaussa (N_s = 5 / 10) | 21,6 pm / 49,7 pm |
 | Kasami vs Gold (ten sam p) | Kasami lepszy o 27 % |
-| Wydłużenie kodu z p = 8 do p = 10 | MAE 5,3 razy mniejsze |
-| Ranking wrażliwości | p ≫ gradient temperaturowy ≫ pozostałe |
+| Odbicia wielokrotne (3 odbicia vs 1) | CDM: zmiana MAE do 15 pm, TDM: do 77 pm |
 
 Pozostałe figury: `results/WP2/benchmark/` i `results/WP3/`.
 
 ## Badanie symulacyjne w Pythonie
 
-Folder `python_selfcal_cdm/` to osobny, samowystarczalny zestaw skryptów napisany pod artykuł o interrogatorze CDM z zamiatanym VCSEL-em. Sprzęt jest sparametryzowany zgodnie z makietą projektu (siatki FBGS DTG o szerokości 250 pm i reflektancji 10 %, VCSEL HCG 1550 nm, stanowisko temperaturowe Peltier). Każdy skrypt `sN_*.py` odpowiada jednej figurze lub jednej tabeli i zapisuje wynik do `figs/` lub `out/`. Wspólna fizyka i estymatory są w `common.py`, a `test_selfcal.py` sprawdza granice korelacyjne kodów, estymatory, algebrę opóźnień ghostów i wzory toru akwizycji. Szczegółowy opis plików: [`python_selfcal_cdm/README.md`](python_selfcal_cdm/README.md).
+Folder `python_selfcal_cdm/` to osobny, samowystarczalny zestaw skryptów napisany pod artykuł o interrogatorze CDM z zamiatanym VCSEL-em. Sprzęt jest sparametryzowany zgodnie z makietą projektu (siatki FBGS DTG o szerokości 250 pm i reflektancji 10 %, VCSEL HCG 1550 nm, stanowisko temperaturowe Peltier). Każdy skrypt `sN_*.py` odpowiada jednej figurze lub tabeli i zapisuje wynik do `figs/` lub `out/`. Wspólna fizyka i estymatory są w `common.py`, a `test_selfcal.py` sprawdza granice korelacyjne kodów, estymatory, algebrę opóźnień ghostów i wzory toru akwizycji. Opis plików: [`python_selfcal_cdm/README.md`](python_selfcal_cdm/README.md).
 
-### Cieniowanie widmowe i pojemność tablicy
-
-Każda siatka jest czytana przez siatki przed nią, więc jej widmo jest zniekształcone iloczynem ich transmisji. Przy R = 10 % już czwarta siatka w rzędzie ma pik przesunięty o 22 pm. Cieniowanie da się odwrócić rekurencyjnie, od pierwszej siatki w głąb, bo transmisja każdej wynika z jej własnego zmierzonego widma. Po korekcie makieta z trzech siatek schodzi do 0,6 pm, a liczba siatek mieszcząca się w progu 10 pm rośnie z 4 do 17.
-
-<table align="center">
-  <tr>
-    <td align="center"><img src="python_selfcal_cdm/figs/fig_s19_deshadow.png" alt="Odcieniowanie: widmo czwartej siatki przed i po korekcie, błąd vs liczba siatek" width="450"></td>
-    <td align="center"><img src="python_selfcal_cdm/figs/fig_s12_capacity.png" alt="Pojemność tablicy: błąd vs liczba siatek z rozkładem na mechanizmy, największe K vs reflektancja" width="450"></td>
-  </tr>
-  <tr>
-    <td align="center"><em>(a) Widmo czwartej siatki surowe, po kolejnych korektach i odtworzone. (b) Błąd RMS vs liczba siatek bez korekty i z korektą.</em></td>
-    <td align="center"><em>(a) Rozkład błędu na mechanizmy: cieniowanie, ghosty, przeciek kodowy z szumem. (b) Największa tablica mieszcząca się w 10 pm vs reflektancja.</em></td>
-  </tr>
-</table>
-
-### Rodzina kodu i rozstaw siatek
-
-W architekturze zamiatanej nadawany jest jeden kod naraz, więc liczy się autokorelacja, nie korelacja wzajemna. Zwykła m-sekwencja z listkiem 1/N wygrywa z kodami Gold (listek 17/N): 6,5 wobec 28,1 pm przy 32 siatkach. Pary Golaya znoszą listek całkowicie kosztem dwóch akwizycji. Sygnały duchowe trzeciego rzędu trafiają w opóźnienia będące kombinacjami pozycji siatek. Przy rozstawie równomiernym każdy ghost mieszczący się w tablicy ląduje w zajętym binie, rozstaw wg linijki Golomba nie daje ani jednej kolizji, o ile okres kodu jest dłuższy niż rozpiętość tablicy.
-
-<table align="center">
-  <tr>
-    <td align="center"><img src="python_selfcal_cdm/figs/fig_s14_codes.png" alt="Błąd RMS vs liczba siatek dla m-sekwencji, Gold, Kasami i par Golaya" width="450"></td>
-    <td align="center"><img src="python_selfcal_cdm/figs/fig_s53_ruler.png" alt="Kolizje ghostów: rozstaw równomierny, linijka Golomba, za krótki kod" width="450"></td>
-  </tr>
-  <tr>
-    <td align="center"><em>Błąd RMS vs liczba siatek dla czterech rodzin kodów. Tylko m-sekwencja i para Golaya mieszczą się w 10 pm do K = 48.</em></td>
-    <td align="center"><em>Biny opóźnienia zajęte przez siatki i ghosty: rozstaw równomierny (4 kolizje), linijka Golomba (0), ta sama linijka przy za krótkim kodzie (6, ghosty zawijają się modulo N).</em></td>
-  </tr>
-</table>
-
-### Hybryda CDM-WDM i budżet błędu
-
-Podział tablicy na pasma długości fali resetuje mechanizmy błędu: 32 siatki w jednym paśmie dają 60,1 pm, te same 32 siatki w czterech pasmach po 8 dają 22,1 pm, tyle samo co samotne 8 siatek. Budżet błędu od źródła do estymaty pokazuje, co dominuje w makiecie jak zakupiona (cieniowanie 8,1 pm i chirp lasera 4,8 pm, razem 9,9 pm) i co zostaje w tablicy zaprojektowanej wg reguł z tego badania (3,3 pm, dominują rozdzielczość binu i przeciek kodowy).
-
-<table align="center">
-  <tr>
-    <td align="center"><img src="python_selfcal_cdm/figs/fig_s21_cdmwdm.png" alt="Hybryda CDM-WDM: adresowanie pasmo x bin opóźnienia i błąd dla trzech konfiguracji" width="400"></td>
-    <td align="center"><img src="python_selfcal_cdm/figs/fig_s15_budget.png" alt="Budżet błędu: makieta jak zakupiona vs tablica zaprojektowana" width="500"></td>
-  </tr>
-  <tr>
-    <td align="center"><em>(a) Siatki adresowane parą pasmo i bin opóźnienia. (b) Jedno pasmo K = 32, cztery pasma po 8, jedno pasmo K = 8.</em></td>
-    <td align="center"><em>Udział ośmiu mechanizmów w błędzie RMS długości fali Bragga. Czerwone: makieta (K = 3, R = 10 %, N = 127). Niebieskie: tablica zaprojektowana (K = 32, R = 1 %, N = 511, po odcieniowaniu).</em></td>
-  </tr>
-</table>
+Tematy: cieniowanie widmowe siatek przez siatki przed nimi i jego rekurencyjne odwracanie, pojemność tablicy w funkcji reflektancji i rozstawu siatek, rodziny kodów w architekturze zamiatanej (m-sekwencje, Gold, Kasami, pary Golaya), rozstaw siatek wg linijki Golomba przeciw sygnałom duchowym, hybryda CDM-WDM, długość kodu jako zmienna projektowa, budżet błędu od źródła do estymaty, próbkowanie ekwiwalentne i wymagania na ADC.
 
 | Wynik | Wartość |
 |-------|---------|
@@ -237,7 +183,7 @@ Podział tablicy na pasma długości fali resetuje mechanizmy błędu: 32 siatki
 | Budżet błędu: makieta jak zakupiona / tablica zaprojektowana | 9,9 pm / 3,3 pm |
 | Hybryda CDM-WDM, 32 siatki: 1 pasmo vs 4 × 8 | 60,1 pm vs 22,1 pm |
 
-Wartości pochodzą z symulacji i wymagają potwierdzenia na makiecie (WP4).
+Wartości pochodzą z symulacji i wymagają potwierdzenia na makiecie (WP4). Figury do artykułu są w `python_selfcal_cdm/figs/`.
 
 ## Etapy projektu
 
@@ -246,14 +192,7 @@ Wartości pochodzą z symulacji i wymagają potwierdzenia na makiecie (WP4).
 | WP1 | Przegląd literatury i analiza rodzin kodów (Kasami, Gold, PRBS, OOC, Sidelnikov, Golay, chaotyczne) | zakończony |
 | WP2 | Symulator sieci czujnikowej: tor sygnałowy, odbicia wielokrotne, model temperaturowy, benchmark kodów i odszumiania | zakończony |
 | WP3 | Analiza wrażliwości, optymalizacja GA/PSO, porównanie przed i po, reguły projektowe interrogatora CDM | zakończony |
-| WP4 | Makieta pomiarowa: sterownik VCSEL, tor APD i akwizycja, stanowisko temperaturowe, walidacja modelu na siatkach FBGS | w trakcie (2026–2027) |
-
-Makieta WP4 ma trzy siatki FBGS DTG o tej samej długości fali, każdą na osobnym stopniu Peltiera. Dwie służą za referencje o znanej, stabilizowanej temperaturze, trzecia jest czujnikiem. Źródłem jest przestrajany VCSEL HCG modulowany bezpośrednio kodem, odbiornikiem światłowodowa APD InGaAs, a rozplot i kalibrację wykonuje mikrokontroler STM32H7.
-
-<p align="center">
-  <img src="python_selfcal_cdm/figs/fig_setup_experiment.png" alt="Schemat stanowiska: VCSEL, cyrkulator, trzy siatki na stopniach Peltiera, APD, STM32" width="900"><br>
-  <em>Schemat stanowiska pomiarowego. Szara gałąź MZI (k-clock) jest opcjonalna i służy do linearyzacji osi długości fali.</em>
-</p>
+| WP4 | Makieta pomiarowa: przestrajany VCSEL, tor APD i akwizycja na STM32, stanowisko temperaturowe, walidacja modelu na siatkach FBGS | w trakcie (2026–2027) |
 
 Chronologia zmian w kodzie: [`CHANGELOG.md`](CHANGELOG.md). Literatura, na której oparto WP1: [`docs/BIBLIOGRAFIA.md`](docs/BIBLIOGRAFIA.md).
 

@@ -4,6 +4,15 @@ Format: data | zadanie | pliki | opis zmian
 
 ---
 
+## 2026-09-23 | README i figury w jednym stylu
+
+- README przepisane: skrót, spis treści, szybki start MATLAB i Python, struktura repozytorium, opis badania `python_selfcal_cdm`, cytowanie (BibTeX). Bibliografia przeniesiona do `docs/BIBLIOGRAFIA.md`.
+- Nowe `src/plots/figStyle.m` i `src/plots/figPanelLetter.m`: wspólny styl figur MATLAB, zgodny z `python_selfcal_cdm/figstyle.py` (Arial, osie w ramce, znaczniki do wewnątrz, paleta Tol vibrant, litery paneli).
+- Nowy `scripts/README_Figures.m`: przerysowuje figury do README z zapisanych wyników w `results/` (bez ponownej symulacji) do `docs/figures/`: wynik symulatora (korelacja + widmo), analiza wrażliwości, optymalizacja.
+- Figury planowane do artykułu nie są pokazywane w README (poza rysunkiem zasady i storyboardem).
+
+---
+
 ## 2026-09-05 | Reference-placement figure
 
 - Redrew panel (a) in `python_selfcal_cdm/s38_references.py` with aligned optical paths, explicit circulator, detector and coupler symbols, and consistent reference and sensor labels.
