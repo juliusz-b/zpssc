@@ -23,3 +23,10 @@ results/**/*.fig
 # Pliki tymczasowe
 *.tmp
 *~
+
+# Cache Pythona
+__pycache__/
+*.pyc
+
+# Surowe rekordy modelu koherentnego (ok. 400 MB, odtwarzalne skryptami z coherent/)
+python_selfcal_cdm/coherent/records/

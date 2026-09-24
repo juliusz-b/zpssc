@@ -4,6 +4,15 @@ Format: data | zadanie | pliki | opis zmian
 
 ---
 
+## 2026-09-24 | v0.2.0: model koherentny i komplet skryptów artykułu
+
+- Nowy folder `python_selfcal_cdm/coherent/`: dekoder rekordów (`decode.py`), kampanie modelu koherentnego (`runs.py`, `campaign.py`, `permutations.py`, `jlt_chain.py`, `jlt_decode.py`, `beat_floor.py`) i skrypty figur 3, 10, 11, 12 artykułu (`fig_validation.py`, `fig_bound.py`, `fig_jlt.py`). Surowe rekordy (ok. 400 MB) zostają poza repo, w `coherent/cache/` są zdekodowane wyniki (2,7 MB), z których figury odtwarzają się bajt w bajt.
+- `python_selfcal_cdm/README.md` przepisane po angielsku: mapa 12 figur artykułu na skrypty, grupy analiz pomocniczych.
+- README główne: opis części Python pod aktualny artykuł, wiersze o sieci 50 siatek i granicy pojemności.
+- `CITATION.cff`: wersja 0.2.0. Wydanie v0.2.0 na GitHubie archiwizuje Zenodo jako nową wersję DOI 10.5281/zenodo.15089768.
+
+---
+
 ## 2026-09-23 | README i figury w jednym stylu
 
 - README przepisane: skrót, spis treści, szybki start MATLAB i Python, struktura repozytorium, opis badania `python_selfcal_cdm`, cytowanie (BibTeX). Bibliografia przeniesiona do `docs/BIBLIOGRAFIA.md`.
