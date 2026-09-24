@@ -218,7 +218,7 @@ ax[0].set_xlim(0, 8)
 ax[0].set_xticks([0, 2, 4, 6, 8])
 ax[0].set_yticks([0, 0.5, 1.0])
 ax[0].set_xlabel('time [chip periods]')
-ax[0].set_ylabel('wavelength shift [a.u.]')
+ax[0].set_ylabel('wavelength shift (normalized)')
 FS.letter(ax[0], 'a')
 ax[0].axhline(plateau, color=FS.C_THEORY, ls=':', lw=0.8)
 ax[0].annotate('Steady-state level', xy=(7.3, plateau), xytext=(7.85, 1.06), color='0.35', fontsize=5.5, ha='right', va='bottom',
