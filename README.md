@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Zaawansowane techniki przetwarzania sygnałów w światłowodowych sieciach czujnikowych</strong><br>
-  Symulator sieci czujnikowej FBG z multipleksacją kodową (CDM) i badanie symulacyjne układu przesłuchującego siatki z przestrajalnym laserem VCSEL
+  Symulator sieci czujnikowej FBG z multipleksacją kodową (CDM) i badanie symulacyjne interrogatora CDM z przestrajalnym laserem VCSEL
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 Wiele siatek Bragga na jednym włóknie, wszystkie o tej samej długości fali, odczytywane jednym tanim laserem VCSEL modulowanym sekwencją kodową. Korelacja rozdziela siatki po opóźnieniu, przestrajanie lasera odtwarza widmo każdej z nich. To repozytorium zawiera:
 
 - **Symulator MATLAB** (`src/`, `scripts/`): pełny tor od kodu przez siatki, odbicia wielokrotne i szum fotodetektora do estymacji długości fali Bragga. Na nim wykonano analizę wrażliwości i optymalizację parametrów sieci.
-- **Badanie symulacyjne w Pythonie** (`python_selfcal_cdm/`): skrypty do artykułu o samokalibrującym się układzie przesłuchującym CDM (interrogatorze). Reguły projektowe, budżet błędu, pojemność sieci siatek, rodziny kodów, tor akwizycji.
+- **Badanie symulacyjne w Pythonie** (`python_selfcal_cdm/`): skrypty do artykułu o samokalibrującej interrogacji CDM. Reguły projektowe, budżet błędu, pojemność sieci siatek, rodziny kodów, tor akwizycji.
 
 <details>
 <summary><strong>English summary</strong></summary>
@@ -32,7 +32,7 @@ ZPSSC is a simulation toolkit for fiber Bragg grating (FBG) sensor networks inte
 </details>
 
 <p align="center">
-  <img src="python_selfcal_cdm/figs/fig_s_fig1_principle.png" alt="Zasada przesłuchiwania siatek CDM z przestrajalnym laserem VCSEL" width="900"><br>
+  <img src="python_selfcal_cdm/figs/fig_s_fig1_principle.png" alt="Zasada interrogacji CDM z przestrajalnym laserem VCSEL" width="900"><br>
   <em>(a) Tor optyczny i krzywa przestrajania lasera VCSEL. (b) Nakładające się widma siatek. (c) Krok przestrajania i modulacja kodem. (d) Echa z siatek. (e) Korelacja w dziedzinie opóźnienia. (f) Odtworzone widmo jednej siatki.</em>
 </p>
 
@@ -103,7 +103,7 @@ python s12_capacity.py            # przykładowy skrypt, figury trafiają do fig
 ├── tests/                  # modele VCSEL i próby transmisji (robocze)
 ├── results/                # figury z symulatora MATLAB (pliki .mat i .fig nie są wersjonowane)
 ├── python_selfcal_cdm/     # badanie symulacyjne (Python), własne README
-│   ├── common.py           # wspólna fizyka: kody, widma FBG, świergot lasera, estymatory, tor akwizycji
+│   ├── common.py           # wspólna fizyka: kody, widma FBG, chirp lasera, estymatory, tor akwizycji
 │   ├── figstyle.py         # styl figur do publikacji
 │   ├── s*_*.py             # skrypty numerowane, każdy generuje jedną figurę lub tabelę
 │   ├── figs/               # wygenerowane figury (PDF + PNG)
@@ -143,24 +143,24 @@ Tor symulacji: generacja kodu, modulacja źródła, widma siatek, odbicia (w tym
 
 ### Co pokazał symulator
 
-**Długość kodu ma największy wpływ na błąd.** Z pięciu przeskanowanych parametrów wydłużenie kodu z 15 do 1023 chipów zmienia błąd o ponad 400 pm, gradient temperaturowy o 200 pm, a głębokość modulacji siatki, liczba siatek i szum detektora po kilkadziesiąt. Dolna granica błędu to deterministyczne listki boczne korelacji, nie szum detektora, więc żadna z ośmiu sprawdzonych metod odszumiania nie pomogła.
+**Długość kodu ma największy wpływ na błąd.** Z pięciu przeskanowanych parametrów wydłużenie kodu z 15 do 1023 chipów zmienia błąd o ponad 400 pm, gradient temperaturowy o 200 pm, a głębokość modulacji siatki, liczba siatek i szum detektora po kilkadziesiąt. Podłoga błędu to deterministyczne listki boczne korelacji, nie szum detektora, więc żadna z ośmiu sprawdzonych metod odszumiania nie pomogła.
 
 <p align="center">
   <img src="docs/figures/fig_sensitivity.png" alt="Analiza wrażliwości: MAE vs długość kodu i ranking pięciu parametrów" width="900"><br>
   <em>(a) Średni błąd długości fali Bragga w funkcji wykładnika długości kodu. (b) Zakres zmian błędu przy zmianie każdego parametru z osobna w badanym przedziale.</em>
 </p>
 
-**Optymalizacja i lepszy estymator.** Optymalizacja GA/PSO pięciu parametrów (Δn_eff, p, próbki na chip, liczba długości fal, rozmieszczenie siatek na osi długości fali) zbija błąd z 391 do 56 pm dla 5 siatek. Zamiana estymatora środka ciężkości (centroidu) na dopasowanie krzywej Gaussa daje kolejny skok do 21,6 pm. We wszystkich wariantach optimum wypadło przy p = 10 i 16 długościach fal.
+**Optymalizacja i lepszy estymator.** Optymalizacja GA/PSO pięciu parametrów (Δn_eff, p, próbki na chip, liczba długości fal, rozmieszczenie siatek na osi długości fali) zbija błąd z 391 do 56 pm dla 5 siatek. Zamiana estymatora centroidu na dopasowanie krzywej Gaussa daje kolejny skok do 21,6 pm. We wszystkich wariantach optimum wypadło przy p = 10 i 16 długościach fal.
 
 <p align="center">
-  <img src="docs/figures/fig_optimization.png" alt="MAE: parametry domyślne, po optymalizacji ze środkiem ciężkości, po optymalizacji z dopasowaniem krzywej Gaussa" width="560"><br>
-  <em>Średni błąd dla 5 i 10 siatek: parametry domyślne, po optymalizacji z estymatorem środka ciężkości, po optymalizacji z dopasowaniem krzywej Gaussa.</em>
+  <img src="docs/figures/fig_optimization.png" alt="MAE: parametry domyślne, po optymalizacji z centroidem, po optymalizacji z dopasowaniem krzywej Gaussa" width="560"><br>
+  <em>Średni błąd dla 5 i 10 siatek: parametry domyślne, po optymalizacji z estymatorem centroidu, po optymalizacji z dopasowaniem krzywej Gaussa.</em>
 </p>
 
 | Wynik | Wartość |
 |-------|---------|
-| MAE, parametry domyślne (N_s = 5, p = 8, środek ciężkości) | 391 pm |
-| MAE po optymalizacji, środek ciężkości (N_s = 5 / 10) | 56 pm / 93 pm |
+| MAE, parametry domyślne (N_s = 5, p = 8, centroid) | 391 pm |
+| MAE po optymalizacji, centroid (N_s = 5 / 10) | 56 pm / 93 pm |
 | MAE po optymalizacji, dopasowanie krzywej Gaussa (N_s = 5 / 10) | 21,6 pm / 49,7 pm |
 | Kasami vs Gold (ten sam p) | Kasami lepszy o 27 % |
 | Odbicia wielokrotne (3 odbicia vs 1) | CDM: zmiana MAE do 15 pm, TDM: do 77 pm |
@@ -169,14 +169,14 @@ Pozostałe figury: `results/WP2/benchmark/` i `results/WP3/`.
 
 ## Badanie symulacyjne w Pythonie
 
-Folder `python_selfcal_cdm/` to osobny, samowystarczalny zestaw skryptów napisany pod artykuł o układzie przesłuchującym CDM z przestrajalnym laserem VCSEL. Sprzęt jest sparametryzowany zgodnie z makietą projektu (siatki FBGS DTG o szerokości 250 pm i reflektancji 10 %, VCSEL HCG 1550 nm, stanowisko temperaturowe Peltier). Każdy skrypt `sN_*.py` odpowiada jednej figurze lub tabeli i zapisuje wynik do `figs/` lub `out/`. Wspólna fizyka i estymatory są w `common.py`, a `test_selfcal.py` sprawdza granice korelacyjne kodów, estymatory, algebrę opóźnień ech pozornych i wzory toru akwizycji. Opis plików: [`python_selfcal_cdm/README.md`](python_selfcal_cdm/README.md).
+Folder `python_selfcal_cdm/` to osobny, samowystarczalny zestaw skryptów napisany pod artykuł o interrogatorze CDM z przestrajalnym laserem VCSEL. Sprzęt jest sparametryzowany zgodnie z makietą projektu (siatki FBGS DTG o szerokości 250 pm i reflektancji 10 %, VCSEL HCG 1550 nm, stanowisko temperaturowe Peltier). Każdy skrypt `sN_*.py` odpowiada jednej figurze lub tabeli i zapisuje wynik do `figs/` lub `out/`. Wspólna fizyka i estymatory są w `common.py`, a `test_selfcal.py` sprawdza granice korelacyjne kodów, estymatory, algebrę opóźnień ech pozornych i wzory toru akwizycji. Opis plików: [`python_selfcal_cdm/README.md`](python_selfcal_cdm/README.md).
 
-Tematy: przesłanianie widmowe siatek przez siatki leżące przed nimi i jego rekurencyjna korekta, pojemność sieci w funkcji reflektancji i rozstawu siatek, rodziny kodów przy przestrajanym źródle nadającym jeden kod naraz (m-sekwencje, Gold, Kasami, pary Golaya), rozstaw siatek wg linijki Golomba przeciw echom pozornym z odbić wielokrotnych, hybryda CDM-WDM, długość kodu jako zmienna projektowa, budżet błędu od źródła do estymaty, próbkowanie ekwiwalentne i wymagania na ADC.
+Tematy: przysłanianie widmowe siatek przez siatki leżące przed nimi i jego rekurencyjna korekta, pojemność sieci w funkcji reflektancji i rozstawu siatek, rodziny kodów przy przestrajanym źródle nadającym jeden kod naraz (m-sekwencje, Gold, Kasami, pary Golaya), rozstaw siatek wg linijki Golomba przeciw echom pozornym z odbić wielokrotnych, hybryda CDM-WDM, długość kodu jako zmienna projektowa, budżet błędu od źródła do estymaty, próbkowanie ekwiwalentne i wymagania na ADC.
 
 | Wynik | Wartość |
 |-------|---------|
-| Przesłanianie widmowe przy R = 10 %, 3 siatki / 96 siatek | 8,1 pm / 179 pm |
-| Sekwencyjna korekta przesłaniania, makieta 3 siatek | 0,6 pm |
+| Przysłanianie widmowe przy R = 10 %, 3 siatki / 96 siatek | 8,1 pm / 179 pm |
+| Sekwencyjna korekta przysłaniania, makieta 3 siatek | 0,6 pm |
 | Pojemność sieci przy R = 10 % (błąd poniżej 10 pm) bez korekty i z korektą | 4 / 17 siatek |
 | Rozstaw równomierny vs losowy, K = 32 | 45,0 pm vs 10,4 pm |
 | m-sekwencja vs Gold przy przestrajanym źródle, K = 32 | 6,5 pm vs 28,1 pm |
@@ -191,7 +191,7 @@ Wartości pochodzą z symulacji i wymagają potwierdzenia na makiecie (WP4). Fig
 |------|--------|------|
 | WP1 | Przegląd literatury i analiza rodzin kodów (Kasami, Gold, PRBS, OOC, Sidelnikov, Golay, chaotyczne) | zakończony |
 | WP2 | Symulator sieci czujnikowej: tor sygnałowy, odbicia wielokrotne, model temperaturowy, benchmark kodów i odszumiania | zakończony |
-| WP3 | Analiza wrażliwości, optymalizacja GA/PSO, porównanie przed i po, reguły projektowe układu przesłuchującego CDM | zakończony |
+| WP3 | Analiza wrażliwości, optymalizacja GA/PSO, porównanie przed i po, reguły projektowe interrogatora CDM | zakończony |
 | WP4 | Makieta pomiarowa: przestrajalny laser VCSEL, tor APD i akwizycja na STM32, stanowisko temperaturowe, walidacja modelu na siatkach FBGS | w trakcie (2026–2027) |
 
 Chronologia zmian w kodzie: [`CHANGELOG.md`](CHANGELOG.md). Literatura, na której oparto WP1: [`docs/BIBLIOGRAFIA.md`](docs/BIBLIOGRAFIA.md).
